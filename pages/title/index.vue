@@ -46,8 +46,8 @@ const { pending, data: rows } = await useAsyncData(
     </div>
 
     <UPagination
-      class="justify-center"
       v-model="page"
+      class="justify-center"
       :page-count="20"
       :total="totalItems"
     />

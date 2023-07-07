@@ -30,7 +30,7 @@ definePageMeta({
   <div class="max-w-sm w-full mx-auto my-24">
     <img class="h-12 w-auto mx-auto mb-12" src="/logo.png" />
     <UCard class="mx-6">
-      <form @submit.prevent="login" class="space-y-3">
+      <form class="space-y-3" @submit.prevent="login">
         <UFormGroup name="email" label="Email">
           <UInput
             v-model="email"
