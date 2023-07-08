@@ -30,7 +30,12 @@ const items = [
   <div
     class="w-48 border-r-2 dark:border-zinc-800 border-zinc-100 h-screen p-3 flex flex-col justify-between"
   >
-    <UVerticalNavigation :links="links" />
+    <div>
+      <NuxtLink to="/">
+        <img src="/logo.png" class="h-8 mx-auto my-6" />
+      </NuxtLink>
+      <UVerticalNavigation :links="links" />
+    </div>
 
     <UDropdown :items="items" :popper="{ placement: 'top-start' }">
       <UButton

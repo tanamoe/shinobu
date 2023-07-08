@@ -8,6 +8,8 @@ const title = await $pb
   .collection("title")
   .getOne(route.params.titleId as string);
 
+const createSlideoverOpen = ref(false);
+
 const name = ref(title.name);
 const description = ref(title.description);
 const selectedFormat = ref();
@@ -42,7 +44,11 @@ const { pending: formatPending, data: formats } = useLazyAsyncData(
   },
 );
 
-const { pending: pending, data: releases } = useLazyAsyncData(
+const {
+  pending,
+  data: releases,
+  refresh,
+} = useLazyAsyncData(
   "releases",
   async () =>
     await $pb
@@ -68,7 +74,7 @@ const unwatch = watch(formats, () => {
 <template>
   <div class="p-6">
     <AppH1>
-      <NuxtLink class="text-zinc-400 dark:text-zinc-400" to="/title">
+      <NuxtLink class="text-zinc-400" to="/title">
         Danh sách truyện /
       </NuxtLink>
       {{ title.name }}
@@ -94,7 +100,27 @@ const unwatch = watch(formats, () => {
     </form>
 
     <div class="mt-12">
-      <AppH2>Release</AppH2>
+      <AppH2>
+        Release
+        <span class="float-right space-x-3">
+          <UButton
+            variant="ghost"
+            color="gray"
+            icon="i-fluent-arrow-clockwise-20-filled"
+            :loading="pending"
+            @click="refresh()"
+          >
+            Refresh
+          </UButton>
+          <UButton
+            icon="i-fluent-add-20-filled"
+            class="float-right"
+            @click="createSlideoverOpen = true"
+          >
+            Create
+          </UButton>
+        </span>
+      </AppH2>
       <UTable :columns="columns" :rows="releases || []" :loading="pending">
         <template #actions-data="{ row }">
           <UButton
@@ -106,5 +132,11 @@ const unwatch = watch(formats, () => {
         </template>
       </UTable>
     </div>
+
+    <ReleaseCreateSlideover
+      v-model="createSlideoverOpen"
+      :title="title"
+      @created="() => refresh()"
+    />
   </div>
 </template>
