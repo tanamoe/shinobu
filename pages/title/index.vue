@@ -22,7 +22,7 @@ const columns = [
   },
 ];
 
-const { pending, data: rows } = await useAsyncData(
+const { pending, data: rows } = await useLazyAsyncData(
   "title",
   () => $pb.collection("title").getList(page.value, 20),
   { watch: [page], server: false },
@@ -31,7 +31,7 @@ const { pending, data: rows } = await useAsyncData(
 
 <template>
   <div class="p-6 max-h-screen flex-col flex space-y-6">
-    <AppHeader>Danh sách truyện</AppHeader>
+    <AppH1>Danh sách truyện</AppH1>
     <div class="flex-1 overflow-y-scroll">
       <UTable :columns="columns" :rows="rows?.items || []" :loading="pending">
         <template #actions-data="{ row }">

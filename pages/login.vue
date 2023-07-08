@@ -34,7 +34,7 @@ definePageMeta({
         <UFormGroup name="email" label="Email">
           <UInput
             v-model="email"
-            placeholder="you@example.com"
+            placeholder="admin@tana.moe"
             icon="i-fluent-mail-16-filled"
           />
         </UFormGroup>
