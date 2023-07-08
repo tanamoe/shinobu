@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Record } from "pocketbase";
 
+const runtimeConfig = useRuntimeConfig();
 const { $pb } = useNuxtApp();
 const route = useRoute();
 
@@ -22,56 +23,105 @@ const columns = [
     label: "Name",
   },
   {
-    key: "edition",
-    label: "Edition",
+    key: "digital",
+    label: "Digital",
   },
   {
-    key: "publish_date",
-    label: "Publish date",
+    key: "cover",
+    label: "Cover",
   },
   {
-    key: "price",
-    label: "Price",
+    key: "actions",
   },
 ];
 
-const { pending, data: books } = useLazyAsyncData(
-  "book",
+const { pending, data: publications } = useLazyAsyncData(
+  "publications",
   async () =>
-    await $pb.collection("book").getFullList({
-      filter: `publication.release  = '${release.id}'`,
-      sort: "publication.volume,edition",
-      expand: "publication",
+    await $pb.collection("publication").getFullList({
+      filter: `release.id = '${release.id}'`,
+      sort: "volume",
     }),
   {
-    transform: (books) =>
-      books.map((book) => ({
-        ...book,
-        name: (book.expand.publication as Record).name,
-        volume:
-          (book.expand.publication as Record).volume / 10000 +
-          ((book.expand.publication as Record).volume % 10) * 0.1,
-        cover: book.cover ?? (book.expand.publication as Record).cover,
+    transform: (publications) =>
+      publications.map((publication) => ({
+        ...publication,
+        volume: publication.volume / 10000 + (publication.volume % 10) * 0.1,
       })),
   },
 );
+
+const publicationOpen = ref(false);
+const booksOpen = ref(false);
+const currentPublication = ref<Partial<Record>>();
+
+const toggleEdit = (publication: Record) => {
+  publicationOpen.value = true;
+  // create new object for updating
+  currentPublication.value = { ...publication };
+};
+
+const toggleEditBook = async (publication: Record) => {
+  booksOpen.value = true;
+  // reference current publication as clone is not needed
+  currentPublication.value = publication;
+};
 </script>
 
 <template>
   <div class="p-6">
     <AppH1>
-      <NuxtLink class="text-zinc-400 dark:text-zinc-400" to="/title">
+      <NuxtLink class="text-zinc-400" to="/title">
         Danh sách truyện /
       </NuxtLink>
-      <NuxtLink
-        class="text-zinc-400 dark:text-zinc-400"
-        :to="`/title/${title.id}`"
-      >
+      <NuxtLink class="text-zinc-400" :to="`/title/${title.id}`">
         {{ title.name }} /
       </NuxtLink>
       {{ release.name }}
     </AppH1>
 
-    <UTable :columns="columns" :rows="books || []" :loading="pending"></UTable>
+    <UTable :columns="columns" :rows="publications || []" :loading="pending">
+      <template #digital-data="{ row }">
+        <UCheckbox v-model="row.digital" disabled />
+      </template>
+      <template #cover-data="{ row }">
+        <div v-if="row.cover" class="space-x-3">
+          <img
+            v-for="image in row.cover"
+            :key="image"
+            class="h-8 rounded"
+            :src="`${runtimeConfig.public.pocketbaseUrl}/api/files/${row.collectionId}/${row.id}/${image}?thumb=100x100`"
+          />
+        </div>
+      </template>
+      <template #actions-data="{ row }">
+        <div class="space-x-3">
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-fluent-list-20-filled"
+            @click="toggleEditBook(row)"
+          />
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-fluent-edit-20-filled"
+            @click="toggleEdit(row)"
+          />
+        </div>
+      </template>
+    </UTable>
+
+    <PublicationUpdateSlideover
+      v-if="currentPublication"
+      v-model="publicationOpen"
+      :publication="currentPublication"
+    />
+
+    <PublicationUpdateBooksSlideover
+      v-if="currentPublication"
+      v-model="booksOpen"
+      :publication="currentPublication"
+    />
   </div>
 </template>

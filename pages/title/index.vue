@@ -6,6 +6,7 @@ const metadata = await $pb.collection("title").getList(1, 1);
 const totalItems = metadata.totalItems;
 
 const page = ref(1);
+const searchQuery = ref("");
 
 const columns = [
   {
@@ -22,9 +23,16 @@ const columns = [
   },
 ];
 
-const { pending, data: rows } = await useLazyAsyncData(
+const {
+  pending,
+  data: rows,
+  refresh,
+} = await useLazyAsyncData(
   "title",
-  () => $pb.collection("title").getList(page.value, 20),
+  () =>
+    $pb
+      .collection("title")
+      .getList(page.value, 20, { filter: `name~'${searchQuery.value}'` }),
   { watch: [page], server: false },
 );
 </script>
@@ -32,6 +40,18 @@ const { pending, data: rows } = await useLazyAsyncData(
 <template>
   <div class="p-6 max-h-screen flex-col flex space-y-6">
     <AppH1>Danh sách truyện</AppH1>
+    <form class="flex gap-3" @submit.prevent="() => refresh()">
+      <div class="flex-1">
+        <UInput
+          v-model="searchQuery"
+          icon="i-heroicons-magnifying-glass-20-solid"
+          placeholder="Search..."
+          color="white"
+        />
+      </div>
+      <UButton type="submit" :loading="pending">Search</UButton>
+    </form>
+
     <div class="flex-1 overflow-y-scroll">
       <UTable :columns="columns" :rows="rows?.items || []" :loading="pending">
         <template #actions-data="{ row }">
