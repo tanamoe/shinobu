@@ -15,7 +15,7 @@ defineEmits<{
 }>();
 
 watchEffect(async () => {
-  data.value = props.publication;
+  data.value = { ...props.publication };
   books.value = await $pb
     .collection("book")
     .getFullList({ filter: `publication.id = '${data.value.id}'` });

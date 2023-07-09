@@ -15,7 +15,7 @@ defineEmits<{
   created: [void];
 }>();
 
-const { pending: publishersPending, data: publishers } = useLazyAsyncData(
+const { pending: publishersPending, data: publishers } = await useLazyAsyncData(
   "publishers",
   async () => await $pb.collection("publisher").getFullList(),
   {
@@ -24,6 +24,7 @@ const { pending: publishersPending, data: publishers } = useLazyAsyncData(
         id: publisher.id,
         label: publisher.name,
       })),
+    server: false,
   },
 );
 

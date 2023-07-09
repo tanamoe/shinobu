@@ -11,7 +11,7 @@ defineEmits<{
   "update:modelValue": [value: boolean];
 }>();
 
-watchEffect(() => (data.value = props.publication));
+watchEffect(() => (data.value = { ...props.publication }));
 </script>
 
 <template>

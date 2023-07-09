@@ -32,7 +32,7 @@ const columns = [
   },
 ];
 
-const { pending: formatPending, data: formats } = useLazyAsyncData(
+const { pending: formatPending, data: formats } = await useLazyAsyncData(
   "format",
   async () => await $pb.collection("format").getFullList(),
   {
@@ -41,6 +41,7 @@ const { pending: formatPending, data: formats } = useLazyAsyncData(
         id: format.id,
         label: format.name,
       })),
+    server: false,
   },
 );
 
@@ -48,7 +49,7 @@ const {
   pending,
   data: releases,
   refresh,
-} = useLazyAsyncData(
+} = await useLazyAsyncData(
   "releases",
   async () =>
     await $pb
@@ -60,6 +61,7 @@ const {
         ...release,
         publisher: (release.expand.publisher as Record).name,
       })),
+    server: false,
   },
 );
 

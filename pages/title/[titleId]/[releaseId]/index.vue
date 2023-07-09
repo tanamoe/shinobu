@@ -15,7 +15,7 @@ const release = await $pb
 
 const columns = [
   {
-    key: "volume",
+    key: "volumeNumber",
     label: "Volume",
   },
   {
@@ -35,7 +35,7 @@ const columns = [
   },
 ];
 
-const { pending, data: publications } = useLazyAsyncData(
+const { pending, data: publications } = await useLazyAsyncData(
   "publications",
   async () =>
     await $pb.collection("publication").getFullList({
@@ -46,24 +46,24 @@ const { pending, data: publications } = useLazyAsyncData(
     transform: (publications) =>
       publications.map((publication) => ({
         ...publication,
-        volume: publication.volume / 10000 + (publication.volume % 10) * 0.1,
+        volumeNumber:
+          publication.volume / 10000 + (publication.volume % 10) * 0.1,
       })),
+    server: false,
   },
 );
 
 const publicationOpen = ref(false);
 const booksOpen = ref(false);
-const currentPublication = ref<Partial<Record>>();
+const currentPublication = shallowRef<Partial<Record>>();
 
 const toggleEdit = (publication: Record) => {
   publicationOpen.value = true;
-  // create new object for updating
-  currentPublication.value = { ...publication };
+  currentPublication.value = publication;
 };
 
 const toggleEditBook = async (publication: Record) => {
   booksOpen.value = true;
-  // reference current publication as clone is not needed
   currentPublication.value = publication;
 };
 </script>
