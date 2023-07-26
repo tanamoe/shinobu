@@ -1,18 +1,49 @@
 <script setup lang="ts">
-import { Record } from "pocketbase";
+import {
+  Collections,
+  type TitleResponse,
+  type FormatResponse,
+  type PublisherResponse,
+  type ReleaseResponse,
+} from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
 
 const title = await $pb
-  .collection("title")
-  .getOne(route.params.titleId as string);
+  .collection(Collections.Title)
+  .getOne<TitleResponse>(route.params.titleId as string);
 
-const createSlideoverOpen = ref(false);
+const formats = (
+  await $pb.collection(Collections.Format).getFullList<FormatResponse>()
+).map((format) => ({
+  id: format.id,
+  label: format.name,
+}));
 
-const name = ref(title.name);
-const description = ref(title.description);
-const selectedFormat = ref();
+const {
+  pending,
+  data: releases,
+  refresh,
+} = await useLazyAsyncData(
+  "releases",
+  () =>
+    $pb.collection(Collections.Release).getFullList<
+      ReleaseResponse<{
+        publisher: PublisherResponse;
+      }>
+    >({
+      filter: `title='${route.params.titleId as string}'`,
+      expand: "publisher",
+    }),
+  {
+    transform: (data) =>
+      structuredClone(data).map((release) => ({
+        ...release,
+        publisher: release.expand?.publisher.name,
+      })),
+  },
+);
 
 const columns = [
   {
@@ -32,70 +63,35 @@ const columns = [
   },
 ];
 
-const { pending: formatPending, data: formats } = useLazyAsyncData(
-  "format",
-  async () => await $pb.collection("format").getFullList(),
-  {
-    transform: (formats) =>
-      formats.map((format) => ({
-        id: format.id,
-        label: format.name,
-      })),
-  },
+const createSlideoverOpen = ref(false);
+const selectedFormat = ref<{ id: string; label: string } | undefined>(
+  formats.find((f) => f.id === title.format),
 );
-
-const {
-  pending,
-  data: releases,
-  refresh,
-} = useLazyAsyncData(
-  "releases",
-  async () =>
-    await $pb
-      .collection("release")
-      .getFullList({ filter: `title = '${title.id}'`, expand: "publisher" }),
-  {
-    transform: (releases) =>
-      releases.map((release) => ({
-        ...release,
-        publisher: (release.expand.publisher as Record).name,
-      })),
-  },
-);
-
-const unwatch = watch(formats, () => {
-  unwatch();
-  return (selectedFormat.value = formats.value?.find(
-    (f) => f.id === title.format,
-  ));
-});
 </script>
 
 <template>
-  <div class="p-6">
+  <div v-if="title" class="p-6">
     <AppH1>
-      <NuxtLink class="text-zinc-400" to="/title">
-        Danh sách truyện /
-      </NuxtLink>
+      <NuxtLink class="text-zinc-400" to="/title"> Title / </NuxtLink>
       {{ title.name }}
     </AppH1>
 
     <form class="space-y-3">
       <div class="grid grid-cols-2 gap-3">
         <UFormGroup name="name" label="Name">
-          <UInput v-model="name" />
+          <UInput v-model="title.name" />
         </UFormGroup>
 
         <UFormGroup name="format" label="Format">
           <USelectMenu
             v-model="selectedFormat"
             :options="formats || []"
-            :loading="formatPending"
+            :loading="pending"
           />
         </UFormGroup>
       </div>
       <UFormGroup name="description" label="Description">
-        <UTextarea v-model="description" resize disabled />
+        <UTextarea v-model="title.description" resize disabled />
       </UFormGroup>
     </form>
 
@@ -133,10 +129,6 @@ const unwatch = watch(formats, () => {
       </UTable>
     </div>
 
-    <ReleaseCreateSlideover
-      v-model="createSlideoverOpen"
-      :title="title"
-      @created="() => refresh()"
-    />
+    <ReleaseCreateSlideover v-model="createSlideoverOpen" :title="title" />
   </div>
 </template>
