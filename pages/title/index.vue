@@ -1,18 +1,29 @@
 <script setup lang="ts">
+import { Collections, type TitleResponse } from "@/types/pb";
+
 const { $pb } = useNuxtApp();
-
-const metadata = await $pb.collection("title").getList(1, 1);
-
-const totalItems = metadata.totalItems;
 
 const page = ref(1);
 const searchQuery = ref("");
 
+const metadata = await $pb
+  .collection(Collections.Title)
+  .getList<TitleResponse>(1, 1);
+
+const {
+  pending,
+  data: rows,
+  refresh,
+} = await useAsyncData(
+  "title",
+  () =>
+    $pb.collection(Collections.Title).getList<TitleResponse>(page.value, 20, {
+      filter: `name~'${searchQuery.value}'`,
+    }),
+  { watch: [page], transform: (data) => structuredClone(data) },
+);
+
 const columns = [
-  {
-    key: "id",
-    label: "ID",
-  },
   {
     key: "name",
     class: "whitespace-normal",
@@ -22,19 +33,6 @@ const columns = [
     key: "actions",
   },
 ];
-
-const {
-  pending,
-  data: rows,
-  refresh,
-} = await useLazyAsyncData(
-  "title",
-  () =>
-    $pb
-      .collection("title")
-      .getList(page.value, 20, { filter: `name~'${searchQuery.value}'` }),
-  { watch: [page], server: false },
-);
 </script>
 
 <template>
@@ -54,6 +52,16 @@ const {
 
     <div class="flex-1 overflow-y-scroll">
       <UTable :columns="columns" :rows="rows?.items || []" :loading="pending">
+        <template #cover-data="{ row }">
+          <div v-if="row.cover" class="space-x-3">
+            <img
+              v-for="image in row.cover"
+              :key="image"
+              class="h-8 rounded"
+              :src="usePocketbaseImage(row, image, '?thumb=100x100')"
+            />
+          </div>
+        </template>
         <template #actions-data="{ row }">
           <UButton
             color="gray"
@@ -66,10 +74,11 @@ const {
     </div>
 
     <UPagination
+      v-if="metadata"
       v-model="page"
       class="justify-center"
       :page-count="20"
-      :total="totalItems"
+      :total="metadata.totalItems"
     />
   </div>
 </template>

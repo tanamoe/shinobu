@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { Record } from "pocketbase";
+import {
+  Collections,
+  type TitleResponse,
+  type PublicationResponse,
+  type ReleaseResponse,
+} from "@/types/pb";
 
 const runtimeConfig = useRuntimeConfig();
 const { $pb } = useNuxtApp();
 const route = useRoute();
 
 const title = await $pb
-  .collection("title")
-  .getOne(route.params.titleId as string);
+  .collection(Collections.Title)
+  .getOne<TitleResponse>(route.params.titleId as string);
 
 const release = await $pb
-  .collection("release")
-  .getOne(route.params.releaseId as string);
+  .collection(Collections.Release)
+  .getOne<ReleaseResponse>(route.params.releaseId as string);
 
 const columns = [
   {
@@ -35,63 +40,81 @@ const columns = [
   },
 ];
 
-const { pending, data: publications } = useLazyAsyncData(
+const {
+  pending,
+  data: publications,
+  refresh,
+} = await useLazyAsyncData(
   "publications",
-  async () =>
-    await $pb.collection("publication").getFullList({
+  () =>
+    $pb.collection(Collections.Publication).getFullList<PublicationResponse>({
       filter: `release.id = '${release.id}'`,
       sort: "volume",
     }),
-  {
-    transform: (publications) =>
-      publications.map((publication) => ({
-        ...publication,
-        volume: publication.volume / 10000 + (publication.volume % 10) * 0.1,
-      })),
-  },
+  { transform: (data) => structuredClone(data) },
 );
 
 const publicationOpen = ref(false);
 const booksOpen = ref(false);
-const currentPublication = ref<Partial<Record>>();
+const createOpen = ref(false);
+const deleteOpen = ref(false);
+const currentPublication = ref<PublicationResponse>();
 
-const toggleEdit = (publication: Record) => {
+const toggleCreate = () => (createOpen.value = true);
+
+const toggleEdit = (publication: PublicationResponse) => {
   publicationOpen.value = true;
   // create new object for updating
   currentPublication.value = { ...publication };
 };
 
-const toggleEditBook = async (publication: Record) => {
+const toggleEditBook = (publication: PublicationResponse) => {
   booksOpen.value = true;
   // reference current publication as clone is not needed
   currentPublication.value = publication;
 };
+
+const toggleDelete = (publication: PublicationResponse) => {
+  deleteOpen.value = true;
+  currentPublication.value = publication;
+};
+
+watch([booksOpen, publicationOpen, createOpen, deleteOpen], () => refresh());
 </script>
 
 <template>
   <div class="p-6">
     <AppH1>
-      <NuxtLink class="text-zinc-400" to="/title">
-        Danh sách truyện /
-      </NuxtLink>
+      <NuxtLink class="text-zinc-400" to="/title"> Title / </NuxtLink>
       <NuxtLink class="text-zinc-400" :to="`/title/${title.id}`">
         {{ title.name }} /
       </NuxtLink>
       {{ release.name }}
     </AppH1>
 
+    <div class="flex justify-end">
+      <UButton
+        class="ml-auto"
+        icon="i-fluent-add-20-filled"
+        @click="toggleCreate"
+      >
+        Create
+      </UButton>
+    </div>
+
     <UTable :columns="columns" :rows="publications || []" :loading="pending">
       <template #digital-data="{ row }">
         <UCheckbox v-model="row.digital" disabled />
       </template>
       <template #cover-data="{ row }">
-        <div v-if="row.cover" class="space-x-3">
-          <img
-            v-for="image in row.cover"
-            :key="image"
-            class="h-8 rounded"
-            :src="`${runtimeConfig.public.pocketbaseUrl}/api/files/${row.collectionId}/${row.id}/${image}?thumb=100x100`"
-          />
+        <div v-if="row.cover">
+          <UAvatarGroup size="sm" :max="5">
+            <UAvatar
+              v-for="image in row.cover"
+              :key="image"
+              :src="`${runtimeConfig.public.pocketbaseUrl}/api/files/${row.collectionId}/${row.id}/${image}?thumb=100x100`"
+            />
+          </UAvatarGroup>
         </div>
       </template>
       <template #actions-data="{ row }">
@@ -108,6 +131,12 @@ const toggleEditBook = async (publication: Record) => {
             icon="i-fluent-edit-20-filled"
             @click="toggleEdit(row)"
           />
+          <UButton
+            color="red"
+            variant="ghost"
+            icon="i-fluent-delete-20-filled"
+            @click="toggleDelete(row)"
+          />
         </div>
       </template>
     </UTable>
@@ -121,6 +150,14 @@ const toggleEditBook = async (publication: Record) => {
     <PublicationUpdateBooksSlideover
       v-if="currentPublication"
       v-model="booksOpen"
+      :publication="currentPublication"
+    />
+
+    <PublicationCreateSlideover v-model="createOpen" :title="title" />
+
+    <PublicationDeleteModal
+      v-if="currentPublication"
+      v-model="deleteOpen"
       :publication="currentPublication"
     />
   </div>

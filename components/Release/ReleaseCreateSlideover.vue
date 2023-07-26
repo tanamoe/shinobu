@@ -1,23 +1,31 @@
 <script setup lang="ts">
-import type { Record } from "pocketbase";
+import { Collections, PublisherResponse, type TitleResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-
-const data = ref();
-const release = ref();
+const { isLoading, execute: createRelease } = useCreateRelease();
 
 const props = defineProps<{
   modelValue: boolean;
-  title: Partial<Record>;
-}>();
-defineEmits<{
-  "update:modelValue": [value: boolean];
-  created: [void];
+  title: TitleResponse;
 }>();
 
-const { pending: publishersPending, data: publishers } = useLazyAsyncData(
+const emit = defineEmits<{
+  "update:modelValue": [value: boolean];
+}>();
+
+const title = computed(() => props.title);
+
+const isOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit("update:modelValue", value),
+});
+
+const { pending: publishersPending, data: publishers } = await useAsyncData(
   "publishers",
-  async () => await $pb.collection("publisher").getFullList(),
+  async () =>
+    await $pb
+      .collection(Collections.Publisher)
+      .getFullList<PublisherResponse>(),
   {
     transform: (publishers) =>
       publishers.map((publisher) => ({
@@ -27,60 +35,39 @@ const { pending: publishersPending, data: publishers } = useLazyAsyncData(
   },
 );
 
-watch(
-  () => props.modelValue,
-  (value) => {
-    if (value === false) release.value = {};
-    else {
-      data.value = props.title;
-      release.value = {
-        title: data.value.id,
-      };
-    }
-  },
-);
+const currentPublisher = ref(publishers?.value ? publishers.value[0] : []);
+
+const handleCreate = (e: Event) => {
+  const formData = new FormData(e.target as HTMLFormElement);
+
+  formData.append("title", title.value.id);
+  formData.append("publisher", formData.get("publisher[id]")!);
+
+  createRelease(0, formData);
+};
 </script>
 
 <template>
-  <USlideover
-    :model-value="modelValue"
-    @update:model-value="
-      (value: boolean) => {
-        $emit('update:modelValue', value);
-      }
-    "
-  >
+  <USlideover v-model="isOpen">
     <div class="p-6">
       <AppH2>
         <span class="text-zinc-400">Create a release for</span>
-        {{ data.name }}
+        {{ title.name }}
       </AppH2>
 
-      <form
-        class="space-y-6"
-        @submit.prevent="
-          async () => {
-            await createRelease({
-              ...release,
-              publisher: release.publisher.id,
-            });
-            $emit('created');
-          }
-        "
-      >
+      <form class="space-y-6" @submit.prevent="handleCreate">
         <UFormGroup name="name" label="Name">
-          <UInput v-model="release.name" />
+          <UInput />
         </UFormGroup>
         <UFormGroup name="publisher" label="Publisher">
           <USelectMenu
-            v-model="release.publisher"
+            v-model="currentPublisher"
             :options="publishers || []"
             :loading="publishersPending"
           />
         </UFormGroup>
         <UFormGroup name="status" label="Status">
-          <USelectMenu
-            v-model="release.status"
+          <USelect
             :options="[
               'WAITING_FOR_APPROVAL',
               'REGISTERED',
@@ -93,7 +80,7 @@ watch(
           />
         </UFormGroup>
         <div class="text-right">
-          <UButton type="submit" label="Save" />
+          <UButton type="submit" label="Save" :pending="isLoading" />
         </div>
       </form>
     </div>
