@@ -21,6 +21,8 @@
     "@types/node": "^18",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
+    "@vueuse/core": "^10.2.1",
+    "@vueuse/nuxt": "^10.2.1",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-vue": "^9.15.1",
@@ -31,6 +33,7 @@
   },
   "dependencies": {
     "@iconify-json/fluent": "^1.1.25",
-    "pocketbase": "^0.15.2"
+    "pocketbase": "^0.15.2",
+    "ufo": "^1.1.2"
   }
 }
