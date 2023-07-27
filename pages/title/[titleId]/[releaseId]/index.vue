@@ -153,7 +153,7 @@ watch([booksOpen, publicationOpen, createOpen, deleteOpen], () => refresh());
       :publication="currentPublication"
     />
 
-    <PublicationCreateSlideover v-model="createOpen" :title="title" />
+    <PublicationCreateSlideover v-model="createOpen" :release="release" />
 
     <PublicationDeleteModal
       v-if="currentPublication"
