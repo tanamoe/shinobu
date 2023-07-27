@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { type TitleResponse } from "@/types/pb";
+import { type ReleaseResponse } from "@/types/pb";
 
 const { isLoading, execute: createPublication } = useCreatePublication();
 
 const props = defineProps<{
   modelValue: boolean;
-  title: TitleResponse;
+  release: ReleaseResponse;
 }>();
 
 const emit = defineEmits<{
@@ -20,7 +20,7 @@ const isOpen = computed({
 const handleCreate = async (e: Event) => {
   const formData = new FormData(e.target as HTMLFormElement);
 
-  formData.append("title", props.title.id);
+  formData.append("release", props.release.id);
 
   await createPublication(0, formData);
   isOpen.value = !isOpen.value;
@@ -32,7 +32,7 @@ const handleCreate = async (e: Event) => {
     <div class="p-6">
       <AppH2>
         <span class="text-zinc-400">Create a publication for</span>
-        {{ title.name }}
+        {{ release.name }}
       </AppH2>
 
       <form class="space-y-6" @submit.prevent="handleCreate">
