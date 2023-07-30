@@ -32,7 +32,7 @@ const { pending, data, refresh } = await useAsyncData(
     transform: (data) =>
       data.map((book) => ({
         ...book,
-        publish_date: book.publish_date.split(" ")[0],
+        publishDate: book.publishDate.split(" ")[0],
       })),
   },
 );
@@ -90,8 +90,8 @@ watch([createPending, updatePending, deletePending], () => refresh());
             <UFormGroup name="edition" label="Edition">
               <UInput v-model="book.edition" />
             </UFormGroup>
-            <UFormGroup name="publish_date" label="Publish date">
-              <UInput v-model="book.publish_date" type="date" />
+            <UFormGroup name="publishDate" label="Publish date">
+              <UInput v-model="book.publishDate" type="date" />
             </UFormGroup>
             <UFormGroup name="price" label="Price">
               <UInput v-model="book.price" type="number">
@@ -152,7 +152,7 @@ watch([createPending, updatePending, deletePending], () => refresh());
             <UFormGroup name="edition" label="Edition">
               <UInput />
             </UFormGroup>
-            <UFormGroup name="publish_date" label="Publish date">
+            <UFormGroup name="publishDate" label="Publish date">
               <UInput type="date" />
             </UFormGroup>
             <UFormGroup name="price" label="price">
