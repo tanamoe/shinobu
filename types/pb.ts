@@ -42,7 +42,7 @@ export type AuthSystemFields<T = never> = {
 export type BookRecord<Tmetadata = unknown> = {
   publication: RecordIdString;
   edition?: string;
-  publish_date?: IsoDateString;
+  publishDate?: IsoDateString;
   cover?: string[];
   price?: number;
   metadata?: null | Tmetadata;
@@ -50,26 +50,27 @@ export type BookRecord<Tmetadata = unknown> = {
 };
 
 export type BookDataRecord = {
-  title_id?: RecordIdString;
+  titleId?: RecordIdString;
   name: string;
   description?: HTMLString;
   format: RecordIdString;
   publication_name: string;
+  baseCover?: string[];
   cover?: string[];
-  publish_date?: IsoDateString;
+  publishDate?: IsoDateString;
 };
 
 export type BookDetailedRecord = {
   name: string;
   volume?: number;
-  release?: RecordIdString;
-  publish_date?: IsoDateString;
-  base_cover?: string[];
+  release: RecordIdString;
+  publishDate?: IsoDateString;
+  baseCover?: string[];
   cover?: string[];
   edition?: string;
   price?: number;
   digital?: boolean;
-  publisher?: RecordIdString;
+  publisher: RecordIdString;
   title: RecordIdString;
 };
 
@@ -82,7 +83,7 @@ export type FormatRecord = {
 };
 
 export type PublicationRecord<Tmetadata = unknown> = {
-  release?: RecordIdString;
+  release: RecordIdString;
   name: string;
   volume?: number;
   cover?: string[];
@@ -110,7 +111,7 @@ export enum ReleaseStatusOptions {
 export type ReleaseRecord = {
   title: RecordIdString;
   name: string;
-  publisher?: RecordIdString;
+  publisher: RecordIdString;
   status?: ReleaseStatusOptions;
   old_id?: number;
 };
@@ -119,14 +120,14 @@ export type TitleRecord = {
   name: string;
   description?: HTMLString;
   format: RecordIdString;
-  old_id?: number;
+  cover?: string;
 };
 
 export type TitleWithCoverRecord = {
   name: string;
   description?: HTMLString;
   format: RecordIdString;
-  cover?: string[];
+  baseCover?: string[];
 };
 
 export type UsersRecord = {
