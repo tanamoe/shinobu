@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@iconify-json/fluent": "^1.1.25",
-    "pocketbase": "^0.15.2",
+    "pocketbase": "^0.16.0",
     "ufo": "^1.1.2"
   }
 }
