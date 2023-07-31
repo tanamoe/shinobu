@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import slug from "slug";
 import { BookResponse, Collections, PublicationResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
@@ -8,7 +9,7 @@ const { isLoading: deletePending, execute: deleteBook } = useDeleteBook();
 
 const props = defineProps<{
   modelValue: boolean;
-  publication: Partial<PublicationResponse>;
+  publication: PublicationResponse;
 }>();
 
 const emit = defineEmits<{
@@ -49,6 +50,23 @@ const handleCreate = async (e: Event) => {
   const formData = new FormData(e.target as HTMLFormElement);
 
   formData.append("publication", publication.value.id!);
+
+  const files = formData.getAll("cover");
+  formData.delete("cover");
+
+  files.forEach((file) => {
+    if (file instanceof File) {
+      const newFile = new File(
+        [file],
+        slug(props.publication.name) + "." + file.name.split(".").at(-1),
+        {
+          type: file.type,
+        },
+      );
+
+      formData.append("cover", newFile);
+    }
+  });
 
   await createBook(0, formData);
 };
