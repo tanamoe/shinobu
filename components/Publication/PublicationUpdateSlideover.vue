@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import slug from "slug";
 import { PublicationResponse } from "@/types/pb";
 
 const { isLoading, execute: updatePublication } = useUpdatePublication();
@@ -21,6 +22,27 @@ const publication = computed(() => props.publication);
 
 const handleUpdate = (e: Event, publication: Partial<PublicationResponse>) => {
   const formData = new FormData(e.target as HTMLFormElement);
+
+  const files = formData.getAll("cover");
+  formData.delete("cover");
+
+  files.forEach((file) => {
+    if (file instanceof File) {
+      if (file.size > 0) {
+        const newFile = new File(
+          [file],
+          slug(props.publication.name) + "." + file.name.split(".").at(-1),
+          {
+            type: file.type,
+          },
+        );
+
+        formData.append("cover", newFile);
+      } else {
+        formData.append("cover", "");
+      }
+    }
+  });
 
   publication.cover?.map((cover) => formData.append("cover", cover));
 
