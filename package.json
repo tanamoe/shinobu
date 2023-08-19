@@ -16,8 +16,9 @@
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxt/eslint-config": "^0.1.1",
-    "@nuxthq/ui": "^2.6.0",
+    "@nuxthq/ui": "^2.7.0",
     "@nuxtjs/google-fonts": "^3.0.2",
+    "@tailwindcss/typography": "^0.5.9",
     "@types/node": "^18.17.1",
     "@types/slug": "^5.0.3",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -34,6 +35,10 @@
   },
   "dependencies": {
     "@iconify-json/fluent": "^1.1.29",
+    "@tiptap/extension-underline": "^2.1.6",
+    "@tiptap/pm": "^2.1.6",
+    "@tiptap/starter-kit": "^2.1.6",
+    "@tiptap/vue-3": "^2.1.6",
     "pocketbase": "^0.16.0",
     "slug": "^8.2.3",
     "ufo": "^1.2.0"
