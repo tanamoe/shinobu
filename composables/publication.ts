@@ -4,35 +4,37 @@ export const useCreatePublication = () => {
   const { $pb } = useNuxtApp();
   const toast = useToast();
 
-  return useAsyncState(
-    async (publication: Partial<PublicationResponse> | FormData) => {
-      try {
-        const res = await $pb
-          .collection(Collections.Publication)
-          .create<PublicationResponse>(publication);
+  const pending = ref(false);
 
-        toast.add({
-          title: `Success`,
-          description: `Created ${res.name}`,
-          icon: "i-fluent-checkmark-circle-20-filled",
-          color: "green",
-        });
+  async function create(publication: Partial<PublicationResponse> | FormData) {
+    pending.value = true;
 
-        return res;
-      } catch (err) {
-        toast.add({
-          title: "An error occurred.",
-          icon: "i-fluent-error-circle-20-filled",
-          color: "red",
-        });
-        console.error(err);
-      }
-    },
-    null,
-    {
-      immediate: false,
-    },
-  );
+    try {
+      const res = await $pb
+        .collection(Collections.Publication)
+        .create<PublicationResponse>(publication);
+
+      toast.add({
+        title: `Success`,
+        description: `Created ${res.name}`,
+        icon: "i-fluent-checkmark-circle-20-filled",
+        color: "green",
+      });
+
+      return res;
+    } catch (err) {
+      toast.add({
+        title: "An error occurred.",
+        icon: "i-fluent-error-circle-20-filled",
+        color: "red",
+      });
+      console.error(err);
+    } finally {
+      pending.value = false;
+    }
+  }
+
+  return { pending, create };
 };
 
 export const useUpdatePublication = () => {

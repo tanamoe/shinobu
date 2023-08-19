@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Collections, type TitleResponse } from "@/types/pb";
+import {
+  type BaseSystemFields,
+  Collections,
+  type FormatResponse,
+  type TitleResponse,
+} from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 
@@ -15,18 +20,26 @@ const {
   data: rows,
   refresh,
 } = await useAsyncData(
-  "title",
   () =>
-    $pb.collection(Collections.Title).getList<TitleResponse>(page.value, 20, {
+    $pb.collection(Collections.Title).getList<
+      TitleResponse<{
+        format: FormatResponse;
+      }>
+    >(page.value, 20, {
       filter: `name~'${searchQuery.value}'`,
+      expand: "format",
+      sort: "-updated",
     }),
   { watch: [page], transform: (data) => structuredClone(data) },
 );
 
 const columns = [
   {
+    key: "cover",
+    label: "Cover",
+  },
+  {
     key: "name",
-    class: "whitespace-normal",
     label: "Name",
   },
   {
@@ -37,12 +50,12 @@ const columns = [
 
 <template>
   <div class="p-6 max-h-screen flex-col flex space-y-6">
-    <AppH1>Danh sách truyện</AppH1>
+    <AppH1>Title</AppH1>
     <form class="flex gap-3" @submit.prevent="() => refresh()">
       <div class="flex-1">
         <UInput
           v-model="searchQuery"
-          icon="i-heroicons-magnifying-glass-20-solid"
+          icon="i-fluent-search-20-filled"
           placeholder="Search..."
           color="white"
         />
@@ -51,24 +64,34 @@ const columns = [
     </form>
 
     <div class="flex-1 overflow-y-scroll">
-      <UTable :columns="columns" :rows="rows?.items || []" :loading="pending">
+      <UTable
+        :columns="columns"
+        :rows="rows?.items || []"
+        :loading="pending"
+        @select="(row: BaseSystemFields) => navigateTo(`/title/${row.id}`)"
+      >
         <template #cover-data="{ row }">
           <div v-if="row.cover" class="space-x-3">
             <img
-              v-for="image in row.cover"
-              :key="image"
-              class="h-8 rounded"
-              :src="usePocketbaseImage(row, image, '?thumb=100x100')"
+              class="h-14 aspect-[2/3] object-cover rounded"
+              :src="usePocketbaseImage(row, row.cover)"
             />
           </div>
         </template>
-        <template #actions-data="{ row }">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-fluent-arrow-right-20-filled"
-            :to="`/title/${row.id}`"
-          />
+        <template #name-data="{ row }">
+          <div class="space-y-1.5">
+            <UBadge color="gray">{{ row.expand.format.name }}</UBadge>
+            <div>{{ row.name }}</div>
+          </div>
+        </template>
+        <template #actions-data>
+          <div class="flex justify-end">
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-fluent-arrow-right-20-filled"
+            />
+          </div>
         </template>
       </UTable>
     </div>

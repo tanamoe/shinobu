@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  type BaseSystemFields,
   Collections,
   type TitleResponse,
   type FormatResponse,
@@ -9,23 +10,37 @@ import {
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
+const { update, pending: updatePending } = useUpdateTitle();
 
-const title = await $pb
-  .collection(Collections.Title)
-  .getOne<TitleResponse>(route.params.titleId as string);
+const { data: title, execute } = await useAsyncData(
+  () =>
+    $pb
+      .collection(Collections.Title)
+      .getOne<TitleResponse>(route.params.titleId as string),
+  {
+    transform: (title) => structuredClone(title),
+  },
+);
 
-const formats = (
-  await $pb.collection(Collections.Format).getFullList<FormatResponse>()
-).map((format) => ({
-  id: format.id,
-  label: format.name,
-}));
+if (!title.value)
+  throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
+
+const { data: formats } = await useAsyncData(
+  () => $pb.collection(Collections.Format).getFullList<FormatResponse>(),
+  {
+    transform: (formats) =>
+      structuredClone(formats).map((format) => ({
+        value: format.id,
+        label: format.name,
+      })),
+  },
+);
 
 const {
   pending,
   data: releases,
   refresh,
-} = await useLazyAsyncData(
+} = await useAsyncData(
   "releases",
   () =>
     $pb.collection(Collections.Release).getFullList<
@@ -45,10 +60,17 @@ const {
   },
 );
 
+async function handleUpdateTitle(e: Event) {
+  const formData = new FormData(e.target as HTMLFormElement);
+  formData.append("description", title.value!.description);
+  await update(title.value!.id, formData);
+  execute();
+}
+
 const columns = [
   {
     key: "name",
-    label: "Bản in",
+    label: "Print release",
   },
   {
     key: "publisher",
@@ -64,9 +86,8 @@ const columns = [
 ];
 
 const createSlideoverOpen = ref(false);
-const selectedFormat = ref<{ id: string; label: string } | undefined>(
-  formats.find((f) => f.id === title.format),
-);
+
+watch([createSlideoverOpen], () => refresh());
 </script>
 
 <template>
@@ -76,26 +97,63 @@ const selectedFormat = ref<{ id: string; label: string } | undefined>(
       {{ title.name }}
     </AppH1>
 
-    <form class="space-y-3">
+    <form class="space-y-3" @submit.prevent="handleUpdateTitle">
       <div class="grid grid-cols-2 gap-3">
         <UFormGroup name="name" label="Name">
           <UInput v-model="title.name" />
         </UFormGroup>
 
         <UFormGroup name="format" label="Format">
-          <USelectMenu
-            v-model="selectedFormat"
-            :options="formats || []"
-            :loading="pending"
-          />
+          <USelect v-model="title.format" :options="formats || []" />
         </UFormGroup>
       </div>
+
       <UFormGroup name="description" label="Description">
-        <UTextarea v-model="title.description" resize disabled />
+        <AppEditor v-model="title.description" />
       </UFormGroup>
+
+      <UCard
+        v-if="title.cover"
+        :ui="{
+          body: { base: 'flex items-center', padding: '' },
+        }"
+      >
+        <img
+          class="w-16 h-auto rounded-md"
+          :src="$pb.files.getUrl(title, title.cover, { thumb: '100x100' })"
+        />
+        <div
+          class="flex-1 w-full flex px-3 gap-3 items-center justify-between overflow-hidden"
+        >
+          <div class="text-ellipsis overflow-hidden">
+            {{ title.cover }}
+          </div>
+          <UButton
+            color="red"
+            variant="ghost"
+            icon="i-fluent-delete-20-filled"
+            @click="title.cover = ''"
+          />
+        </div>
+      </UCard>
+
+      <UFormGroup name="cover">
+        <UInput type="file" :disabled="title.cover !== ''" />
+      </UFormGroup>
+
+      <div class="text-right">
+        <UButton
+          color="gray"
+          icon="i-fluent-save-20-filled"
+          :loading="updatePending"
+          type="submit"
+        >
+          Save
+        </UButton>
+      </div>
     </form>
 
-    <div class="mt-12">
+    <section v-if="releases" class="mt-12">
       <AppH2>
         Release
         <span class="float-right space-x-3">
@@ -109,7 +167,8 @@ const selectedFormat = ref<{ id: string; label: string } | undefined>(
             Refresh
           </UButton>
           <UButton
-            icon="i-fluent-add-20-filled"
+            color="gray"
+            icon="i-fluent-add-square-multiple-20-filled"
             class="float-right"
             @click="createSlideoverOpen = true"
           >
@@ -117,17 +176,27 @@ const selectedFormat = ref<{ id: string; label: string } | undefined>(
           </UButton>
         </span>
       </AppH2>
-      <UTable :columns="columns" :rows="releases || []" :loading="pending">
-        <template #actions-data="{ row }">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-fluent-arrow-right-20-filled"
-            :to="`/title/${title.id}/${row.id}`"
-          />
+
+      <UTable
+        :columns="columns"
+        :rows="releases"
+        :loading="pending"
+        class="dark:divide-gray-700 gap-1 rounded-md border border-gray-300 dark:border-gray-700"
+        @select="
+          (row: BaseSystemFields) => navigateTo(`/title/${title!.id}/${row.id}`)
+        "
+      >
+        <template #actions-data>
+          <div class="flex justify-end">
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-fluent-arrow-right-20-filled"
+            />
+          </div>
         </template>
       </UTable>
-    </div>
+    </section>
 
     <ReleaseCreateSlideover v-model="createSlideoverOpen" :title="title" />
   </div>

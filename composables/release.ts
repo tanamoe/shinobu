@@ -1,3 +1,4 @@
+import { ClientResponseError } from "pocketbase";
 import {
   Collections,
   type ReleaseRecord,
@@ -8,34 +9,37 @@ export const useCreateRelease = () => {
   const { $pb } = useNuxtApp();
   const toast = useToast();
 
-  return useAsyncState(
-    async (release: Partial<ReleaseRecord> | FormData) => {
-      try {
-        const res = await $pb
-          .collection(Collections.Release)
-          .create<ReleaseResponse>(release);
+  const pending = ref(false);
 
-        toast.add({
-          id: "create_release",
-          title: `Success`,
-          icon: "i-fluent-checkmark-circle-20-filled",
-          color: "green",
-        });
+  async function create(release: Partial<ReleaseRecord> | FormData) {
+    pending.value = true;
 
-        return res;
-      } catch (err) {
+    try {
+      const res = await $pb
+        .collection(Collections.Release)
+        .create<ReleaseResponse>(release);
+
+      toast.add({
+        id: "create_release",
+        title: `Success`,
+        icon: "i-fluent-checkmark-circle-20-filled",
+        color: "green",
+      });
+
+      return res;
+    } catch (error) {
+      if (error instanceof ClientResponseError)
         toast.add({
-          id: "error",
-          title: "An error occurred.",
+          title: "Error",
+          description: error.message,
           icon: "i-fluent-error-circle-20-filled",
           color: "red",
         });
-        console.error(err);
-      }
-    },
-    null,
-    {
-      immediate: false,
-    },
-  );
+      else console.error(error);
+    } finally {
+      pending.value = false;
+    }
+  }
+
+  return { pending, create };
 };

@@ -5,12 +5,12 @@ const name = $pb.authStore.model.email;
 
 const links = [
   {
-    label: "Trang chủ",
+    label: "Home",
     icon: "i-fluent-home-20-filled",
     to: "/",
   },
   {
-    label: "Tựa truyện",
+    label: "Title",
     icon: "i-fluent-book-20-filled",
     to: "/title",
   },
@@ -19,7 +19,7 @@ const links = [
 const items = [
   [
     {
-      label: "Đăng xuất",
+      label: "Logout",
       to: "/logout",
     },
   ],

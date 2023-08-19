@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type ReleaseResponse } from "@/types/pb";
 
-const { isLoading, execute: createPublication } = useCreatePublication();
+const { pending, create } = useCreatePublication();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -19,11 +19,9 @@ const isOpen = computed({
 
 const handleCreate = async (e: Event) => {
   const formData = new FormData(e.target as HTMLFormElement);
-
   formData.append("release", props.release.id);
-
-  await createPublication(0, formData);
-  isOpen.value = !isOpen.value;
+  await create(formData);
+  isOpen.value = false;
 };
 </script>
 
@@ -46,7 +44,7 @@ const handleCreate = async (e: Event) => {
           <UToggle />
         </UFormGroup>
         <div class="text-right">
-          <UButton type="submit" label="Save" :pending="isLoading" />
+          <UButton type="submit" label="Save" :pending="pending" />
         </div>
       </form>
     </div>
