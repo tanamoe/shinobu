@@ -2,7 +2,7 @@
 import { Collections, PublisherResponse, type TitleResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { isLoading, execute: createRelease } = useCreateRelease();
+const { pending, create } = useCreateRelease();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -28,22 +28,20 @@ const { pending: publishersPending, data: publishers } = await useAsyncData(
       .getFullList<PublisherResponse>(),
   {
     transform: (publishers) =>
-      publishers.map((publisher) => ({
-        id: publisher.id,
+      structuredClone(publishers).map((publisher) => ({
+        value: publisher.id,
         label: publisher.name,
       })),
   },
 );
 
-const currentPublisher = ref(publishers?.value ? publishers.value[0] : []);
+const currentPublisher = ref();
 
-const handleCreate = (e: Event) => {
+const handleCreate = async (e: Event) => {
   const formData = new FormData(e.target as HTMLFormElement);
-
   formData.append("title", title.value.id);
-  formData.append("publisher", formData.get("publisher[id]")!);
-
-  createRelease(0, formData);
+  await create(formData);
+  isOpen.value = false;
 };
 </script>
 
@@ -60,7 +58,7 @@ const handleCreate = (e: Event) => {
           <UInput />
         </UFormGroup>
         <UFormGroup name="publisher" label="Publisher">
-          <USelectMenu
+          <USelect
             v-model="currentPublisher"
             :options="publishers || []"
             :loading="publishersPending"
@@ -80,7 +78,7 @@ const handleCreate = (e: Event) => {
           />
         </UFormGroup>
         <div class="text-right">
-          <UButton type="submit" label="Save" :pending="isLoading" />
+          <UButton type="submit" label="Save" :pending="pending" />
         </div>
       </form>
     </div>

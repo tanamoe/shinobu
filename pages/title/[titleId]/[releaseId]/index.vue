@@ -108,13 +108,12 @@ watch([booksOpen, publicationOpen, createOpen, deleteOpen], () => refresh());
       </template>
       <template #cover-data="{ row }">
         <div v-if="row.cover">
-          <UAvatarGroup size="sm" :max="5">
-            <UAvatar
-              v-for="image in row.cover"
-              :key="image"
-              :src="`${runtimeConfig.public.pocketbaseUrl}/api/files/${row.collectionId}/${row.id}/${image}?thumb=100x100`"
-            />
-          </UAvatarGroup>
+          <img
+            v-for="image in row.cover"
+            :key="image"
+            class="w-12 h-auto rounded-md"
+            :src="$pb.getFileUrl(row, image, { thumb: '100x100' })"
+          />
         </div>
       </template>
       <template #actions-data="{ row }">

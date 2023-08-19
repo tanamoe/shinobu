@@ -1,26 +1,21 @@
 import { ClientResponseError } from "pocketbase";
-import {
-  Collections,
-  type ReleaseRecord,
-  type ReleaseResponse,
-} from "@/types/pb";
+import { Collections, type TitleRecord, type TitleResponse } from "@/types/pb";
 
-export const useCreateRelease = () => {
+export function useUpdateTitle() {
   const { $pb } = useNuxtApp();
   const toast = useToast();
 
   const pending = ref(false);
 
-  async function create(release: Partial<ReleaseRecord> | FormData) {
+  async function update(id: string, data: Partial<TitleRecord> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Release)
-        .create<ReleaseResponse>(release);
+        .collection(Collections.Title)
+        .update<TitleResponse>(id, data);
 
       toast.add({
-        id: "create_release",
         title: `Success`,
         icon: "i-fluent-checkmark-circle-20-filled",
         color: "green",
@@ -41,5 +36,5 @@ export const useCreateRelease = () => {
     }
   }
 
-  return { pending, create };
-};
+  return { pending, update };
+}
