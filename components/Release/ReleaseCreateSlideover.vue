@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Collections, PublisherResponse, type TitleResponse } from "@/types/pb";
+import {
+  Collections,
+  PublisherResponse,
+  ReleaseStatusOptions,
+  type TitleResponse,
+} from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const { pending, create } = useCreateRelease();
@@ -65,17 +70,7 @@ const handleCreate = async (e: Event) => {
           />
         </UFormGroup>
         <UFormGroup name="status" label="Status">
-          <USelect
-            :options="[
-              'WAITING_FOR_APPROVAL',
-              'REGISTERED',
-              'LICENSED',
-              'ON_GOING',
-              'COMPLETED',
-              'HIATUS',
-              'CANCELLED',
-            ]"
-          />
+          <USelect :options="Object.values(ReleaseStatusOptions)" />
         </UFormGroup>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />
