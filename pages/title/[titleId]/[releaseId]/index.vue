@@ -1,31 +1,27 @@
 <script setup lang="ts">
 import {
   Collections,
-  ReleaseStatusOptions,
+  type ReleaseStatusOptions,
   type TitleResponse,
   type PublicationResponse,
   type ReleaseResponse,
-  PublisherResponse,
+  type PublisherResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
 const { pending, update } = useUpdateRelease();
 
-const { data: title } = await useAsyncData(
-  () =>
-    $pb
-      .collection(Collections.Title)
-      .getOne<TitleResponse>(route.params.titleId as string),
-  { transform: (title) => structuredClone(title) },
+const { data: title } = await useAsyncData(() =>
+  $pb
+    .collection(Collections.Title)
+    .getOne<TitleResponse>(route.params.titleId as string),
 );
 
-const { data: release } = await useAsyncData(
-  () =>
-    $pb
-      .collection(Collections.Release)
-      .getOne<ReleaseResponse>(route.params.releaseId as string),
-  { transform: (release) => structuredClone(release) },
+const { data: release } = await useAsyncData(() =>
+  $pb
+    .collection(Collections.Release)
+    .getOne<ReleaseResponse>(route.params.releaseId as string),
 );
 
 if (!release.value || !title.value) throw createError({ statusCode: 404 });
@@ -34,7 +30,7 @@ const { pending: publishersPending, data: publishers } = await useAsyncData(
   () => $pb.collection(Collections.Publisher).getFullList<PublisherResponse>(),
   {
     transform: (publishers) =>
-      structuredClone(publishers).map((publisher) => ({
+      publishers.map((publisher) => ({
         value: publisher.id,
         label: publisher.name,
       })),
@@ -67,14 +63,11 @@ const {
   pending: publicationsPending,
   data: publications,
   refresh,
-} = await useLazyAsyncData(
-  "publications",
-  () =>
-    $pb.collection(Collections.Publication).getFullList<PublicationResponse>({
-      filter: `release.id = '${release.value!.id}'`,
-      sort: "volume",
-    }),
-  { transform: (data) => structuredClone(data) },
+} = await useLazyAsyncData("publications", () =>
+  $pb.collection(Collections.Publication).getFullList<PublicationResponse>({
+    filter: `release.id = '${release.value!.id}'`,
+    sort: "volume",
+  }),
 );
 
 const publicationOpen = ref(false);

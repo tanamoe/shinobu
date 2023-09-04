@@ -33,7 +33,7 @@ const { pending: publishersPending, data: publishers } = await useAsyncData(
       .getFullList<PublisherResponse>(),
   {
     transform: (publishers) =>
-      structuredClone(publishers).map((publisher) => ({
+      publishers.map((publisher) => ({
         value: publisher.id,
         label: publisher.name,
       })),

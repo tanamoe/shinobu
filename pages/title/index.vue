@@ -30,7 +30,7 @@ const {
       expand: "format",
       sort: "-updated",
     }),
-  { watch: [page], transform: (data) => structuredClone(data) },
+  { watch: [page] },
 );
 
 const columns = [

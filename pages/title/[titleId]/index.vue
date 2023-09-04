@@ -12,14 +12,10 @@ const { $pb } = useNuxtApp();
 const route = useRoute();
 const { update, pending: updatePending } = useUpdateTitle();
 
-const { data: title, execute } = await useAsyncData(
-  () =>
-    $pb
-      .collection(Collections.Title)
-      .getOne<TitleResponse>(route.params.titleId as string),
-  {
-    transform: (title) => structuredClone(title),
-  },
+const { data: title, execute } = await useAsyncData(() =>
+  $pb
+    .collection(Collections.Title)
+    .getOne<TitleResponse>(route.params.titleId as string),
 );
 
 if (!title.value)
@@ -29,7 +25,7 @@ const { data: formats } = await useAsyncData(
   () => $pb.collection(Collections.Format).getFullList<FormatResponse>(),
   {
     transform: (formats) =>
-      structuredClone(formats).map((format) => ({
+      formats.map((format) => ({
         value: format.id,
         label: format.name,
       })),
@@ -53,7 +49,7 @@ const {
     }),
   {
     transform: (data) =>
-      structuredClone(data).map((release) => ({
+      data.map((release) => ({
         ...release,
         publisher: release.expand?.publisher.name,
       })),
