@@ -4,15 +4,16 @@
 
 export enum Collections {
   Book = "book",
-  BookData = "book_data",
   BookDetailed = "book_detailed",
   Format = "format",
   Publication = "publication",
   Publisher = "publisher",
   Release = "release",
+  Review = "review",
+  Staff = "staff",
   Title = "title",
-  TitleWithCover = "title_with_cover",
   Users = "users",
+  Work = "work",
 }
 
 // Alias types for improved usability
@@ -40,63 +41,52 @@ export type AuthSystemFields<T = never> = {
 // Record types for each collection
 
 export type BookRecord<Tmetadata = unknown> = {
-  publication: RecordIdString;
-  edition?: string;
-  publishDate?: IsoDateString;
   cover?: string[];
-  price?: number;
+  edition?: string;
   metadata?: null | Tmetadata;
   old_id?: string;
-};
-
-export type BookDataRecord = {
-  titleId?: RecordIdString;
-  name: string;
-  description?: HTMLString;
-  format: RecordIdString;
-  publication_name: string;
-  baseCover?: string[];
-  cover?: string[];
+  price?: number;
+  publication: RecordIdString;
   publishDate?: IsoDateString;
 };
 
 export type BookDetailedRecord = {
-  name: string;
-  volume?: number;
-  release: RecordIdString;
-  publishDate?: IsoDateString;
   baseCover?: string[];
   cover?: string[];
-  edition?: string;
-  price?: number;
   digital?: boolean;
+  edition?: string;
+  name: string;
+  price?: number;
+  publishDate?: IsoDateString;
   publisher: RecordIdString;
+  release: RecordIdString;
   title: RecordIdString;
+  volume?: number;
 };
 
 export type FormatRecord = {
-  name: string;
-  slug: string;
   color: string;
   decription?: HTMLString;
+  name: string;
+  slug: string;
   thumbnail?: string;
 };
 
 export type PublicationRecord<Tmetadata = unknown> = {
-  release: RecordIdString;
-  name: string;
-  volume?: number;
   cover?: string[];
   digital?: boolean;
   metadata?: null | Tmetadata;
+  name: string;
   old_id?: string;
+  release: RecordIdString;
+  volume?: number;
 };
 
 export type PublisherRecord = {
-  name: string;
-  logo?: string;
-  slug: string;
   color: string;
+  logo?: string;
+  name: string;
+  slug: string;
 };
 
 export enum ReleaseStatusOptions {
@@ -109,40 +99,51 @@ export enum ReleaseStatusOptions {
   "CANCELLED" = "CANCELLED",
 }
 export type ReleaseRecord = {
-  title: RecordIdString;
   name: string;
+  old_id?: number;
   publisher: RecordIdString;
   status?: ReleaseStatusOptions;
-  old_id?: number;
+  title: RecordIdString;
 };
 
-export type TitleRecord = {
+export type ReviewRecord = {
+  content: HTMLString;
+  header: string;
+  release: RecordIdString;
+  score?: number;
+  user: RecordIdString;
+};
+
+export type StaffRecord = {
   name: string;
-  description?: HTMLString;
-  format: RecordIdString;
+};
+
+export type TitleRecord<Tmetadata = unknown> = {
   cover?: string;
-};
-
-export type TitleWithCoverRecord = {
-  name: string;
   description?: HTMLString;
   format: RecordIdString;
-  baseCover?: string[];
+  metadata?: null | Tmetadata;
+  name: string;
 };
 
 export type UsersRecord = {
-  displayName?: string;
-  bio?: HTMLString;
   avatar?: string;
   banner?: string;
+  bio?: string;
+  displayName?: string;
+};
+
+export type WorkRecord = {
+  name: string;
+  priority?: number;
+  staff: RecordIdString;
+  title: RecordIdString;
 };
 
 // Response types include system fields and match responses from the PocketBase API
 export type BookResponse<Tmetadata = unknown, Texpand = unknown> = Required<
   BookRecord<Tmetadata>
 > &
-  BaseSystemFields<Texpand>;
-export type BookDataResponse<Texpand = unknown> = Required<BookDataRecord> &
   BaseSystemFields<Texpand>;
 export type BookDetailedResponse<Texpand = unknown> =
   Required<BookDetailedRecord> & BaseSystemFields<Texpand>;
@@ -156,37 +157,45 @@ export type PublisherResponse<Texpand = unknown> = Required<PublisherRecord> &
   BaseSystemFields<Texpand>;
 export type ReleaseResponse<Texpand = unknown> = Required<ReleaseRecord> &
   BaseSystemFields<Texpand>;
-export type TitleResponse<Texpand = unknown> = Required<TitleRecord> &
+export type ReviewResponse<Texpand = unknown> = Required<ReviewRecord> &
   BaseSystemFields<Texpand>;
-export type TitleWithCoverResponse<Texpand = unknown> =
-  Required<TitleWithCoverRecord> & BaseSystemFields<Texpand>;
+export type StaffResponse<Texpand = unknown> = Required<StaffRecord> &
+  BaseSystemFields<Texpand>;
+export type TitleResponse<Tmetadata = unknown, Texpand = unknown> = Required<
+  TitleRecord<Tmetadata>
+> &
+  BaseSystemFields<Texpand>;
 export type UsersResponse<Texpand = unknown> = Required<UsersRecord> &
   AuthSystemFields<Texpand>;
+export type WorkResponse<Texpand = unknown> = Required<WorkRecord> &
+  BaseSystemFields<Texpand>;
 
 // Types containing all Records and Responses, useful for creating typing helper functions
 
 export type CollectionRecords = {
   book: BookRecord;
-  book_data: BookDataRecord;
   book_detailed: BookDetailedRecord;
   format: FormatRecord;
   publication: PublicationRecord;
   publisher: PublisherRecord;
   release: ReleaseRecord;
+  review: ReviewRecord;
+  staff: StaffRecord;
   title: TitleRecord;
-  title_with_cover: TitleWithCoverRecord;
   users: UsersRecord;
+  work: WorkRecord;
 };
 
 export type CollectionResponses = {
   book: BookResponse;
-  book_data: BookDataResponse;
   book_detailed: BookDetailedResponse;
   format: FormatResponse;
   publication: PublicationResponse;
   publisher: PublisherResponse;
   release: ReleaseResponse;
+  review: ReviewResponse;
+  staff: StaffResponse;
   title: TitleResponse;
-  title_with_cover: TitleWithCoverResponse;
   users: UsersResponse;
+  work: WorkResponse;
 };
