@@ -1,5 +1,5 @@
 // plugins/pocketbase.js
-import PocketBase, { type Admin, type Record } from "pocketbase";
+import PocketBase, { type AuthModel } from "pocketbase";
 
 export default defineNuxtPlugin(async () => {
   const runtimeConfig = useRuntimeConfig();
@@ -8,7 +8,7 @@ export default defineNuxtPlugin(async () => {
 
   const cookie = useCookie<{
     token: string;
-    model: Record | Admin | null;
+    model: AuthModel;
   }>("pb_auth", {
     path: "/",
     secure: true,
