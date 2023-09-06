@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Admin } from "pocketbase";
-
 const { $pb } = useNuxtApp();
 const toast = useToast();
 
@@ -44,7 +42,7 @@ definePageMeta({
   middleware: () => {
     const { $pb } = useNuxtApp();
 
-    if ($pb.authStore.model instanceof Admin) return navigateTo("/");
+    if ($pb.authStore.isAdmin) return navigateTo("/");
   },
 });
 </script>
