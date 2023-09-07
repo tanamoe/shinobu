@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Sortable } from "sortablejs-vue3";
 import {
   type BaseSystemFields,
   Collections,
@@ -6,11 +7,14 @@ import {
   type FormatResponse,
   type PublisherResponse,
   type ReleaseResponse,
+  type WorkResponse,
+  type StaffResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
 const { update, pending: updatePending } = useUpdateTitle();
+const { updatePriority } = useWorks();
 
 const { data: title, execute } = await useAsyncData(() =>
   $pb
@@ -54,6 +58,18 @@ const {
         publisher: release.expand?.publisher.name,
       })),
   },
+);
+
+const works = await useAsyncData(() =>
+  $pb.collection(Collections.Work).getFullList<
+    WorkResponse<{
+      staff: StaffResponse;
+    }>
+  >({
+    filter: `title='${route.params.titleId as string}'`,
+    expand: "staff",
+    sort: "+priority",
+  }),
 );
 
 async function handleUpdateTitle(e: Event) {
@@ -146,6 +162,45 @@ watch([createSlideoverOpen], () => refresh());
         </UButton>
       </div>
     </form>
+
+    <section v-if="works.data.value" class="mt-12">
+      <AppH2>Works</AppH2>
+      <ClientOnly>
+        <Sortable
+          :list="works.data.value"
+          item-key="id"
+          tag="div"
+          @end="
+            (e) => moveItemInArray(works.data.value!, e.oldIndex, e.newIndex)
+          "
+        >
+          <template
+            #item="{
+              element,
+              index,
+            }: {
+              element: WorkResponse<{
+                staff: StaffResponse<unknown>;
+              }>;
+              index: number;
+            }"
+          >
+            <div :id="element.id" :key="element.id" class="draggable">
+              {{ index }}. {{ element.expand!.staff.name }}
+            </div>
+          </template>
+        </Sortable>
+        <div class="text-right">
+          <UButton
+            color="gray"
+            icon="i-fluent-save-20-filled"
+            @click="updatePriority(works.data.value)"
+          >
+            Save
+          </UButton>
+        </div>
+      </ClientOnly>
+    </section>
 
     <section v-if="releases" class="mt-12">
       <AppH2>
