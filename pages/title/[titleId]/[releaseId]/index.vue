@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   Collections,
-  type ReleaseStatusOptions,
+  ReleaseStatusOptions,
   type TitleResponse,
   type PublicationResponse,
   type ReleaseResponse,
