@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@vueuse/nuxt", "@nuxtjs/google-fonts", "@nuxthq/ui"],
+  modules: ["@vueuse/nuxt", "@nuxtjs/google-fonts", "@nuxt/ui"],
   runtimeConfig: {
     public: {
       pocketbaseUrl: process.env.POCKETBASE_URL,
