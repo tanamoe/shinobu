@@ -16,6 +16,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  change: [void];
 }>();
 
 const title = computed(() => props.title);
@@ -26,7 +27,6 @@ const isOpen = computed({
 });
 
 const { pending: publishersPending, data: publishers } = await useAsyncData(
-  "publishers",
   async () =>
     await $pb
       .collection(Collections.Publisher)
@@ -45,8 +45,13 @@ const currentPublisher = ref();
 const handleCreate = async (e: Event) => {
   const formData = new FormData(e.target as HTMLFormElement);
   formData.append("title", title.value.id);
-  await create(formData);
-  isOpen.value = false;
+
+  const res = await create(formData);
+
+  if (res) {
+    emit("change");
+    isOpen.value = false;
+  }
 };
 </script>
 

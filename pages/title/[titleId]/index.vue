@@ -1,20 +1,8 @@
 <script setup lang="ts">
-import { Sortable } from "sortablejs-vue3";
-import {
-  type BaseSystemFields,
-  Collections,
-  type TitleResponse,
-  type FormatResponse,
-  type PublisherResponse,
-  type ReleaseResponse,
-  type WorkResponse,
-  type StaffResponse,
-} from "@/types/pb";
+import { Collections, type TitleResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
-const { update, pending: updatePending } = useUpdateTitle();
-const { updatePriority } = useWorks();
 
 const { data: title, execute } = await useAsyncData(() =>
   $pb
@@ -24,82 +12,6 @@ const { data: title, execute } = await useAsyncData(() =>
 
 if (!title.value)
   throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
-
-const { data: formats } = await useAsyncData(
-  () => $pb.collection(Collections.Format).getFullList<FormatResponse>(),
-  {
-    transform: (formats) =>
-      formats.map((format) => ({
-        value: format.id,
-        label: format.name,
-      })),
-  },
-);
-
-const {
-  pending,
-  data: releases,
-  refresh,
-} = await useAsyncData(
-  "releases",
-  () =>
-    $pb.collection(Collections.Release).getFullList<
-      ReleaseResponse<{
-        publisher: PublisherResponse;
-      }>
-    >({
-      filter: `title='${route.params.titleId as string}'`,
-      expand: "publisher",
-    }),
-  {
-    transform: (data) =>
-      data.map((release) => ({
-        ...release,
-        publisher: release.expand?.publisher.name,
-      })),
-  },
-);
-
-const works = await useAsyncData(() =>
-  $pb.collection(Collections.Work).getFullList<
-    WorkResponse<{
-      staff: StaffResponse;
-    }>
-  >({
-    filter: `title='${route.params.titleId as string}'`,
-    expand: "staff",
-    sort: "+priority",
-  }),
-);
-
-async function handleUpdateTitle(e: Event) {
-  const formData = new FormData(e.target as HTMLFormElement);
-  formData.append("description", title.value!.description);
-  await update(title.value!.id, formData);
-  execute();
-}
-
-const columns = [
-  {
-    key: "name",
-    label: "Print release",
-  },
-  {
-    key: "publisher",
-    label: "Publisher",
-  },
-  {
-    key: "status",
-    label: "Status",
-  },
-  {
-    key: "actions",
-  },
-];
-
-const createSlideoverOpen = ref(false);
-
-watch([createSlideoverOpen], () => refresh());
 </script>
 
 <template>
@@ -109,144 +21,15 @@ watch([createSlideoverOpen], () => refresh());
       {{ title.name }}
     </AppH1>
 
-    <form class="space-y-3" @submit.prevent="handleUpdateTitle">
-      <div class="grid grid-cols-2 gap-3">
-        <UFormGroup name="name" label="Name">
-          <UInput v-model="title.name" />
-        </UFormGroup>
-
-        <UFormGroup name="format" label="Format">
-          <USelect v-model="title.format" :options="formats || []" />
-        </UFormGroup>
+    <section class="flex gap-6">
+      <div class="flex-1">
+        <TitleDetails :title="title" @change="execute()" />
+        <TitleReleases :title="title" />
       </div>
-
-      <AppEditor v-model="title.description" />
-
-      <UCard
-        v-if="title.cover"
-        :ui="{
-          body: { base: 'flex items-center', padding: '' },
-        }"
-      >
-        <img
-          class="w-16 h-auto rounded-md"
-          :src="$pb.files.getUrl(title, title.cover, { thumb: '100x100' })"
-        />
-        <div
-          class="flex-1 w-full flex px-3 gap-3 items-center justify-between overflow-hidden"
-        >
-          <div class="text-ellipsis overflow-hidden">
-            {{ title.cover }}
-          </div>
-          <UButton
-            color="red"
-            variant="ghost"
-            icon="i-fluent-delete-20-filled"
-            @click="title.cover = ''"
-          />
-        </div>
-      </UCard>
-
-      <UFormGroup name="cover">
-        <UInput type="file" :disabled="title.cover !== ''" />
-      </UFormGroup>
-
-      <div class="text-right">
-        <UButton
-          color="gray"
-          icon="i-fluent-save-20-filled"
-          :loading="updatePending"
-          type="submit"
-        >
-          Save
-        </UButton>
+      <div>
+        <TitleCover :title="title" @change="execute()" />
+        <TitleWorks :title="title" />
       </div>
-    </form>
-
-    <section v-if="works.data.value" class="mt-12">
-      <AppH2>Works</AppH2>
-      <ClientOnly>
-        <Sortable
-          :list="works.data.value"
-          item-key="id"
-          tag="div"
-          @end="
-            (e) => moveItemInArray(works.data.value!, e.oldIndex, e.newIndex)
-          "
-        >
-          <template
-            #item="{
-              element,
-              index,
-            }: {
-              element: WorkResponse<{
-                staff: StaffResponse<unknown>;
-              }>;
-              index: number;
-            }"
-          >
-            <div :id="element.id" :key="element.id" class="draggable">
-              {{ index }}. {{ element.expand!.staff.name }}
-            </div>
-          </template>
-        </Sortable>
-        <div class="text-right">
-          <UButton
-            color="gray"
-            icon="i-fluent-save-20-filled"
-            @click="updatePriority(works.data.value)"
-          >
-            Save
-          </UButton>
-        </div>
-      </ClientOnly>
     </section>
-
-    <section v-if="releases" class="mt-12">
-      <AppH2>
-        Release
-        <span class="float-right space-x-3">
-          <UButton
-            variant="ghost"
-            color="gray"
-            icon="i-fluent-arrow-clockwise-20-filled"
-            :loading="pending"
-            @click="refresh()"
-          >
-            Refresh
-          </UButton>
-          <UButton
-            color="gray"
-            icon="i-fluent-add-square-multiple-20-filled"
-            class="float-right"
-            @click="createSlideoverOpen = true"
-          >
-            Create
-          </UButton>
-        </span>
-      </AppH2>
-
-      <UTable
-        :columns="columns"
-        :rows="releases"
-        :loading="pending"
-        class="dark:divide-gray-700 gap-1 rounded-md border border-gray-300 dark:border-gray-700"
-        @select="
-          (row: BaseSystemFields) => navigateTo(`/title/${title!.id}/${row.id}`)
-        "
-      >
-        <template #actions-data>
-          <div class="flex justify-end">
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-fluent-arrow-right-20-filled"
-            />
-          </div>
-        </template>
-      </UTable>
-    </section>
-
-    <ReleaseCreateSlideover v-model="createSlideoverOpen" :title="title" />
   </div>
 </template>
