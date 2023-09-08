@@ -104,9 +104,7 @@ watch([createSlideoverOpen], () => refresh());
         </UFormGroup>
       </div>
 
-      <UFormGroup name="description" label="Description">
-        <AppEditor v-model="title.description" />
-      </UFormGroup>
+      <AppEditor v-model="title.description" />
 
       <UCard
         v-if="title.cover"
