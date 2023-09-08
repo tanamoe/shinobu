@@ -39,7 +39,7 @@
     "@tiptap/pm": "^2.1.7",
     "@tiptap/starter-kit": "^2.1.7",
     "@tiptap/vue-3": "^2.1.7",
-    "pocketbase": "^0.17.3",
+    "pocketbase": "^0.18.0",
     "slug": "^8.2.3",
     "sortablejs": "^1.15.0",
     "sortablejs-vue3": "^1.2.9",
