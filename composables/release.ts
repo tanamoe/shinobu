@@ -5,7 +5,7 @@ import {
   type ReleaseResponse,
 } from "@/types/pb";
 
-export const useCreateRelease = () => {
+export function useRelease() {
   const { $pb } = useNuxtApp();
   const toast = useToast();
 
@@ -26,28 +26,19 @@ export const useCreateRelease = () => {
       });
 
       return res;
-    } catch (error) {
-      if (error instanceof ClientResponseError)
+    } catch (err) {
+      if (err instanceof ClientResponseError) {
         toast.add({
-          title: "Error",
-          description: error.message,
+          title: "An error occurred.",
+          description: err.message,
           icon: "i-fluent-error-circle-20-filled",
           color: "red",
         });
-      else console.error(error);
+      }
     } finally {
       pending.value = false;
     }
   }
-
-  return { pending, create };
-};
-
-export const useUpdateRelease = () => {
-  const { $pb } = useNuxtApp();
-  const toast = useToast();
-
-  const pending = ref(false);
 
   async function update(
     id: string,
@@ -67,19 +58,19 @@ export const useUpdateRelease = () => {
       });
 
       return res;
-    } catch (error) {
-      if (error instanceof ClientResponseError)
+    } catch (err) {
+      if (err instanceof ClientResponseError) {
         toast.add({
-          title: "Error",
-          description: error.message,
+          title: "An error occurred.",
+          description: err.message,
           icon: "i-fluent-error-circle-20-filled",
           color: "red",
         });
-      else console.error(error);
+      }
     } finally {
       pending.value = false;
     }
   }
 
-  return { pending, update };
-};
+  return { pending, create, update };
+}

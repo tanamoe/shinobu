@@ -1,7 +1,7 @@
 import { ClientResponseError } from "pocketbase";
 import { Collections, type TitleRecord, type TitleResponse } from "@/types/pb";
 
-export function useUpdateTitle() {
+export function useTitle() {
   const { $pb } = useNuxtApp();
   const toast = useToast();
 
