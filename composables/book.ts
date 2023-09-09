@@ -1,102 +1,96 @@
 import { Collections, type BookRecord, type BookResponse } from "@/types/pb";
 
-export const useCreateBook = () => {
+export function useBook() {
   const { $pb } = useNuxtApp();
   const toast = useToast();
 
-  return useAsyncState(
-    async (book: Partial<BookRecord> | FormData) => {
-      try {
-        const res = await $pb
-          .collection(Collections.Book)
-          .create<BookResponse>(book);
+  const pending = ref(false);
 
-        toast.add({
-          title: `Success`,
-          icon: "i-fluent-checkmark-circle-20-filled",
-          color: "green",
-        });
+  async function create(book: Partial<BookRecord> | FormData) {
+    pending.value = true;
 
-        return res;
-      } catch (err) {
+    try {
+      const res = await $pb
+        .collection(Collections.Book)
+        .create<BookResponse>(book);
+
+      toast.add({
+        title: `Success`,
+        icon: "i-fluent-checkmark-circle-20-filled",
+        color: "green",
+      });
+
+      return res;
+    } catch (err) {
+      if (err instanceof ClientResponseError) {
         toast.add({
           title: "An error occurred.",
+          description: err.message,
           icon: "i-fluent-error-circle-20-filled",
           color: "red",
         });
-        console.error(err);
       }
-    },
-    null,
-    {
-      immediate: false,
-    },
-  );
-};
+    } finally {
+      pending.value = false;
+    }
+  }
 
-export const useUpdateBook = () => {
-  const { $pb } = useNuxtApp();
-  const toast = useToast();
+  async function update(id: string, book: Partial<BookRecord> | FormData) {
+    pending.value = true;
 
-  return useAsyncState(
-    async (id: string, book: Partial<BookRecord> | FormData) => {
-      try {
-        const res = await $pb
-          .collection(Collections.Book)
-          .update<BookResponse>(id, book);
+    try {
+      const res = await $pb
+        .collection(Collections.Book)
+        .update<BookResponse>(id, book);
 
-        toast.add({
-          title: `Success!`,
-          description: `Updated ${res.edition}`,
-          icon: "i-fluent-checkmark-circle-20-filled",
-          color: "green",
-        });
+      toast.add({
+        title: `Success!`,
+        description: `Updated ${res.edition}`,
+        icon: "i-fluent-checkmark-circle-20-filled",
+        color: "green",
+      });
 
-        return res;
-      } catch (err) {
+      return res;
+    } catch (err) {
+      if (err instanceof ClientResponseError) {
         toast.add({
           title: "An error occurred.",
+          description: err.message,
           icon: "i-fluent-error-circle-20-filled",
           color: "red",
         });
-        console.error(err);
       }
-    },
-    null,
-    {
-      immediate: false,
-    },
-  );
-};
+    } finally {
+      pending.value = false;
+    }
+  }
 
-export const useDeleteBook = () => {
-  const { $pb } = useNuxtApp();
-  const toast = useToast();
+  async function remove(id: string) {
+    pending.value = true;
 
-  return useAsyncState(
-    async (id: string) => {
-      try {
-        const res = await $pb.collection(Collections.Book).delete(id);
+    try {
+      const res = await $pb.collection(Collections.Book).delete(id);
 
-        toast.add({
-          title: `Success!`,
-          icon: "i-fluent-checkmark-circle-20-filled",
-          color: "green",
-        });
+      toast.add({
+        title: `Success!`,
+        icon: "i-fluent-checkmark-circle-20-filled",
+        color: "green",
+      });
 
-        return res;
-      } catch (err) {
+      return res;
+    } catch (err) {
+      if (err instanceof ClientResponseError) {
         toast.add({
           title: "An error occurred.",
+          description: err.message,
           icon: "i-fluent-error-circle-20-filled",
           color: "red",
         });
-        console.error(err);
       }
-    },
-    null,
-    {
-      immediate: false,
-    },
-  );
-};
+    } finally {
+      pending.value = false;
+    }
+  }
+
+  return { pending, create, update, remove };
+}

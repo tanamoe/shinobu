@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PublicationResponse } from "@/types/pb";
 
-const { isLoading, execute: deletePublication } = useDeletePublication();
+const { pending, remove } = usePublication();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -18,7 +18,7 @@ const isOpen = computed({
 });
 
 const handleDelete = async () => {
-  await deletePublication(0, props.publication.id);
+  await remove(props.publication.id);
   isOpen.value = !isOpen.value;
 };
 </script>
@@ -35,7 +35,7 @@ const handleDelete = async () => {
           <UButton variant="ghost" color="gray" @click="isOpen = !isOpen">
             Cancel
           </UButton>
-          <UButton color="red" :pending="isLoading" @click="handleDelete()">
+          <UButton color="red" :pending="pending" @click="handleDelete()">
             Delete
           </UButton>
         </div>

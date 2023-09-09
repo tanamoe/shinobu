@@ -46,11 +46,16 @@ const columns = [
     key: "actions",
   },
 ];
+
+useHead({
+  title: "Title listing",
+});
 </script>
 
 <template>
   <div class="p-6 max-h-screen flex-col flex space-y-6">
-    <AppH1>Title</AppH1>
+    <AppBreadcrumb :items="[{ label: 'Title', active: true }]" />
+
     <form class="flex gap-3" @submit.prevent="() => refresh()">
       <div class="flex-1">
         <UInput
@@ -60,7 +65,7 @@ const columns = [
           color="white"
         />
       </div>
-      <UButton type="submit" :loading="pending">Search</UButton>
+      <UButton type="submit" :loading="pending" color="gray">Search</UButton>
     </form>
 
     <div class="flex-1 overflow-y-scroll">

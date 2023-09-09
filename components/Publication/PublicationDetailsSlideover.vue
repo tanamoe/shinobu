@@ -2,7 +2,7 @@
 import slug from "slug";
 import { PublicationResponse } from "@/types/pb";
 
-const { isLoading, execute: updatePublication } = useUpdatePublication();
+const { pending, update } = usePublication();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  change: [void];
 }>();
 
 const isOpen = computed({
@@ -20,7 +21,10 @@ const isOpen = computed({
 
 const publication = computed(() => props.publication);
 
-const handleUpdate = (e: Event, publication: Partial<PublicationResponse>) => {
+async function handleUpdate(
+  e: Event,
+  publication: Partial<PublicationResponse>,
+) {
   const formData = new FormData(e.target as HTMLFormElement);
 
   const files = formData.getAll("cover");
@@ -46,8 +50,10 @@ const handleUpdate = (e: Event, publication: Partial<PublicationResponse>) => {
 
   publication.cover?.map((cover) => formData.append("cover", cover));
 
-  updatePublication(0, publication.id!, formData);
-};
+  await update(publication.id!, formData);
+
+  emit("change");
+}
 </script>
 
 <template>
@@ -62,16 +68,16 @@ const handleUpdate = (e: Event, publication: Partial<PublicationResponse>) => {
         class="space-y-6"
         @submit.prevent="(e) => handleUpdate(e, publication)"
       >
-        <UFormGroup name="name" label="Name">
-          <UInput v-model="publication.name" />
+        <UFormGroup label="Name">
+          <UInput v-model="publication.name" name="name" />
         </UFormGroup>
-        <UFormGroup name="volume" label="Volume">
-          <UInput v-model="publication.volume" />
+        <UFormGroup label="Volume">
+          <UInput v-model="publication.volume" name="volume" />
         </UFormGroup>
-        <UFormGroup name="digital" label="Digital">
-          <UToggle v-model="publication.digital" />
+        <UFormGroup label="Digital">
+          <UToggle v-model="publication.digital" name="digital" />
         </UFormGroup>
-        <UFormGroup name="cover" label="Cover">
+        <UFormGroup label="Cover">
           <div class="space-y-3">
             <div
               v-for="image in publication.cover"
@@ -101,10 +107,10 @@ const handleUpdate = (e: Event, publication: Partial<PublicationResponse>) => {
               />
             </div>
           </div>
-          <UInput class="mt-3" type="file" multiple />
+          <UInput class="mt-3" type="file" multiple name="cover" />
         </UFormGroup>
         <div class="text-right">
-          <UButton type="submit" label="Save" :pending="isLoading" />
+          <UButton type="submit" label="Save" :pending="pending" />
         </div>
       </form>
     </div>

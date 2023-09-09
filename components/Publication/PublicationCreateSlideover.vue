@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type ReleaseResponse } from "@/types/pb";
 
-const { pending, create } = useCreatePublication();
+const { pending, create } = usePublication();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  change: [void];
 }>();
 
 const isOpen = computed({
@@ -17,11 +18,19 @@ const isOpen = computed({
   set: (value) => emit("update:modelValue", value),
 });
 
-const handleCreate = async (e: Event) => {
-  const formData = new FormData(e.target as HTMLFormElement);
-  formData.append("release", props.release.id);
-  await create(formData);
+const state = ref({
+  name: "",
+  volume: 0,
+  digital: false,
+});
+
+const handleCreate = async () => {
+  await create({
+    release: props.release.id,
+    ...state.value,
+  });
   isOpen.value = false;
+  emit("change");
 };
 </script>
 
@@ -35,13 +44,13 @@ const handleCreate = async (e: Event) => {
 
       <form class="space-y-6" @submit.prevent="handleCreate">
         <UFormGroup name="name" label="Name">
-          <UInput />
+          <UInput v-model="state.name" />
         </UFormGroup>
         <UFormGroup name="volume" label="Volume">
-          <UInput />
+          <UInput v-model="state.volume" />
         </UFormGroup>
         <UFormGroup name="digital" label="Digital">
-          <UToggle />
+          <UToggle v-model="state.digital" />
         </UFormGroup>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />

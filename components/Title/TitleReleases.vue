@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {
+  Collections,
   type BaseSystemFields,
   type TitleResponse,
   type ReleaseResponse,
-  Collections,
   type PublisherResponse,
 } from "@/types/pb";
 

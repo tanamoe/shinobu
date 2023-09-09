@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import {
   Collections,
-  type TitleResponse,
-  type FormatResponse,
+  type PublisherResponse,
+  ReleaseStatusOptions,
+  type ReleaseResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { update, pending } = useTitle();
+const { update, pending } = useRelease();
 
 const props = defineProps<{
-  title: TitleResponse;
+  release: ReleaseResponse;
 }>();
 
 const emit = defineEmits<{
@@ -17,13 +18,13 @@ const emit = defineEmits<{
 }>();
 
 const state = ref({
-  name: props.title.name,
-  format: props.title.format,
-  description: props.title.description,
+  name: props.release.name,
+  status: props.release.status,
+  publisher: props.release.publisher,
 });
 
-const { data: formats } = await useAsyncData(
-  () => $pb.collection(Collections.Format).getFullList<FormatResponse>(),
+const { data: publishers } = await useAsyncData(
+  () => $pb.collection(Collections.Publisher).getFullList<PublisherResponse>(),
   {
     transform: (formats) =>
       formats.map((format) => ({
@@ -34,24 +35,29 @@ const { data: formats } = await useAsyncData(
 );
 
 async function handleUpdate() {
-  const res = await update(props.title.id, state.value);
+  const res = await update(props.release.id, state.value);
   if (res) emit("change");
 }
 </script>
 
 <template>
   <form class="space-y-3" @submit.prevent="handleUpdate">
-    <div class="grid grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <UFormGroup name="name" label="Name">
         <UInput v-model="state.name" />
       </UFormGroup>
 
-      <UFormGroup name="format" label="Format">
-        <USelect v-model="state.format" :options="formats || []" />
+      <UFormGroup name="status" label="Status">
+        <USelect
+          v-model="state.status"
+          :options="Object.values(ReleaseStatusOptions)"
+        />
+      </UFormGroup>
+
+      <UFormGroup name="publisher" label="Publisher">
+        <USelect v-model="state.publisher" :options="publishers || []" />
       </UFormGroup>
     </div>
-
-    <AppEditor v-model="state.description" />
 
     <div class="text-right">
       <UButton

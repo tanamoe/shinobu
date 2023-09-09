@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import slug from "slug";
 import { type TitleResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { update, pending } = useUpdateTitle();
+const { update, pending } = useTitle();
 
 const props = defineProps<{
   title: TitleResponse;
@@ -26,7 +27,30 @@ function openFileUpload() {
 }
 
 async function handleUploadCover() {
-  const res = await update(props.title.id, new FormData(fileInputForm.value));
+  const formData = new FormData(fileInputForm.value);
+
+  const files = formData.getAll("cover");
+  formData.delete("cover");
+
+  files.forEach((file) => {
+    if (file instanceof File) {
+      if (file.size > 0) {
+        const newFile = new File(
+          [file],
+          slug(props.title.name) + "." + file.name.split(".").at(-1),
+          {
+            type: file.type,
+          },
+        );
+
+        formData.append("cover", newFile);
+      } else {
+        formData.append("cover", "");
+      }
+    }
+  });
+
+  const res = await update(props.title.id, formData);
   if (res) emit("change");
 }
 
@@ -87,8 +111,13 @@ function handleShowPreview() {
     </div>
 
     <form ref="fileInputForm">
-      <UFormGroup v-show="false" name="cover">
-        <input ref="fileInput" type="file" @change="handleShowPreview" />
+      <UFormGroup v-show="false">
+        <input
+          ref="fileInput"
+          type="file"
+          name="cover"
+          @change="handleShowPreview"
+        />
       </UFormGroup>
     </form>
   </div>

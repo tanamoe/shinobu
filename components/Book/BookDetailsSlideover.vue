@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import slug from "slug";
-import { BookResponse, Collections, PublicationResponse } from "@/types/pb";
+import {
+  type BookResponse,
+  Collections,
+  type PublicationResponse,
+} from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { isLoading: createPending, execute: createBook } = useCreateBook();
-const { isLoading: updatePending, execute: updateBook } = useUpdateBook();
-const { isLoading: deletePending, execute: deleteBook } = useDeleteBook();
+const { pending, create, update, remove } = useBook();
 
 const props = defineProps<{
   modelValue: boolean;
@@ -14,6 +16,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  change: [void];
 }>();
 
 const isOpen = computed({
@@ -23,7 +26,11 @@ const isOpen = computed({
 
 const publication = computed(() => props.publication);
 
-const { pending, data, refresh } = await useAsyncData(
+const {
+  pending: booksPending,
+  data,
+  refresh,
+} = await useAsyncData(
   () =>
     $pb.collection(Collections.Book).getFullList<BookResponse>({
       filter: `publication.id = '${publication.value.id}'`,
@@ -38,13 +45,16 @@ const { pending, data, refresh } = await useAsyncData(
   },
 );
 
-const handleUpdate = (e: Event, book: Partial<BookResponse>) => {
+async function handleUpdate(e: Event, book: Partial<BookResponse>) {
   const formData = new FormData(e.target as HTMLFormElement);
 
   book.cover?.map((cover) => formData.append("cover", cover));
 
-  updateBook(0, book.id!, formData);
-};
+  await update(book.id!, formData);
+
+  refresh();
+  emit("change");
+}
 
 const handleCreate = async (e: Event) => {
   const formData = new FormData(e.target as HTMLFormElement);
@@ -68,10 +78,10 @@ const handleCreate = async (e: Event) => {
     }
   });
 
-  await createBook(0, formData);
-};
+  await create(formData);
 
-watch([createPending, updatePending, deletePending], () => refresh());
+  refresh();
+};
 </script>
 
 <template>
@@ -82,7 +92,7 @@ watch([createPending, updatePending, deletePending], () => refresh());
         <span class="text-zinc-400">books</span>
       </AppH2>
 
-      <div v-if="pending">
+      <div v-if="booksPending">
         <UCard class="space-y-6">
           <div class="space-y-2">
             <USkeleton class="h-3 w-full" />
@@ -105,14 +115,18 @@ watch([createPending, updatePending, deletePending], () => refresh());
             class="space-y-6"
             @submit.prevent="(e) => handleUpdate(e, book)"
           >
-            <UFormGroup name="edition" label="Edition">
-              <UInput v-model="book.edition" />
+            <UFormGroup label="Edition">
+              <UInput v-model="book.edition" name="edition" />
             </UFormGroup>
-            <UFormGroup name="publishDate" label="Publish date">
-              <UInput v-model="book.publishDate" type="date" />
+            <UFormGroup label="Publish date">
+              <UInput
+                v-model="book.publishDate"
+                type="date"
+                name="publishDate"
+              />
             </UFormGroup>
-            <UFormGroup name="price" label="Price">
-              <UInput v-model="book.price" type="number">
+            <UFormGroup label="Price">
+              <UInput v-model="book.price" type="number" name="price">
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-xs">
                     VND
@@ -120,7 +134,7 @@ watch([createPending, updatePending, deletePending], () => refresh());
                 </template>
               </UInput>
             </UFormGroup>
-            <UFormGroup name="cover" label="Cover">
+            <UFormGroup label="Cover">
               <div class="space-y-3">
                 <div
                   v-for="image in book.cover"
@@ -150,17 +164,17 @@ watch([createPending, updatePending, deletePending], () => refresh());
                   />
                 </div>
               </div>
-              <UInput class="mt-3" type="file" multiple />
+              <UInput class="mt-3" type="file" name="cover" multiple />
             </UFormGroup>
             <div class="text-right space-x-3">
               <UButton
                 label="Delete"
-                :pending="deletePending"
+                :pending="pending"
                 variant="ghost"
                 color="red"
-                @click="deleteBook(0, book.id)"
+                @click="remove(book.id)"
               />
-              <UButton label="Save" :pending="updatePending" type="submit" />
+              <UButton label="Save" :pending="pending" type="submit" />
             </div>
           </form>
         </UCard>
@@ -187,7 +201,7 @@ watch([createPending, updatePending, deletePending], () => refresh());
                 label="Create"
                 icon="i-fluent-add-20-filled"
                 type="submit"
-                :pending="createPending"
+                :pending="pending"
               />
             </div>
           </form>

@@ -7,7 +7,7 @@ import {
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { pending, create } = useCreateRelease();
+const { pending, create } = useRelease();
 
 const props = defineProps<{
   modelValue: boolean;
