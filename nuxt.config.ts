@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   modules: ["@vueuse/nuxt", "@nuxtjs/google-fonts", "@nuxt/ui"],
   runtimeConfig: {
+    tenorApiKey: process.env.TENOR_API_KEY,
     public: {
       pocketbaseUrl: process.env.POCKETBASE_URL,
     },
