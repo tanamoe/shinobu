@@ -30,6 +30,8 @@ async function handleUpdate(
   const files = formData.getAll("cover");
   formData.delete("cover");
 
+  formData.set("digital", JSON.stringify(publication.digital));
+
   files.forEach((file) => {
     if (file instanceof File) {
       if (file.size > 0) {
