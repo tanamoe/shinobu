@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   Collections,
-  PublisherResponse,
+  type PublisherResponse,
   ReleaseStatusOptions,
   type TitleResponse,
 } from "@/types/pb";
@@ -19,14 +19,24 @@ const emit = defineEmits<{
   change: [void];
 }>();
 
-const title = computed(() => props.title);
-
 const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
 });
 
-const { pending: publishersPending, data: publishers } = await useAsyncData(
+const state = ref<{
+  title: string;
+  name?: string;
+  publisher?: string;
+  status?: ReleaseStatusOptions;
+}>({
+  title: props.title.id,
+  name: undefined,
+  publisher: undefined,
+  status: undefined,
+});
+
+const { data: publishers } = await useAsyncData(
   async () =>
     await $pb
       .collection(Collections.Publisher)
@@ -40,13 +50,8 @@ const { pending: publishersPending, data: publishers } = await useAsyncData(
   },
 );
 
-const currentPublisher = ref();
-
-const handleCreate = async (e: Event) => {
-  const formData = new FormData(e.target as HTMLFormElement);
-  formData.append("title", title.value.id);
-
-  const res = await create(formData);
+const handleCreate = async () => {
+  const res = await create(state.value);
 
   if (res) {
     emit("change");
@@ -64,18 +69,22 @@ const handleCreate = async (e: Event) => {
       </AppH2>
 
       <form class="space-y-6" @submit.prevent="handleCreate">
-        <UFormGroup name="name" label="Name">
-          <UInput />
+        <UFormGroup label="Name">
+          <UInput v-model="state.name" name="name" />
         </UFormGroup>
-        <UFormGroup name="publisher" label="Publisher">
+        <UFormGroup label="Publisher">
           <USelect
-            v-model="currentPublisher"
+            v-model="state.publisher"
             :options="publishers || []"
-            :loading="publishersPending"
+            name="publisher"
           />
         </UFormGroup>
-        <UFormGroup name="status" label="Status">
-          <USelect :options="Object.values(ReleaseStatusOptions)" />
+        <UFormGroup label="Status">
+          <USelect
+            v-model="state.status"
+            :options="Object.values(ReleaseStatusOptions)"
+            name="status"
+          />
         </UFormGroup>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />

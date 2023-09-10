@@ -43,14 +43,14 @@ const handleCreate = async () => {
       </AppH2>
 
       <form class="space-y-6" @submit.prevent="handleCreate">
-        <UFormGroup name="name" label="Name">
-          <UInput v-model="state.name" />
+        <UFormGroup label="Name">
+          <UInput v-model="state.name" name="name" />
         </UFormGroup>
-        <UFormGroup name="volume" label="Volume">
-          <UInput v-model="state.volume" />
+        <UFormGroup label="Volume">
+          <UInput v-model="state.volume" name="volume" />
         </UFormGroup>
-        <UFormGroup name="digital" label="Digital">
-          <UToggle v-model="state.digital" />
+        <UFormGroup label="Digital">
+          <UToggle v-model="state.digital" name="digital" />
         </UFormGroup>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />

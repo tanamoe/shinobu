@@ -181,14 +181,14 @@ const handleCreate = async (e: Event) => {
 
         <UCard>
           <form class="space-y-6" @submit.prevent="handleCreate">
-            <UFormGroup name="edition" label="Edition">
-              <UInput />
+            <UFormGroup label="Edition">
+              <UInput name="edition" />
             </UFormGroup>
-            <UFormGroup name="publishDate" label="Publish date">
-              <UInput type="date" />
+            <UFormGroup label="Publish date">
+              <UInput type="date" name="publishDate" />
             </UFormGroup>
-            <UFormGroup name="price" label="price">
-              <UInput label="Price" type="number">
+            <UFormGroup label="Price">
+              <UInput type="number" name="price">
                 <template #trailing>
                   <span class="text-gray-500 dark:text-gray-400 text-xs">
                     VND
