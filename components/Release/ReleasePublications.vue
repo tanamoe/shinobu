@@ -65,17 +65,22 @@ function handleRemove(row: PublicationResponse) {
   removeOpen.value = true;
   publication.value = { ...row };
 }
+
+defineShortcuts({
+  n: {
+    usingInput: true,
+    handler: () => {
+      createOpen.value = true;
+    },
+  },
+});
 </script>
 
 <template>
   <div class="flex justify-end mt-12">
-    <UButton
-      class="ml-auto"
-      icon="i-fluent-add-20-filled"
-      color="gray"
-      @click="createOpen = true"
-    >
+    <UButton class="ml-auto" color="gray" @click="createOpen = true">
       Create
+      <UKbd>N</UKbd>
     </UButton>
   </div>
 
