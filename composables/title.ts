@@ -7,6 +7,35 @@ export function useTitle() {
 
   const pending = ref(false);
 
+  async function create(data: Partial<TitleRecord> | FormData) {
+    pending.value = true;
+
+    try {
+      const res = await $pb
+        .collection(Collections.Title)
+        .create<TitleResponse>(data);
+
+      toast.add({
+        title: `Success`,
+        icon: "i-fluent-checkmark-circle-20-filled",
+        color: "green",
+      });
+
+      return res;
+    } catch (error) {
+      if (error instanceof ClientResponseError)
+        toast.add({
+          title: "Error",
+          description: error.message,
+          icon: "i-fluent-error-circle-20-filled",
+          color: "red",
+        });
+      else console.error(error);
+    } finally {
+      pending.value = false;
+    }
+  }
+
   async function update(id: string, data: Partial<TitleRecord> | FormData) {
     pending.value = true;
 
@@ -36,5 +65,5 @@ export function useTitle() {
     }
   }
 
-  return { pending, update };
+  return { pending, create, update };
 }
