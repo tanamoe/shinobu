@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   Collections,
+  type TitleResponse,
   type PublicationResponse,
   type ReleaseResponse,
 } from "@/types/pb";
@@ -9,10 +10,12 @@ const { $pb } = useNuxtApp();
 
 const props = defineProps<{
   release: ReleaseResponse;
+  title: TitleResponse;
 }>();
 
 const publication = ref<PublicationResponse>();
 
+const quickCreateOpen = ref(false);
 const createOpen = ref(false);
 const editOpen = ref(false);
 const booksOpen = ref(false);
@@ -25,7 +28,7 @@ const {
 } = await useLazyAsyncData("publications", () =>
   $pb.collection(Collections.Publication).getFullList<PublicationResponse>({
     filter: `release.id = '${props.release.id}'`,
-    sort: "volume",
+    sort: "-volume",
   }),
 );
 
@@ -77,10 +80,22 @@ defineShortcuts({
 </script>
 
 <template>
-  <div class="flex justify-end mt-12">
-    <UButton class="ml-auto" color="gray" @click="createOpen = true">
+  <div class="flex items-center justify-end gap-3 mt-12">
+    <UButton
+      color="gray"
+      icon="i-fluent-collections-add-20-filled"
+      class="float-right"
+      @click="quickCreateOpen = true"
+    >
+      Quick create
+    </UButton>
+    <UButton
+      color="gray"
+      icon="i-fluent-add-square-multiple-20-filled"
+      class="float-right"
+      @click="createOpen = true"
+    >
       Create
-      <UKbd>N</UKbd>
     </UButton>
   </div>
 
@@ -131,6 +146,13 @@ defineShortcuts({
       </div>
     </template>
   </UTable>
+
+  <PublicationQuickCreateModal
+    v-model="quickCreateOpen"
+    :release="release"
+    :title="title"
+    @change="refresh()"
+  />
 
   <PublicationCreateSlideover
     v-model="createOpen"
