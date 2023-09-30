@@ -20,4 +20,5 @@ export default defineNuxtConfig({
       Alexandria: [700, 900],
     },
   },
+  ssr: false,
 });
