@@ -43,6 +43,6 @@ useHead({
 
     <ReleaseDetails :release="release" @change="refresh()" />
 
-    <ReleasePublications :release="release" />
+    <ReleasePublications :title="title" :release="release" />
   </div>
 </template>

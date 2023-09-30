@@ -91,7 +91,7 @@ const {
           </UCard>
         </template>
       </Sortable>
-      <div class="text-right">
+      <div class="text-right mt-3">
         <UButton
           color="gray"
           icon="i-fluent-save-20-filled"

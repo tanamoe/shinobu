@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   Collections,
+  type TitleResponse,
   type PublicationResponse,
   type ReleaseResponse,
 } from "@/types/pb";
@@ -9,10 +10,12 @@ const { $pb } = useNuxtApp();
 
 const props = defineProps<{
   release: ReleaseResponse;
+  title: TitleResponse;
 }>();
 
 const publication = ref<PublicationResponse>();
 
+const quickCreateOpen = ref(false);
 const createOpen = ref(false);
 const editOpen = ref(false);
 const booksOpen = ref(false);
@@ -25,7 +28,7 @@ const {
 } = await useLazyAsyncData("publications", () =>
   $pb.collection(Collections.Publication).getFullList<PublicationResponse>({
     filter: `release.id = '${props.release.id}'`,
-    sort: "volume",
+    sort: "-volume",
   }),
 );
 
@@ -65,14 +68,31 @@ function handleRemove(row: PublicationResponse) {
   removeOpen.value = true;
   publication.value = { ...row };
 }
+
+defineShortcuts({
+  n: {
+    usingInput: true,
+    handler: () => {
+      createOpen.value = true;
+    },
+  },
+});
 </script>
 
 <template>
-  <div class="flex justify-end mt-12">
+  <div class="flex items-center justify-end gap-3 mt-12">
     <UButton
-      class="ml-auto"
-      icon="i-fluent-add-20-filled"
       color="gray"
+      icon="i-fluent-collections-add-20-filled"
+      class="float-right"
+      @click="quickCreateOpen = true"
+    >
+      Quick create
+    </UButton>
+    <UButton
+      color="gray"
+      icon="i-fluent-add-square-multiple-20-filled"
+      class="float-right"
       @click="createOpen = true"
     >
       Create
@@ -126,6 +146,13 @@ function handleRemove(row: PublicationResponse) {
       </div>
     </template>
   </UTable>
+
+  <PublicationQuickCreateModal
+    v-model="quickCreateOpen"
+    :release="release"
+    :title="title"
+    @change="refresh()"
+  />
 
   <PublicationCreateSlideover
     v-model="createOpen"
