@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { type ReleaseResponse, type TitleResponse } from "@/types/pb";
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+
+import { z } from "zod";
 
 const { pending, quickCreate } = usePublication();
 
@@ -11,12 +14,28 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:modelValue": [value: boolean];
+  change: [void];
 }>();
 
-const state = ref({
+const schema = z.object({
+  from: z.coerce.number().min(0),
+  to: z.coerce.number().min(0),
+  price: z.coerce.number().min(0).nullable(),
+  digital: z.boolean(),
+});
+
+type Schema = z.output<typeof schema>;
+
+const state = ref<{
+  from?: number;
+  to?: number;
+  price?: number;
+  digital: boolean;
+}>({
   from: undefined,
   to: undefined,
   price: undefined,
+  digital: false,
 });
 
 const isOpen = computed({
@@ -24,16 +43,17 @@ const isOpen = computed({
   set: (value) => emit("update:modelValue", value),
 });
 
-function handleCreate() {
-  if (state.value.from && state.value.to && state.value.price) {
-    quickCreate(
-      props.release,
-      props.title,
-      state.value.from,
-      state.value.to,
-      state.value.price,
-    );
-  }
+async function submit(event: FormSubmitEvent<Schema>) {
+  await quickCreate(
+    props.release,
+    props.title,
+    event.data.from,
+    event.data.to,
+    event.data.price || undefined,
+    event.data.digital,
+  );
+
+  emit("change");
 }
 </script>
 
@@ -42,14 +62,23 @@ function handleCreate() {
     <UCard>
       <template #header>Quick create {{ title.name }}</template>
 
-      <form class="space-y-6" @submit.prevent="handleCreate()">
+      <UForm
+        class="space-y-6"
+        :schema="schema"
+        :state="state"
+        @submit.prevent="submit"
+      >
         <div class="flex gap-6 items-center">
           <UFormGroup name="from">
-            <UInput v-model="state.from" placeholder="From volume" />
+            <UInput
+              v-model="state.from"
+              type="number"
+              placeholder="From volume"
+            />
           </UFormGroup>
           <UIcon name="i-fluent-arrow-right-20-filled" />
           <UFormGroup name="to">
-            <UInput v-model="state.to" placeholder="To volume" />
+            <UInput v-model="state.to" type="number" placeholder="To volume" />
           </UFormGroup>
         </div>
         <UFormGroup name="price">
@@ -59,9 +88,12 @@ function handleCreate() {
             </template>
           </UInput>
         </UFormGroup>
+        <UFormGroup name="digital" label="Digital">
+          <UToggle v-model="state.digital" />
+        </UFormGroup>
 
         <UButton type="submit" :pending="pending">Create</UButton>
-      </form>
+      </UForm>
     </UCard>
   </UModal>
 </template>

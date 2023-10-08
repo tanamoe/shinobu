@@ -49,19 +49,21 @@ export function usePublication() {
     release: ReleaseResponse,
     title: TitleResponse,
     from: number,
-    to?: number,
+    to: number,
     price?: number,
+    digital?: boolean,
   ) {
     pending.value = true;
 
     try {
-      for (let i = from; i <= (to ?? from); i++) {
+      for (let i = from; i <= to; i++) {
         const res = await $pb
           .collection(Collections.Publication)
           .create<PublicationResponse>({
             release: release.id,
             name: `${title.name} - Tập ${i}`,
             volume: i * 10000,
+            digital,
           });
 
         await $pb.collection(Collections.Book).create<BookResponse>({
