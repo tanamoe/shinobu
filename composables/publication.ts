@@ -56,7 +56,7 @@ export function usePublication() {
     pending.value = true;
 
     try {
-      for (let i = Number(from); i <= Number(to); i++) {
+      for (let i = from; i <= to; i++) {
         const res = await $pb
           .collection(Collections.Publication)
           .create<PublicationResponse>({

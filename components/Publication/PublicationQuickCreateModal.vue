@@ -44,8 +44,6 @@ const isOpen = computed({
 });
 
 async function submit(event: FormSubmitEvent<Schema>) {
-  console.log(typeof event.data.from, typeof event.data.to);
-
   await quickCreate(
     props.release,
     props.title,
