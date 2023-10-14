@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type ReleaseResponse, type TitleResponse } from "@/types/pb";
+import { type ReleasesResponse, type TitlesResponse } from "@/types/pb";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 
 import { z } from "zod";
@@ -8,8 +8,8 @@ const { pending, quickCreate } = usePublication();
 
 const props = defineProps<{
   modelValue: boolean;
-  release: ReleaseResponse;
-  title: TitleResponse;
+  release: ReleasesResponse;
+  title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{

@@ -2,16 +2,16 @@
 import { Sortable } from "sortablejs-vue3";
 import {
   Collections,
-  type TitleResponse,
-  type StaffResponse,
-  type WorkResponse,
+  type TitlesResponse,
+  type StaffsResponse,
+  type WorksResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const { updatePriority } = useWorks();
 
 const props = defineProps<{
-  title: TitleResponse;
+  title: TitlesResponse;
 }>();
 
 const createOpen = ref(false);
@@ -21,9 +21,9 @@ const {
   pending,
   refresh,
 } = await useAsyncData(() =>
-  $pb.collection(Collections.Work).getFullList<
-    WorkResponse<{
-      staff: StaffResponse;
+  $pb.collection(Collections.Works).getFullList<
+    WorksResponse<{
+      staff: StaffsResponse;
     }>
   >({
     filter: `title='${props.title.id}'`,
@@ -69,8 +69,8 @@ const {
           #item="{
             element,
           }: {
-            element: WorkResponse<{
-              staff: StaffResponse<unknown>;
+            element: WorksResponse<{
+              staff: StaffsResponse<unknown>;
             }>;
           }"
         >

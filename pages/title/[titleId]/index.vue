@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { Collections, type TitleResponse } from "@/types/pb";
+import { Collections, type TitlesResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
 
 const { data: title, refresh } = await useAsyncData(() =>
   $pb
-    .collection(Collections.Title)
-    .getOne<TitleResponse>(route.params.titleId as string),
+    .collection(Collections.Titles)
+    .getOne<TitlesResponse>(route.params.titleId as string),
 );
 
 if (!title.value)

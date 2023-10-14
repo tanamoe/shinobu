@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
   Collections,
-  type TitleResponse,
-  type ReleaseResponse,
+  type TitlesResponse,
+  type ReleasesResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
@@ -10,8 +10,8 @@ const route = useRoute();
 
 const { data: title } = await useAsyncData(() =>
   $pb
-    .collection(Collections.Title)
-    .getOne<TitleResponse>(route.params.titleId as string),
+    .collection(Collections.Titles)
+    .getOne<TitlesResponse>(route.params.titleId as string),
 );
 
 if (!title.value)
@@ -19,8 +19,8 @@ if (!title.value)
 
 const { data: release, refresh } = await useAsyncData(() =>
   $pb
-    .collection(Collections.Release)
-    .getOne<ReleaseResponse>(route.params.releaseId as string),
+    .collection(Collections.Releases)
+    .getOne<ReleasesResponse>(route.params.releaseId as string),
 );
 
 if (!release.value)

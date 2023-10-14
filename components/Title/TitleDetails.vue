@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import {
   Collections,
-  type TitleResponse,
-  type FormatResponse,
+  type TitlesResponse,
+  type FormatsResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const { update, pending } = useTitle();
 
 const props = defineProps<{
-  title: TitleResponse;
+  title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{
@@ -23,7 +23,7 @@ const state = ref({
 });
 
 const { data: formats } = await useAsyncData(
-  () => $pb.collection(Collections.Format).getFullList<FormatResponse>(),
+  () => $pb.collection(Collections.Formats).getFullList<FormatsResponse>(),
   {
     transform: (formats) =>
       formats.map((format) => ({

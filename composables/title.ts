@@ -1,5 +1,9 @@
 import { ClientResponseError } from "pocketbase";
-import { Collections, type TitleRecord, type TitleResponse } from "@/types/pb";
+import {
+  Collections,
+  type TitlesRecord,
+  type TitlesResponse,
+} from "@/types/pb";
 
 export function useTitle() {
   const { $pb } = useNuxtApp();
@@ -7,13 +11,13 @@ export function useTitle() {
 
   const pending = ref(false);
 
-  async function create(data: Partial<TitleRecord> | FormData) {
+  async function create(data: Partial<TitlesRecord> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Title)
-        .create<TitleResponse>(data);
+        .collection(Collections.Titles)
+        .create<TitlesResponse>(data);
 
       toast.add({
         title: `Success`,
@@ -36,13 +40,13 @@ export function useTitle() {
     }
   }
 
-  async function update(id: string, data: Partial<TitleRecord> | FormData) {
+  async function update(id: string, data: Partial<TitlesRecord> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Title)
-        .update<TitleResponse>(id, data);
+        .collection(Collections.Titles)
+        .update<TitlesResponse>(id, data);
 
       toast.add({
         title: `Success`,

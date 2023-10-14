@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import slug from "slug";
 import {
-  type BookResponse,
+  type BooksResponse,
   Collections,
-  type PublicationResponse,
+  type PublicationsResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
@@ -11,7 +11,7 @@ const { pending, create, update, remove } = useBook();
 
 const props = defineProps<{
   modelValue: boolean;
-  publication: PublicationResponse;
+  publication: PublicationsResponse;
 }>();
 
 const emit = defineEmits<{
@@ -32,7 +32,7 @@ const {
   refresh,
 } = await useAsyncData(
   () =>
-    $pb.collection(Collections.Book).getFullList<BookResponse>({
+    $pb.collection(Collections.Books).getFullList<BooksResponse>({
       filter: `publication.id = '${publication.value.id}'`,
     }),
   {
@@ -45,7 +45,7 @@ const {
   },
 );
 
-async function handleUpdate(e: Event, book: Partial<BookResponse>) {
+async function handleUpdate(e: Event, book: Partial<BooksResponse>) {
   const formData = new FormData(e.target as HTMLFormElement);
 
   book.cover?.map((cover) => formData.append("cover", cover));

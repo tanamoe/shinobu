@@ -1,8 +1,8 @@
 import { ClientResponseError } from "pocketbase";
 import {
   Collections,
-  type ReleaseRecord,
-  type ReleaseResponse,
+  type ReleasesRecord,
+  type ReleasesResponse,
 } from "@/types/pb";
 
 export function useRelease() {
@@ -11,13 +11,13 @@ export function useRelease() {
 
   const pending = ref(false);
 
-  async function create(release: Partial<ReleaseRecord> | FormData) {
+  async function create(release: Partial<ReleasesRecord> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Release)
-        .create<ReleaseResponse>(release);
+        .collection(Collections.Releases)
+        .create<ReleasesResponse>(release);
 
       toast.add({
         title: `Success`,
@@ -42,14 +42,14 @@ export function useRelease() {
 
   async function update(
     id: string,
-    release: Partial<ReleaseRecord> | FormData,
+    release: Partial<ReleasesRecord> | FormData,
   ) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Release)
-        .update<ReleaseResponse>(id, release);
+        .collection(Collections.Releases)
+        .update<ReleasesResponse>(id, release);
 
       toast.add({
         title: `Success`,

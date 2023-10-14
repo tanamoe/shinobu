@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import {
   Collections,
-  type TitleResponse,
-  type PublicationResponse,
-  type ReleaseResponse,
+  type TitlesResponse,
+  type PublicationsResponse,
+  type ReleasesResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 
 const props = defineProps<{
-  release: ReleaseResponse;
-  title: TitleResponse;
+  release: ReleasesResponse;
+  title: TitlesResponse;
 }>();
 
-const publication = ref<PublicationResponse>();
+const publication = ref<PublicationsResponse>();
 
 const quickCreateOpen = ref(false);
 const createOpen = ref(false);
@@ -26,7 +26,7 @@ const {
   data: publications,
   refresh,
 } = await useLazyAsyncData("publications", () =>
-  $pb.collection(Collections.Publication).getFullList<PublicationResponse>({
+  $pb.collection(Collections.Publications).getFullList<PublicationsResponse>({
     filter: `release.id = '${props.release.id}'`,
     sort: "-volume",
   }),
@@ -54,17 +54,17 @@ const columns = [
   },
 ];
 
-function handleEdit(row: PublicationResponse) {
+function handleEdit(row: PublicationsResponse) {
   editOpen.value = true;
   publication.value = { ...row };
 }
 
-function handleEditBook(row: PublicationResponse) {
+function handleEditBook(row: PublicationsResponse) {
   booksOpen.value = true;
   publication.value = { ...row };
 }
 
-function handleRemove(row: PublicationResponse) {
+function handleRemove(row: PublicationsResponse) {
   removeOpen.value = true;
   publication.value = { ...row };
 }

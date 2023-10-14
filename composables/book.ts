@@ -1,4 +1,5 @@
-import { Collections, type BookRecord, type BookResponse } from "@/types/pb";
+import { Collections, type BooksRecord, type BooksResponse } from "@/types/pb";
+import { ClientResponseError } from "pocketbase";
 
 export function useBook() {
   const { $pb } = useNuxtApp();
@@ -6,13 +7,13 @@ export function useBook() {
 
   const pending = ref(false);
 
-  async function create(book: Partial<BookRecord> | FormData) {
+  async function create(book: Partial<BooksRecord> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Book)
-        .create<BookResponse>(book);
+        .collection(Collections.Books)
+        .create<BooksResponse>(book);
 
       toast.add({
         title: `Success`,
@@ -35,13 +36,13 @@ export function useBook() {
     }
   }
 
-  async function update(id: string, book: Partial<BookRecord> | FormData) {
+  async function update(id: string, book: Partial<BooksRecord> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Book)
-        .update<BookResponse>(id, book);
+        .collection(Collections.Books)
+        .update<BooksResponse>(id, book);
 
       toast.add({
         title: `Success!`,
@@ -69,7 +70,7 @@ export function useBook() {
     pending.value = true;
 
     try {
-      const res = await $pb.collection(Collections.Book).delete(id);
+      const res = await $pb.collection(Collections.Books).delete(id);
 
       toast.add({
         title: `Success!`,
