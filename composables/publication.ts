@@ -1,10 +1,10 @@
 import {
   Collections,
-  type PublicationRecord,
-  type PublicationResponse,
-  type ReleaseResponse,
-  type TitleResponse,
-  type BookResponse,
+  type PublicationsRecord,
+  type PublicationsResponse,
+  type ReleasesResponse,
+  type TitlesResponse,
+  type BooksResponse,
 } from "@/types/pb";
 import { ClientResponseError } from "pocketbase";
 
@@ -14,13 +14,13 @@ export function usePublication() {
 
   const pending = ref(false);
 
-  async function create(publication: Partial<PublicationRecord> | FormData) {
+  async function create(publication: Partial<PublicationsRecord> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Publication)
-        .create<PublicationResponse>(publication);
+        .collection(Collections.Publications)
+        .create<PublicationsResponse>(publication);
 
       toast.add({
         title: `Success`,
@@ -46,8 +46,8 @@ export function usePublication() {
   }
 
   async function quickCreate(
-    release: ReleaseResponse,
-    title: TitleResponse,
+    release: ReleasesResponse,
+    title: TitlesResponse,
     from: number,
     to: number,
     price?: number,
@@ -58,15 +58,15 @@ export function usePublication() {
     try {
       for (let i = from; i <= to; i++) {
         const res = await $pb
-          .collection(Collections.Publication)
-          .create<PublicationResponse>({
+          .collection(Collections.Publications)
+          .create<PublicationsResponse>({
             release: release.id,
             name: `${title.name} - Tập ${i}`,
             volume: i * 10000,
             digital,
           });
 
-        await $pb.collection(Collections.Book).create<BookResponse>({
+        await $pb.collection(Collections.Books).create<BooksResponse>({
           publication: res.id,
           price,
         });
@@ -95,14 +95,14 @@ export function usePublication() {
 
   async function update(
     id: string,
-    publication: Partial<PublicationRecord> | FormData,
+    publication: Partial<PublicationsRecord> | FormData,
   ) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Publication)
-        .update<PublicationResponse>(id, publication);
+        .collection(Collections.Publications)
+        .update<PublicationsResponse>(id, publication);
 
       toast.add({
         title: `Success`,
@@ -131,7 +131,7 @@ export function usePublication() {
     pending.value = true;
 
     try {
-      const res = await $pb.collection(Collections.Publication).delete(id);
+      const res = await $pb.collection(Collections.Publications).delete(id);
 
       toast.add({
         title: `Success`,

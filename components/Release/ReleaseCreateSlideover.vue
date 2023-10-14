@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {
   Collections,
-  type PublisherResponse,
-  ReleaseStatusOptions,
-  type TitleResponse,
+  type PublishersResponse,
+  ReleasesStatusOptions,
+  type TitlesResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
@@ -11,7 +11,7 @@ const { pending, create } = useRelease();
 
 const props = defineProps<{
   modelValue: boolean;
-  title: TitleResponse;
+  title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{
@@ -28,7 +28,7 @@ const state = ref<{
   title: string;
   name?: string;
   publisher?: string;
-  status?: ReleaseStatusOptions;
+  status?: ReleasesStatusOptions;
 }>({
   title: props.title.id,
   name: undefined,
@@ -39,8 +39,8 @@ const state = ref<{
 const { data: publishers } = await useAsyncData(
   async () =>
     await $pb
-      .collection(Collections.Publisher)
-      .getFullList<PublisherResponse>(),
+      .collection(Collections.Publishers)
+      .getFullList<PublishersResponse>(),
   {
     transform: (publishers) =>
       publishers.map((publisher) => ({
@@ -82,7 +82,7 @@ const handleCreate = async () => {
         <UFormGroup label="Status">
           <USelect
             v-model="state.status"
-            :options="Object.values(ReleaseStatusOptions)"
+            :options="Object.values(ReleasesStatusOptions)"
             name="status"
           />
         </UFormGroup>

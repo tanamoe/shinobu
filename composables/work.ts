@@ -1,5 +1,5 @@
 import { ClientResponseError } from "pocketbase";
-import { Collections, type WorkResponse } from "@/types/pb";
+import { Collections, type WorksResponse } from "@/types/pb";
 
 export function useWork() {
   const { $pb } = useNuxtApp();
@@ -7,13 +7,13 @@ export function useWork() {
 
   const pending = ref(false);
 
-  async function create(data: Partial<WorkResponse> | FormData) {
+  async function create(data: Partial<WorksResponse> | FormData) {
     pending.value = true;
 
     try {
       const res = await $pb
-        .collection(Collections.Work)
-        .create<WorkResponse>(data);
+        .collection(Collections.Works)
+        .create<WorksResponse>(data);
 
       toast.add({
         title: `Success`,

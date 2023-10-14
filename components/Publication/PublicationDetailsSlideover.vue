@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import slug from "slug";
-import { PublicationResponse } from "@/types/pb";
+import { PublicationsResponse } from "@/types/pb";
 
 const { pending, update } = usePublication();
 
 const props = defineProps<{
   modelValue: boolean;
-  publication: PublicationResponse;
+  publication: PublicationsResponse;
 }>();
 
 const emit = defineEmits<{
@@ -23,7 +23,7 @@ const publication = computed(() => props.publication);
 
 async function handleUpdate(
   e: Event,
-  publication: Partial<PublicationResponse>,
+  publication: Partial<PublicationsResponse>,
 ) {
   const formData = new FormData(e.target as HTMLFormElement);
 

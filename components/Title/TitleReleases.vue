@@ -2,15 +2,15 @@
 import {
   Collections,
   type BaseSystemFields,
-  type TitleResponse,
-  type ReleaseResponse,
-  type PublisherResponse,
+  type TitlesResponse,
+  type ReleasesResponse,
+  type PublishersResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 
 const props = defineProps<{
-  title: TitleResponse;
+  title: TitlesResponse;
 }>();
 
 const createOpen = ref(false);
@@ -21,9 +21,9 @@ const {
   refresh,
 } = await useAsyncData(
   () =>
-    $pb.collection(Collections.Release).getFullList<
-      ReleaseResponse<{
-        publisher: PublisherResponse;
+    $pb.collection(Collections.Releases).getFullList<
+      ReleasesResponse<{
+        publisher: PublishersResponse;
       }>
     >({
       filter: `title='${props.title.id}'`,

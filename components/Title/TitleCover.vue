@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import slug from "slug";
-import { type TitleResponse } from "@/types/pb";
+import { type TitlesResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const { update, pending } = useTitle();
 
 const props = defineProps<{
-  title: TitleResponse;
+  title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{

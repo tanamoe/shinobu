@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { type ReleaseResponse } from "@/types/pb";
+import { type ReleasesResponse } from "@/types/pb";
 
 const { pending, create } = usePublication();
 
 const props = defineProps<{
   modelValue: boolean;
-  release: ReleaseResponse;
+  release: ReleasesResponse;
 }>();
 
 const emit = defineEmits<{

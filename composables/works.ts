@@ -1,5 +1,5 @@
 import { ClientResponseError } from "pocketbase";
-import { Collections, type WorkResponse } from "@/types/pb";
+import { Collections, type WorksResponse } from "@/types/pb";
 
 export function useWorks() {
   const { $pb } = useNuxtApp();
@@ -7,14 +7,16 @@ export function useWorks() {
 
   const pending = ref(false);
 
-  async function updatePriority(records: WorkResponse[]) {
+  async function updatePriority(records: WorksResponse[]) {
     pending.value = true;
 
     for (const [i, record] of records.entries()) {
       try {
-        await $pb.collection(Collections.Work).update<WorkResponse>(record.id, {
-          priority: i + 1,
-        });
+        await $pb
+          .collection(Collections.Works)
+          .update<WorksResponse>(record.id, {
+            priority: i + 1,
+          });
 
         toast.add({
           title: `Success`,

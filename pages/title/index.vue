@@ -2,8 +2,8 @@
 import {
   type BaseSystemFields,
   Collections,
-  type FormatResponse,
-  type TitleResponse,
+  type FormatsResponse,
+  type TitlesResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
@@ -15,8 +15,8 @@ const createOpen = ref(false);
 const quickCreateOpen = ref(false);
 
 const metadata = await $pb
-  .collection(Collections.Title)
-  .getList<TitleResponse>(1, 1);
+  .collection(Collections.Titles)
+  .getList<TitlesResponse>(1, 1);
 
 const {
   pending,
@@ -24,9 +24,9 @@ const {
   refresh,
 } = await useAsyncData(
   () =>
-    $pb.collection(Collections.Title).getList<
-      TitleResponse<{
-        format: FormatResponse;
+    $pb.collection(Collections.Titles).getList<
+      TitlesResponse<{
+        format: FormatsResponse;
       }>
     >(page.value, 20, {
       filter: `name~'${searchQuery.value}'`,

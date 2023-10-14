@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {
   Collections,
-  type StaffResponse,
-  type TitleResponse,
+  type StaffsResponse,
+  type TitlesResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
@@ -10,7 +10,7 @@ const { pending, create } = useWork();
 
 const props = defineProps<{
   modelValue: boolean;
-  title: TitleResponse;
+  title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{
@@ -25,7 +25,7 @@ const isOpen = computed({
 
 const { data: staff } = await useAsyncData(
   () =>
-    $pb.collection(Collections.Staff).getList<StaffResponse>(1, 15, {
+    $pb.collection(Collections.Staffs).getList<StaffsResponse>(1, 15, {
       sort: "+created",
     }),
   {
@@ -57,8 +57,8 @@ const label = computed({
 
     if (staff?.label) {
       const res = await $pb
-        .collection(Collections.Staff)
-        .create<StaffResponse>({
+        .collection(Collections.Staffs)
+        .create<StaffsResponse>({
           name: staff.label,
         });
 
@@ -73,8 +73,8 @@ const label = computed({
 
 const search = async (query: string) => {
   const res = await $pb
-    .collection(Collections.Staff)
-    .getList<StaffResponse>(1, 15, {
+    .collection(Collections.Staffs)
+    .getList<StaffsResponse>(1, 15, {
       filter: `name~'${query}'`,
     });
 
