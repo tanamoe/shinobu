@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { Collections, type TitlesResponse } from "@/types/pb";
+import { Collections } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
 
 const { data: title, refresh } = await useAsyncData(() =>
-  $pb
-    .collection(Collections.Titles)
-    .getOne<TitlesResponse>(route.params.titleId as string),
+  $pb.collection(Collections.Titles).getOne(route.params.titleId as string),
 );
 
 if (!title.value)
@@ -29,12 +27,12 @@ useHead({
 
     <section class="flex gap-6">
       <div class="flex-1">
-        <TitleDetails :title="title" @change="refresh()" />
-        <TitleReleases :title="title" />
+        <PageTitleDetails :title="title" @change="refresh()" />
+        <PageTitleReleases :title="title" />
       </div>
       <div>
-        <TitleCover :title="title" @change="refresh()" />
-        <TitleWorks :title="title" />
+        <PageTitleCover :title="title" @change="refresh()" />
+        <PageTitleWorks :title="title" />
       </div>
     </section>
   </div>

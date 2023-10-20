@@ -13,22 +13,18 @@ const props = defineProps<{
   title: TitlesResponse;
 }>();
 
-const createOpen = ref(false);
-
 const {
   pending,
   data: releases,
   refresh,
-} = await useAsyncData(
+} = await useLazyAsyncData(
   () =>
-    $pb.collection(Collections.Releases).getFullList<
-      ReleasesResponse<{
-        publisher: PublishersResponse;
-      }>
-    >({
-      filter: `title='${props.title.id}'`,
-      expand: "publisher",
-    }),
+    $pb
+      .collection(Collections.Releases)
+      .getFullList<ReleasesResponse<{ publisher: PublishersResponse }>>({
+        filter: `title='${props.title.id}'`,
+        expand: "publisher",
+      }),
   {
     transform: (data) =>
       data.map((release) => ({
@@ -71,21 +67,14 @@ const columns = [
         >
           Refresh
         </UButton>
-        <UButton
-          color="gray"
-          icon="i-fluent-add-square-multiple-20-filled"
-          class="float-right"
-          @click="createOpen = true"
-        >
-          Create
-        </UButton>
+
+        <ReleaseCreate :title="title" @change="refresh()" />
       </span>
     </AppH2>
 
     <UTable
       :columns="columns"
       :rows="releases"
-      :loading="pending"
       class="dark:divide-gray-700 gap-1 rounded-md border border-gray-300 dark:border-gray-700"
       @select="
         (row: BaseSystemFields) => navigateTo(`/title/${title!.id}/${row.id}`)
@@ -102,10 +91,4 @@ const columns = [
       </template>
     </UTable>
   </section>
-
-  <ReleaseCreateSlideover
-    v-model="createOpen"
-    :title="title"
-    @change="refresh()"
-  />
 </template>

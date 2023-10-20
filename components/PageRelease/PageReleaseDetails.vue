@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import {
-  Collections,
-  type PublishersResponse,
-  ReleasesStatusOptions,
-  type ReleasesResponse,
-} from "@/types/pb";
+import { z } from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import { ReleasesStatusOptions, type ReleasesResponse } from "@/types/pb";
 
-const { $pb } = useNuxtApp();
 const { update, pending } = useRelease();
 
 const props = defineProps<{
@@ -17,32 +13,28 @@ const emit = defineEmits<{
   change: [void];
 }>();
 
-const state = ref({
+const schema = z.object({
+  name: z.string(),
+  status: z.nativeEnum(ReleasesStatusOptions),
+  publisher: z.string(),
+});
+
+type Schema = z.output<typeof schema>;
+
+const state = ref<Schema>({
   name: props.release.name,
   status: props.release.status,
   publisher: props.release.publisher,
 });
 
-const { data: publishers } = await useAsyncData(
-  () =>
-    $pb.collection(Collections.Publishers).getFullList<PublishersResponse>(),
-  {
-    transform: (formats) =>
-      formats.map((format) => ({
-        value: format.id,
-        label: format.name,
-      })),
-  },
-);
-
-async function handleUpdate() {
-  const res = await update(props.release.id, state.value);
+async function submit(event: FormSubmitEvent<Schema>) {
+  const res = await update(props.release.id, event.data);
   if (res) emit("change");
 }
 </script>
 
 <template>
-  <form class="space-y-3" @submit.prevent="handleUpdate">
+  <UForm :schema="schema" :state="state" class="space-y-3" @submit="submit">
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <UFormGroup name="name" label="Name">
         <UInput v-model="state.name" />
@@ -56,7 +48,7 @@ async function handleUpdate() {
       </UFormGroup>
 
       <UFormGroup name="publisher" label="Publisher">
-        <USelect v-model="state.publisher" :options="publishers || []" />
+        <AppPublisherSelect v-model="state.publisher" />
       </UFormGroup>
     </div>
 
@@ -70,5 +62,5 @@ async function handleUpdate() {
         Save
       </UButton>
     </div>
-  </form>
+  </UForm>
 </template>

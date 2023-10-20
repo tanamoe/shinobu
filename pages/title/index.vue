@@ -11,9 +11,6 @@ const { $pb } = useNuxtApp();
 const page = ref(1);
 const searchQuery = ref("");
 
-const createOpen = ref(false);
-const quickCreateOpen = ref(false);
-
 const metadata = await $pb
   .collection(Collections.Titles)
   .getList<TitlesResponse>(1, 1);
@@ -81,23 +78,7 @@ useHead({
       >
         Refresh
       </UButton>
-      <UButton
-        color="gray"
-        icon="i-fluent-collections-add-20-filled"
-        class="float-right"
-        disabled
-        @click="createOpen = true"
-      >
-        Quick create
-      </UButton>
-      <UButton
-        color="gray"
-        icon="i-fluent-add-square-multiple-20-filled"
-        class="float-right"
-        @click="createOpen = true"
-      >
-        Create
-      </UButton>
+      <TitleCreate />
     </div>
 
     <div class="flex-1 overflow-y-scroll">
@@ -140,7 +121,5 @@ useHead({
       :page-count="20"
       :total="metadata.totalItems"
     />
-
-    <TitleCreateSlideover v-model="createOpen" />
   </div>
 </template>

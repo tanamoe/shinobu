@@ -4,29 +4,24 @@ import {
   type StaffsResponse,
   type TitlesResponse,
 } from "@/types/pb";
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import { z } from "zod";
 
 const { $pb } = useNuxtApp();
 const { pending, create } = useWork();
 
 const props = defineProps<{
-  modelValue: boolean;
   title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{
-  "update:modelValue": [value: boolean];
   change: [void];
 }>();
 
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
-});
-
-const { data: staff } = await useAsyncData(
+const { data: staff } = await useLazyAsyncData(
   () =>
-    $pb.collection(Collections.Staffs).getList<StaffsResponse>(1, 15, {
-      sort: "+created",
+    $pb.collection(Collections.Staffs).getList(1, 15, {
+      sort: "-updated",
     }),
   {
     transform: (data) =>
@@ -37,33 +32,37 @@ const { data: staff } = await useAsyncData(
   },
 );
 
-if (!staff.value) throw createError({ statusCode: 500 });
-
-const state = ref<{
-  name: string;
-}>({
-  name: "",
+const schema = z.object({
+  title: z.string(),
+  name: z.string(),
+  staff: z.object({
+    id: z.string(),
+    label: z.string(),
+  }),
 });
 
-const selected = ref<{
-  id: string;
-  label: string;
-}>();
+type Schema = z.output<typeof schema>;
+
+const isOpen = ref(false);
+
+const state = ref<Partial<Schema>>({
+  title: props.title.id,
+  name: undefined,
+  staff: undefined,
+});
 
 const label = computed({
-  get: () => selected.value,
+  get: () => state.value.staff,
   set: async (staff) => {
-    if (staff?.id) return (selected.value = staff);
+    if (staff?.id) return (state.value.staff = staff);
 
     if (staff?.label) {
-      const res = await $pb
-        .collection(Collections.Staffs)
-        .create<StaffsResponse>({
-          name: staff.label,
-        });
+      const res = await $pb.collection(Collections.Staffs).create({
+        name: staff.label,
+      });
 
       if (res)
-        selected.value = {
+        state.value.staff = {
           id: res.id,
           label: res.name,
         };
@@ -71,31 +70,47 @@ const label = computed({
   },
 });
 
-const search = async (query: string) => {
+async function search(query: string) {
   const res = await $pb
     .collection(Collections.Staffs)
     .getList<StaffsResponse>(1, 15, {
       filter: `name~'${query}'`,
+      sort: "-updated",
     });
 
   return res.items.map((staff) => ({
     id: staff.id,
     label: staff.name,
   }));
-};
+}
 
-const handleCreate = async () => {
-  await create({
-    title: props.title.id,
-    staff: selected.value?.id,
-    name: state.value.name,
+async function submit(event: FormSubmitEvent<Schema>) {
+  const res = await create({
+    ...event.data,
+    staff: event.data.staff.id,
   });
-  isOpen.value = false;
-  emit("change");
-};
+
+  if (res) {
+    isOpen.value = false;
+    state.value = {
+      title: props.title.id,
+      name: undefined,
+      staff: undefined,
+    };
+    emit("change");
+  }
+}
 </script>
 
 <template>
+  <UButton
+    color="gray"
+    icon="i-fluent-add-square-multiple-20-filled"
+    class="float-right"
+    @click="isOpen = true"
+  >
+    Create
+  </UButton>
   <USlideover v-model="isOpen">
     <div class="p-6">
       <AppH2>
@@ -103,7 +118,7 @@ const handleCreate = async () => {
         {{ title.name }}
       </AppH2>
 
-      <form class="space-y-6" @submit.prevent="handleCreate">
+      <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
         <UFormGroup label="Staff">
           <USelectMenu
             v-if="staff"
@@ -124,7 +139,7 @@ const handleCreate = async () => {
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />
         </div>
-      </form>
+      </UForm>
     </div>
   </USlideover>
 </template>
