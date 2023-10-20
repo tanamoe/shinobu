@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { z } from "zod";
 import {
   Collections,
   type StaffsResponse,
   type TitlesResponse,
 } from "@/types/pb";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
-import { z } from "zod";
 
 const { $pb } = useNuxtApp();
 const { pending, create } = useWork();
