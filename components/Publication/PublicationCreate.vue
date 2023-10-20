@@ -16,7 +16,7 @@ const emit = defineEmits<{
 const schema = z.object({
   release: z.string(),
   name: z.string(),
-  volume: z.number(),
+  volume: z.coerce.number(),
   digital: z.boolean(),
 });
 
