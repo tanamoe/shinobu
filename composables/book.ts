@@ -36,7 +36,10 @@ export function useBook() {
     }
   }
 
-  async function update(id: string, book: Partial<BooksRecord> | FormData) {
+  async function update(
+    id: string,
+    book: Partial<BooksRecord> | { covers?: File | File[] } | FormData,
+  ) {
     pending.value = true;
 
     try {

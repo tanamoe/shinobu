@@ -20,7 +20,7 @@ const {
   data: works,
   pending,
   refresh,
-} = await useAsyncData(() =>
+} = await useLazyAsyncData(() =>
   $pb.collection(Collections.Works).getFullList<
     WorksResponse<{
       staff: StaffsResponse;
@@ -47,14 +47,7 @@ const {
         >
           Refresh
         </UButton>
-        <UButton
-          color="gray"
-          icon="i-fluent-add-square-multiple-20-filled"
-          class="float-right"
-          @click="createOpen = true"
-        >
-          Create
-        </UButton>
+        <WorkCreate :title="title" @change="refresh()" />
       </span>
     </AppH2>
     <ClientOnly>
@@ -102,10 +95,4 @@ const {
       </div>
     </ClientOnly>
   </section>
-
-  <WorkCreateSlideover
-    v-model="createOpen"
-    :title="title"
-    @change="refresh()"
-  />
 </template>

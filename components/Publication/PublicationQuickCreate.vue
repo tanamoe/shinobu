@@ -7,13 +7,11 @@ import { z } from "zod";
 const { pending, quickCreate } = usePublication();
 
 const props = defineProps<{
-  modelValue: boolean;
   release: ReleasesResponse;
   title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{
-  "update:modelValue": [value: boolean];
   change: [void];
 }>();
 
@@ -26,21 +24,13 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = ref<{
-  from?: number;
-  to?: number;
-  price?: number;
-  digital: boolean;
-}>({
+const isOpen = ref(false);
+
+const state = ref({
   from: undefined,
   to: undefined,
   price: undefined,
   digital: false,
-});
-
-const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
 });
 
 async function submit(event: FormSubmitEvent<Schema>) {
@@ -58,16 +48,19 @@ async function submit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
+  <UButton
+    color="gray"
+    icon="i-fluent-collections-add-20-filled"
+    class="float-right"
+    @click="isOpen = true"
+  >
+    Quick create
+  </UButton>
   <UModal v-model="isOpen">
     <UCard>
       <template #header>Quick create {{ title.name }}</template>
 
-      <UForm
-        class="space-y-6"
-        :schema="schema"
-        :state="state"
-        @submit.prevent="submit"
-      >
+      <UForm class="space-y-6" :schema="schema" :state="state" @submit="submit">
         <div class="flex gap-6 items-center">
           <UFormGroup name="from">
             <UInput

@@ -1,26 +1,18 @@
 <script setup lang="ts">
-import {
-  Collections,
-  type TitlesResponse,
-  type ReleasesResponse,
-} from "@/types/pb";
+import { Collections } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
 
 const { data: title } = await useAsyncData(() =>
-  $pb
-    .collection(Collections.Titles)
-    .getOne<TitlesResponse>(route.params.titleId as string),
+  $pb.collection(Collections.Titles).getOne(route.params.titleId as string),
 );
 
 if (!title.value)
   throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
 
 const { data: release, refresh } = await useAsyncData(() =>
-  $pb
-    .collection(Collections.Releases)
-    .getOne<ReleasesResponse>(route.params.releaseId as string),
+  $pb.collection(Collections.Releases).getOne(route.params.releaseId as string),
 );
 
 if (!release.value)
@@ -41,8 +33,8 @@ useHead({
       ]"
     />
 
-    <ReleaseDetails :release="release" @change="refresh()" />
+    <PageReleaseDetails :release="release" @change="refresh()" />
 
-    <ReleasePublications :title="title" :release="release" />
+    <PageReleasePublications :title="title" :release="release" />
   </div>
 </template>

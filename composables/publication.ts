@@ -14,13 +14,17 @@ export function usePublication() {
 
   const pending = ref(false);
 
-  async function create(publication: Partial<PublicationsRecord> | FormData) {
+  async function create(
+    publication:
+      | (Partial<PublicationsRecord> | { covers?: File[] | File })
+      | FormData,
+  ) {
     pending.value = true;
 
     try {
       const res = await $pb
         .collection(Collections.Publications)
-        .create<PublicationsResponse>(publication);
+        .create(publication);
 
       toast.add({
         title: `Success`,
@@ -95,7 +99,9 @@ export function usePublication() {
 
   async function update(
     id: string,
-    publication: Partial<PublicationsRecord> | FormData,
+    publication:
+      | (Partial<PublicationsRecord> | { covers?: File[] | File })
+      | FormData,
   ) {
     pending.value = true;
 
