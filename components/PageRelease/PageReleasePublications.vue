@@ -10,17 +10,16 @@ const { $pb } = useNuxtApp();
 const { publication, edit, remove, books } = usePublications();
 
 const props = defineProps<{
-  release: ReleasesResponse;
-  title: TitlesResponse;
+  release: ReleasesResponse<{
+    title: TitlesResponse;
+  }>;
 }>();
 
-const { data: publications, refresh } = await useLazyAsyncData(
-  "publications",
-  () =>
-    $pb.collection(Collections.Publications).getFullList<PublicationsResponse>({
-      filter: `release.id = '${props.release.id}'`,
-      sort: "-volume",
-    }),
+const { data: publications, refresh } = await useLazyAsyncData(() =>
+  $pb.collection(Collections.Publications).getFullList<PublicationsResponse>({
+    filter: `release.id = '${props.release.id}'`,
+    sort: "-volume",
+  }),
 );
 
 const columns = [
@@ -44,11 +43,7 @@ const columns = [
 
 <template>
   <div class="flex items-center justify-end gap-3 mt-12">
-    <PublicationQuickCreate
-      :release="release"
-      :title="title"
-      @change="refresh()"
-    />
+    <PublicationQuickCreate :release="release" @change="refresh()" />
     <PublicationCreate :release="release" @change="refresh()" />
   </div>
 
