@@ -78,7 +78,7 @@ useHead({
       >
         Refresh
       </UButton>
-      <TitleCreate />
+      <TitleCreate @change="refresh" />
     </div>
 
     <div class="flex-1 overflow-y-scroll">
