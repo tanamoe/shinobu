@@ -7,8 +7,9 @@ import { z } from "zod";
 const { pending, quickCreate } = usePublication();
 
 const props = defineProps<{
-  release: ReleasesResponse;
-  title: TitlesResponse;
+  release: ReleasesResponse<{
+    title: TitlesResponse;
+  }>;
 }>();
 
 const emit = defineEmits<{
@@ -36,7 +37,7 @@ const state = ref({
 async function submit(event: FormSubmitEvent<Schema>) {
   await quickCreate(
     props.release,
-    props.title,
+    props.release.expand!.title,
     event.data.from,
     event.data.to,
     event.data.price || undefined,
@@ -58,7 +59,9 @@ async function submit(event: FormSubmitEvent<Schema>) {
   </UButton>
   <UModal v-model="isOpen">
     <UCard>
-      <template #header>Quick create {{ title.name }}</template>
+      <template #header
+        >Quick create {{ props.release.expand!.title.name }}</template
+      >
 
       <UForm class="space-y-6" :schema="schema" :state="state" @submit="submit">
         <div class="flex gap-6 items-center">
