@@ -11,10 +11,6 @@ const { $pb } = useNuxtApp();
 const page = ref(1);
 const searchQuery = ref("");
 
-const metadata = await $pb
-  .collection(Collections.Titles)
-  .getList<TitlesResponse>(1, 1);
-
 const {
   pending,
   data: rows,
@@ -30,7 +26,9 @@ const {
       expand: "format",
       sort: "-updated",
     }),
-  { watch: [page] },
+  {
+    watch: [page],
+  },
 );
 
 const columns = [
@@ -86,13 +84,15 @@ useHead({
         :columns="columns"
         :rows="rows?.items || []"
         :loading="pending"
-        @select="(row: BaseSystemFields) => navigateTo(`/title/${row.id}`)"
+        @select="
+          async (row: BaseSystemFields) => await navigateTo(`/title/${row.id}`)
+        "
       >
         <template #cover-data="{ row }">
           <div v-if="row.cover" class="space-x-3">
             <img
               class="h-14 aspect-[2/3] object-cover rounded"
-              :src="usePocketbaseImage(row, row.cover)"
+              :src="$pb.files.getUrl(row, row.cover)"
             />
           </div>
         </template>
@@ -115,11 +115,10 @@ useHead({
     </div>
 
     <UPagination
-      v-if="metadata"
       v-model="page"
       class="justify-center"
       :page-count="20"
-      :total="metadata.totalItems"
+      :total="rows?.totalItems || 0"
     />
   </div>
 </template>
