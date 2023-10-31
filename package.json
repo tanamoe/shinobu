@@ -21,7 +21,6 @@
     "@nuxt/devtools": "latest",
     "@nuxt/eslint-config": "^0.2.0",
     "@nuxt/ui": "^2.9.0",
-    "@nuxtjs/google-fonts": "^3.0.2",
     "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20.8.7",
     "@types/slug": "^5.0.6",
