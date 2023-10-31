@@ -4,11 +4,13 @@ import defaultTheme from "tailwindcss/defaultTheme";
 export default {
   content: ["docs/content/**/*.md"],
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ["Inter", ...defaultTheme.fontFamily.sans],
-        heading: "Alexandria",
-      },
+    fontFamily: {
+      sans: [
+        ["Inter", ...defaultTheme.fontFamily.sans],
+        {
+          fontFeatureSettings: "'cv11'",
+        },
+      ],
     },
   },
   plugins: [require("@tailwindcss/typography")],
