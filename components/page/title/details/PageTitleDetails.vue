@@ -37,7 +37,12 @@ async function handleUpdate() {
       <PageTitleDetailsDemographic />
     </div>
 
-    <AppEditor v-model="state.description" />
+    <ClientOnly>
+      <AppEditor v-model="state.description" />
+      <template #fallback>
+        <USkeleton class="w-full h-[40vh] rounded-md" />
+      </template>
+    </ClientOnly>
 
     <div class="text-right">
       <UButton
