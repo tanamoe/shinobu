@@ -26,13 +26,18 @@ useHead({
     />
 
     <section class="flex gap-6">
-      <div class="flex-1">
+      <div class="flex-1 space-y-12">
         <PageTitleDetails :title="title" @change="refresh()" />
+
         <PageTitleReleases :title="title" />
+
+        <div class="flex gap-6">
+          <PageTitleLinks class="flex-1" :title="title" />
+          <PageTitleWorks class="flex-1" :title="title" />
+        </div>
       </div>
       <div>
         <PageTitleCover :title="title" @change="refresh()" />
-        <PageTitleWorks :title="title" />
       </div>
     </section>
   </div>
