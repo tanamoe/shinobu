@@ -1,4 +1,4 @@
-import { PublicationsResponse } from "~/types/pb";
+import type { PublicationsResponse } from "@/types/pb";
 
 export function usePublications() {
   const publication = useState<PublicationsResponse | undefined>();
