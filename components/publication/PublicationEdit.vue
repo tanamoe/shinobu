@@ -67,7 +67,7 @@ watchEffect(() => {
   state.value = {
     name: publication.value?.name,
     volume: publication.value?.volume,
-    digital: false,
+    digital: publication.value?.digital,
     covers: undefined,
     "covers-": [],
   };
