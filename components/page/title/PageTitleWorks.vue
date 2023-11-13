@@ -14,8 +14,6 @@ const props = defineProps<{
   title: TitlesResponse;
 }>();
 
-const createOpen = ref(false);
-
 const {
   data: works,
   pending,
@@ -34,7 +32,7 @@ const {
 </script>
 
 <template>
-  <section v-if="works" class="mt-12">
+  <section v-if="works">
     <AppH2>
       Staff
       <span class="float-right space-x-3">
@@ -47,9 +45,10 @@ const {
         >
           Refresh
         </UButton>
-        <WorkCreate :title="title" @change="refresh()" />
+        <PageTitleWorkCreate :title="title" @change="refresh" />
       </span>
     </AppH2>
+
     <ClientOnly>
       <Sortable
         :list="works"
@@ -73,7 +72,6 @@ const {
             :ui="{
               body: {
                 base: 'prose dark:prose-invert prose-sm',
-                padding: 'px-2 py-4 sm:p-3',
               },
             }"
           >

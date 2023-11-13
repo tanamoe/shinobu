@@ -2,10 +2,10 @@
 import slug from "slug";
 import { z } from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
-import type { BooksResponse } from "~/types/pb";
+import type { BooksResponse } from "@/types/pb";
 
 const { pending, update, remove } = useBook();
-const { publication } = usePublications();
+const { publication } = useReleasePage();
 
 const props = defineProps<{
   book: BooksResponse;

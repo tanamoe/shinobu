@@ -2,7 +2,7 @@
 import { Collections } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { publication, booksOpen } = usePublications();
+const { publication, booksOpen } = useReleasePage();
 
 const { pending, data, refresh } = await useLazyAsyncData(
   () =>
@@ -47,14 +47,14 @@ const { pending, data, refresh } = await useLazyAsyncData(
       </div>
 
       <div v-else-if="data" class="space-y-6">
-        <BookEditCard
+        <PageReleaseBookEdit
           v-for="book in data"
           :key="book.id"
           :book="book"
           @change="refresh"
         />
 
-        <BookCreateCard @change="refresh" />
+        <PageReleaseBookCreate @change="refresh" />
       </div>
     </div>
   </USlideover>

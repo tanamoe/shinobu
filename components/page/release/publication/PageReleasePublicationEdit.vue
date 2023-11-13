@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 
 const { pending, update } = usePublication();
-const { publication, editOpen } = usePublications();
+const { publication, editOpen } = useReleasePage();
 
 const emit = defineEmits<{
   change: [void];
