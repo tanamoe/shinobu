@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 
 const { pending, create } = useBook();
-const { publication } = usePublications();
+const { publication } = useReleasePage();
 
 const emit = defineEmits<{
   change: [void];

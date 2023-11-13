@@ -7,7 +7,7 @@ import {
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { publication, edit, remove, books } = usePublications();
+const { publication, edit, remove, books } = useReleasePage();
 
 const props = defineProps<{
   release: ReleasesResponse<{
@@ -43,8 +43,8 @@ const columns = [
 
 <template>
   <div class="flex items-center justify-end gap-3 mt-12">
-    <PublicationQuickCreate :release="release" @change="refresh()" />
-    <PublicationCreate :release="release" @change="refresh()" />
+    <PageReleasePublicationQuickCreate :release="release" @change="refresh()" />
+    <PageReleasePublicationCreate :release="release" @change="refresh()" />
   </div>
 
   <UTable :columns="columns" :rows="publications || []">
@@ -54,8 +54,8 @@ const columns = [
       </UBadge>
     </template>
     <template #name-data="{ row }">
-      {{ row.name }}
-      <UBadge v-if="row.digital">Digital</UBadge>
+      <span>{{ row.name }}</span>
+      <UBadge v-if="row.digital" class="ml-3" color="gray">Digital</UBadge>
     </template>
     <template #covers-data="{ row }">
       <div v-if="row.covers" class="flex gap-3">
@@ -97,9 +97,9 @@ const columns = [
     </template>
   </UTable>
 
-  <PublicationBooks v-if="publication" @change="refresh()" />
+  <PageReleaseBooks v-if="publication" @change="refresh()" />
 
-  <PublicationEdit @change="refresh()" />
+  <PageReleasePublicationEdit @change="refresh()" />
 
-  <PublicationRemove @change="refresh()" />
+  <PageReleasePublicationRemove @change="refresh()" />
 </template>

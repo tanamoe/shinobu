@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { pending, remove } = usePublication();
-const { publication, removeOpen } = usePublications();
+const { publication, removeOpen } = useReleasePage();
 
 const emit = defineEmits<{
   change: [void];

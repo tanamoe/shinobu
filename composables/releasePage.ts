@@ -1,6 +1,6 @@
 import type { PublicationsResponse } from "@/types/pb";
 
-export function usePublications() {
+export function useReleasePage() {
   const publication = useState<PublicationsResponse | undefined>();
 
   const editOpen = useState(() => false);

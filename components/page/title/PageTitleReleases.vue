@@ -54,7 +54,7 @@ const columns = [
 </script>
 
 <template>
-  <section v-if="releases" class="mt-12">
+  <section v-if="releases">
     <AppH2>
       Releases
       <span class="float-right space-x-3">
@@ -68,7 +68,7 @@ const columns = [
           Refresh
         </UButton>
 
-        <ReleaseCreate :title="title" @change="refresh()" />
+        <PageTitleReleaseCreate :title="title" @change="refresh" />
       </span>
     </AppH2>
 
