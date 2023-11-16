@@ -61,12 +61,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
         <span class="text-zinc-400">Create a title</span>
       </AppH2>
 
-      <UForm
-        :schema="schema"
-        :state="state"
-        class="space-y-6"
-        @submit.prevent="submit"
-      >
+      <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
         <UFormGroup label="Name" name="name">
           <UInput v-model="state.name" />
         </UFormGroup>
