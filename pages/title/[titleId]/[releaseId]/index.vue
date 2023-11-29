@@ -31,14 +31,12 @@ useHead({
 
 <template>
   <div v-if="release && release.expand?.title" class="p-6">
-    <AppBreadcrumb
-      :items="[
-        { label: 'Title', href: '/title' },
-        {
-          label: release.expand?.title.name,
-          href: `/title/${release.expand?.title.id}`,
-        },
-        { label: release.name, active: true },
+    <UBreadcrumb
+      class="mb-6"
+      :links="[
+        { label: 'Title', to: '/title', icon: 'i-fluent-book-20-filled' },
+        { label: release.expand?.title.name, to: `/title/${release.title}` },
+        { label: release.name, to: `/title/${release.title}/${release.id}` },
       ]"
     />
 

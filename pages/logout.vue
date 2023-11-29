@@ -3,5 +3,5 @@ const { $pb } = useNuxtApp();
 
 $pb.authStore.clear();
 
-navigateTo("/login");
+await navigateTo("/login");
 </script>

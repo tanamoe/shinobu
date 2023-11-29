@@ -4,6 +4,6 @@ const { data: gif } = await useFetch("/api/random-gif");
 
 <template>
   <div class="flex items-center justify-center h-full">
-    <img :src="gif?.result" />
+    <img v-if="gif" :src="gif.result" />
   </div>
 </template>
