@@ -17,5 +17,11 @@ export default defineAppConfig({
         padding: "p-3 sm:p-3",
       },
     },
+    breadcrumb: {
+      li: "text-2xl",
+      base: "font-normal",
+      active: "text-gray-700 dark:text-gray-200",
+      inactive: "text-gray-500 dark:text-gray-400",
+    },
   },
 });

@@ -1,22 +1,32 @@
 <script setup lang="ts">
+import { z } from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+
 const { $pb } = useNuxtApp();
 const toast = useToast();
 
-const email = ref("");
-const password = ref("");
+const schema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Invalid password"),
+});
+
+type Schema = z.output<typeof schema>;
+
+const state = ref({
+  email: undefined,
+  password: undefined,
+});
 const pending = ref(false);
 
-const login = async () => {
+async function onSubmit(event: FormSubmitEvent<Schema>) {
   pending.value = true;
 
   try {
-    await $pb.admins.authWithPassword(email.value, password.value);
-
-    pending.value = false;
+    await $pb.admins.authWithPassword(event.data.email, event.data.password);
 
     toast.add({
       id: "login_success",
-      title: `Successfully login as ${email.value}!`,
+      title: `Successfully login as ${event.data.email}!`,
       description: "Redirecting...",
       icon: "i-fluent-checkmark-circle-20-filled",
       color: "sky",
@@ -24,8 +34,6 @@ const login = async () => {
 
     return navigateTo("/");
   } catch (err) {
-    pending.value = false;
-
     toast.add({
       id: "login_error",
       title: "An error occurred.",
@@ -33,35 +41,38 @@ const login = async () => {
       color: "red",
     });
 
-    console.log(err);
+    console.error(err);
+  } finally {
+    pending.value = false;
   }
-};
+}
 
 definePageMeta({
   layout: false,
-  middleware: () => {
-    const { $pb } = useNuxtApp();
-
-    if ($pb.authStore.isAdmin) return navigateTo("/");
-  },
+  middleware: "login",
 });
 </script>
 
 <template>
   <div class="max-w-sm w-full mx-auto my-24">
     <img class="h-12 w-auto mx-auto mb-12" src="/logo.png" />
-    <UCard class="mx-6">
-      <form class="space-y-3" @submit.prevent="login">
+    <UCard class="mx-6" :ui="{ body: { padding: 'p-6 sm:p-6' } }">
+      <UForm
+        :state="state"
+        :schema="schema"
+        class="space-y-3"
+        @submit="onSubmit"
+      >
         <UFormGroup name="email" label="Email">
           <UInput
-            v-model="email"
+            v-model="state.email"
             placeholder="admin@tana.moe"
             icon="i-fluent-mail-16-filled"
           />
         </UFormGroup>
         <UFormGroup name="password" label="Password">
           <UInput
-            v-model="password"
+            v-model="state.password"
             placeholder="•••••••••••••••"
             icon="i-fluent-key-16-filled"
             type="password"
@@ -70,7 +81,7 @@ definePageMeta({
         <div class="text-right">
           <UButton type="submit" :loading="pending">Đăng nhập</UButton>
         </div>
-      </form>
+      </UForm>
     </UCard>
   </div>
 </template>

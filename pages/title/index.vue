@@ -52,7 +52,12 @@ useHead({
 
 <template>
   <div class="p-6 max-h-screen flex-col flex space-y-6">
-    <AppBreadcrumb :items="[{ label: 'Title', active: true }]" />
+    <UBreadcrumb
+      class="mb-6"
+      :links="[
+        { label: 'Title', to: '/title', icon: 'i-fluent-book-20-filled' },
+      ]"
+    />
 
     <form class="flex gap-3" @submit.prevent="() => refresh()">
       <div class="flex-1">

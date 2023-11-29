@@ -18,10 +18,11 @@ useHead({
 
 <template>
   <div v-if="title" class="p-6">
-    <AppBreadcrumb
-      :items="[
-        { label: 'Title', href: '/title' },
-        { label: title.name, active: true },
+    <UBreadcrumb
+      class="mb-6"
+      :links="[
+        { label: 'Title', to: '/title', icon: 'i-fluent-book-20-filled' },
+        { label: title.name, to: `/title/${title.id}` },
       ]"
     />
 
