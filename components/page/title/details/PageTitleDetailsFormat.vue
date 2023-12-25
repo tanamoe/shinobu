@@ -1,19 +1,12 @@
 <script setup lang="ts">
-import { Collections } from "@/types/pb";
+const { formats } = useMeta();
+const state = useTitlePage();
 
-const { $pb } = useNuxtApp();
-const { state } = useTitlePage();
-
-const { data, pending } = await useLazyAsyncData(
-  () => $pb.collection(Collections.Formats).getFullList(),
-  {
-    transform: (formats) =>
-      formats.map(({ id, name }) => ({
-        id,
-        name,
-      })),
-    default: () => [],
-  },
+const data = computed(() =>
+  formats.value.map(({ id, name }) => ({
+    id,
+    name,
+  })),
 );
 
 const selected = computed(
@@ -26,7 +19,6 @@ const selected = computed(
     <USelectMenu
       v-model="state.format"
       :options="data"
-      :loading="pending"
       value-attribute="id"
       option-attribute="name"
       searchable

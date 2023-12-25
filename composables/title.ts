@@ -73,19 +73,19 @@ export function useTitle() {
 }
 
 export function useTitlePage() {
-  const state = useState<{
+  return useState<{
     name: string;
     description: string;
     format: string;
     genres: string[];
     demographic: string;
+    slugGroup: string;
   }>(() => ({
     name: "",
     description: "",
     format: "",
     genres: [],
     demographic: "",
+    slugGroup: "",
   }));
-
-  return { state };
 }

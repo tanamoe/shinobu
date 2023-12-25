@@ -1,25 +1,19 @@
 <script setup lang="ts">
 import { z } from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
-import { Collections, type FormatsResponse } from "@/types/pb";
 
-const { $pb } = useNuxtApp();
+const { formats } = useMeta();
 const { pending, create } = useTitle();
 
 const emit = defineEmits<{
   change: [void];
 }>();
 
-const { data: formats } = await useLazyAsyncData(
-  async () =>
-    await $pb.collection(Collections.Formats).getFullList<FormatsResponse>(),
-  {
-    transform: (formats) =>
-      formats.map((format) => ({
-        value: format.id,
-        label: format.name,
-      })),
-  },
+const f = computed(() =>
+  formats.value.map((format) => ({
+    value: format.id,
+    label: format.name,
+  })),
 );
 
 const schema = z.object({
@@ -66,7 +60,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
           <UInput v-model="state.name" />
         </UFormGroup>
         <UFormGroup label="Format" name="format">
-          <USelect v-model="state.format" :options="formats || []" />
+          <USelect v-model="state.format" :options="f" />
         </UFormGroup>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />
