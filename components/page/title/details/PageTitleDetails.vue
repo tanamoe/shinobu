@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import slug from "slug";
 import { type TitlesResponse } from "@/types/pb";
 
 const { update, pending } = useTitle();
-const { state } = useTitlePage();
+const state = useTitlePage();
 
 const props = defineProps<{
   title: TitlesResponse;
@@ -18,7 +19,12 @@ state.value = {
   format: props.title.format,
   genres: props.title.genres,
   demographic: props.title.demographic,
+  slugGroup: props.title.slugGroup,
 };
+
+function generateSlug() {
+  state.value.slugGroup = slug(state.value.name);
+}
 
 async function handleUpdate() {
   const res = await update(props.title.id, state.value);
@@ -35,6 +41,17 @@ async function handleUpdate() {
       <PageTitleDetailsFormat />
       <PageTitleDetailsGenres />
       <PageTitleDetailsDemographic />
+    </div>
+
+    <div class="flex items-end gap-3">
+      <UFormGroup name="slugGroup" label="Slug" class="flex-1">
+        <UInput v-model="state.slugGroup" />
+      </UFormGroup>
+      <UButton
+        icon="i-fluent-sparkle-20-filled"
+        color="gray"
+        @click="generateSlug"
+      />
     </div>
 
     <ClientOnly>

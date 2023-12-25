@@ -1,26 +1,16 @@
 <script setup lang="ts">
-import { Collections } from "@/types/pb";
+const { demographics } = useMeta();
+const state = useTitlePage();
 
-const { $pb } = useNuxtApp();
-const { state } = useTitlePage();
-
-const { data, pending } = await useLazyAsyncData(
-  () => $pb.collection(Collections.Demographics).getFullList(),
-  {
-    transform: (demographics) =>
-      demographics.map(({ id, name }) => ({
-        id,
-        name,
-      })),
-    default: () => [],
-  },
+const data = computed(() =>
+  demographics.value.map(({ id, name }) => ({
+    id,
+    name,
+  })),
 );
 
-const selected = computed(
-  () =>
-    data.value?.find(
-      (demographic) => state.value.demographic === demographic.id,
-    ),
+const selected = computed(() =>
+  data.value.find((demographic) => state.value.demographic === demographic.id),
 );
 </script>
 
@@ -29,7 +19,6 @@ const selected = computed(
     <USelectMenu
       v-model="state.demographic"
       :options="data"
-      :loading="pending"
       value-attribute="id"
       option-attribute="name"
       searchable
