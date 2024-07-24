@@ -11,10 +11,13 @@ useHead({
 </script>
 
 <template>
-  <NuxtLayout>
-    <NuxtLoadingIndicator />
-    <NuxtPage />
+  <div>
+    <NuxtLoadingIndicator color="#89C4F4" />
 
-    <UNotifications />
-  </NuxtLayout>
+    <NuxtLayout>
+      <NuxtPage />
+
+      <UNotifications />
+    </NuxtLayout>
+  </div>
 </template>
