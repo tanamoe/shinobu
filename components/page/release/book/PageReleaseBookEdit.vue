@@ -94,7 +94,7 @@ async function handleRemove() {
       </UFormGroup>
       <UFormGroup label="Covers" name="covers">
         <div class="space-y-3">
-          <AppInputFileList
+          <AppAssetsList
             v-model:remove-files="state['covers-']"
             :record="book"
             :files="book.covers"
