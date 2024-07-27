@@ -1,6 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@vueuse/nuxt", "@nuxt/ui", "@pinia/nuxt", "@nuxtjs/google-fonts"],
+  modules: [
+    "@vueuse/nuxt",
+    "@nuxt/ui",
+    "@pinia/nuxt",
+    "@nuxtjs/google-fonts",
+    "@nuxt/eslint",
+  ],
 
   runtimeConfig: {
     public: {
