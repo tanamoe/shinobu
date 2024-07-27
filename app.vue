@@ -19,5 +19,8 @@ useHead({
 
       <UNotifications />
     </NuxtLayout>
+
+    <UModals />
+    <USlideovers />
   </div>
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SlideoverBooks, SlideoverPublicationEdit } from "#components";
 import {
   Collections,
   type TitlesResponse,
@@ -7,7 +8,8 @@ import {
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { publication, edit, remove, books } = useReleasePage();
+const slideover = useSlideover();
+const { publication, remove } = useReleasePage();
 
 const props = defineProps<{
   release: ReleasesResponse<{
@@ -15,9 +17,11 @@ const props = defineProps<{
   }>;
 }>();
 
-const { data: publications, refresh } = await useLazyAsyncData(() =>
+const { data: publications, refresh } = await useAsyncData(() =>
   $pb.collection(Collections.Publications).getFullList<PublicationsResponse>({
-    filter: `release.id = '${props.release.id}'`,
+    filter: $pb.filter("release.id = {:release}", {
+      release: props.release.id,
+    }),
     sort: "-volume",
   }),
 );
@@ -39,6 +43,18 @@ const columns = [
     key: "actions",
   },
 ];
+
+function books(publication: PublicationsResponse) {
+  slideover.open(SlideoverBooks, {
+    publication,
+  });
+}
+
+function edit(publication: PublicationsResponse) {
+  slideover.open(SlideoverPublicationEdit, {
+    publication,
+  });
+}
 </script>
 
 <template>
@@ -55,7 +71,6 @@ const columns = [
     </template>
     <template #name-data="{ row }">
       <span>{{ row.name }}</span>
-      <UBadge v-if="row.digital" class="ml-3" color="gray">Digital</UBadge>
     </template>
     <template #covers-data="{ row }">
       <div v-if="row.covers" class="flex gap-3">
@@ -96,10 +111,6 @@ const columns = [
       </div>
     </template>
   </UTable>
-
-  <PageReleaseBooks v-if="publication" @change="refresh()" />
-
-  <PageReleasePublicationEdit @change="refresh()" />
 
   <PageReleasePublicationRemove @change="refresh()" />
 </template>

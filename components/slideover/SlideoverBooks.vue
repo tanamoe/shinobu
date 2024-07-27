@@ -1,16 +1,36 @@
 <script setup lang="ts">
-import { Collections } from "@/types/pb";
+import {
+  Collections,
+  type AssetsResponse,
+  type BooksResponse,
+  type BookMetadataResponse,
+  type PublicationsResponse,
+} from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const { publication, booksOpen } = useReleasePage();
 
-const { pending, data, refresh } = await useLazyAsyncData(
+const props = defineProps<{
+  publication: PublicationsResponse;
+}>();
+
+const { data, status, refresh } = await useLazyAsyncData(
   () =>
-    $pb.collection(Collections.Books).getFullList({
-      filter: `publication.id='${publication.value?.id}'`,
+    $pb.collection(Collections.Books).getFullList<
+      BooksResponse<
+        unknown,
+        {
+          assets_via_book?: AssetsResponse[];
+          bookMetadata_via_book?: BookMetadataResponse;
+        }
+      >
+    >({
+      filter: $pb.filter("publication.id = {:publication}", {
+        publication: props.publication.id,
+      }),
+      expand: "assets_via_book,bookMetadata_via_book",
     }),
   {
-    watch: [publication],
+    watch: [props.publication],
     transform: (data) =>
       data.map((book) => ({
         ...book,
@@ -22,14 +42,14 @@ const { pending, data, refresh } = await useLazyAsyncData(
 </script>
 
 <template>
-  <USlideover v-if="publication" v-model="booksOpen">
+  <USlideover>
     <div class="p-6 overflow-y-scroll">
       <AppH2>
         {{ publication.name }}
         <span class="text-zinc-400">books</span>
       </AppH2>
 
-      <div v-if="pending">
+      <div v-if="status == 'pending'">
         <UCard class="space-y-6">
           <div class="space-y-2">
             <USkeleton class="h-3 w-full" />
@@ -47,12 +67,9 @@ const { pending, data, refresh } = await useLazyAsyncData(
       </div>
 
       <div v-else-if="data" class="space-y-6">
-        <PageReleaseBookEdit
-          v-for="book in data"
-          :key="book.id"
-          :book="book"
-          @change="refresh"
-        />
+        <UCard v-for="book in data">
+          <BookEdit :book="book" @change="refresh" />
+        </UCard>
 
         <PageReleaseBookCreate @change="refresh" />
       </div>
