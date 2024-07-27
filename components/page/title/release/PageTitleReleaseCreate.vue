@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 import { ReleasesStatusOptions, type TitlesResponse } from "@/types/pb";
-import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import type { FormSubmitEvent } from "#ui/types";
 
 const { pending, create } = useRelease();
 

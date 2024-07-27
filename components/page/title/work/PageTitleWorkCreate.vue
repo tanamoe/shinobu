@@ -5,7 +5,7 @@ import {
   type StaffsResponse,
   type TitlesResponse,
 } from "@/types/pb";
-import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import type { FormSubmitEvent } from "#ui/types";
 
 const { $pb } = useNuxtApp();
 const { pending, create } = useWork();

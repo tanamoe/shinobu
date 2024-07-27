@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type ReleasesResponse, type TitlesResponse } from "@/types/pb";
-import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import type { FormSubmitEvent } from "#ui/types";
 
 import { z } from "zod";
 

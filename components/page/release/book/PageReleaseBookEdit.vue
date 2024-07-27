@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import slug from "slug";
 import { z } from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import type { FormSubmitEvent } from "#ui/types";
 import type { BooksResponse } from "@/types/pb";
 
 const { pending, update, remove } = useBook();
