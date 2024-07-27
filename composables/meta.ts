@@ -3,6 +3,7 @@ import {
   type FormatsResponse,
   type DemographicsResponse,
   type GenresResponse,
+  type AssetTypesResponse,
 } from "@/types/pb";
 
 export function useMeta() {
@@ -11,6 +12,7 @@ export function useMeta() {
   const demographics = useState<DemographicsResponse[]>(() => []);
   const formats = useState<FormatsResponse[]>(() => []);
   const genres = useState<GenresResponse[]>(() => []);
+  const assetTypes = useState<AssetTypesResponse[]>(() => []);
 
   async function update() {
     const d = await $pb.collection(Collections.Demographics).getFullList();
@@ -27,7 +29,12 @@ export function useMeta() {
     if (g) {
       genres.value = g;
     }
+
+    const at = await $pb.collection(Collections.AssetTypes).getFullList();
+    if (at) {
+      assetTypes.value = at;
+    }
   }
 
-  return { demographics, formats, genres, update };
+  return { demographics, formats, genres, assetTypes, update };
 }
