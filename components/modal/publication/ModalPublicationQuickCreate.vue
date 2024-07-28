@@ -4,6 +4,7 @@ import type { FormSubmitEvent } from "#ui/types";
 
 import { z } from "zod";
 
+const modal = useModal();
 const { pending, quickCreate } = usePublication();
 
 const props = defineProps<{
@@ -13,25 +14,21 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  change: [void];
+  change: [];
 }>();
 
 const schema = z.object({
   from: z.coerce.number().min(0),
   to: z.coerce.number().min(0),
   price: z.coerce.number().min(0).nullable(),
-  digital: z.boolean(),
 });
 
 type Schema = z.output<typeof schema>;
-
-const isOpen = ref(false);
 
 const state = ref({
   from: undefined,
   to: undefined,
   price: undefined,
-  digital: false,
 });
 
 async function submit(event: FormSubmitEvent<Schema>) {
@@ -41,23 +38,15 @@ async function submit(event: FormSubmitEvent<Schema>) {
     event.data.from,
     event.data.to,
     event.data.price || undefined,
-    event.data.digital,
   );
 
+  modal.close();
   emit("change");
 }
 </script>
 
 <template>
-  <UButton
-    color="gray"
-    icon="i-fluent-collections-add-20-filled"
-    class="float-right"
-    @click="isOpen = true"
-  >
-    Quick create
-  </UButton>
-  <UModal v-model="isOpen">
+  <UModal>
     <UCard>
       <template #header
         >Quick create {{ props.release.expand!.title.name }}</template
@@ -83,9 +72,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
               <span class="text-gray-500 dark:text-gray-400 text-xs">VND</span>
             </template>
           </UInput>
-        </UFormGroup>
-        <UFormGroup name="digital" label="Digital">
-          <UToggle v-model="state.digital" />
         </UFormGroup>
 
         <UButton type="submit" :pending="pending">Create</UButton>

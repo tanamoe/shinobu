@@ -10,7 +10,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  change: [void];
+  change: [];
 }>();
 
 const state = ref({

@@ -2,11 +2,12 @@
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 
+const slideover = useSlideover();
 const { formats } = useMeta();
 const { pending, create } = useTitle();
 
 const emit = defineEmits<{
-  change: [void];
+  change: [];
 }>();
 
 const f = computed(() =>
@@ -23,8 +24,6 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const isOpen = ref(false);
-
 const state = ref({
   name: undefined,
   format: undefined,
@@ -34,22 +33,14 @@ async function submit(event: FormSubmitEvent<Schema>) {
   const res = await create(event.data);
 
   if (res) {
+    slideover.close();
     emit("change");
-    isOpen.value = false;
   }
 }
 </script>
 
 <template>
-  <UButton
-    color="gray"
-    icon="i-fluent-add-square-multiple-20-filled"
-    class="float-right"
-    @click="isOpen = true"
-  >
-    Create
-  </UButton>
-  <USlideover v-model="isOpen">
+  <USlideover>
     <div class="p-6">
       <AppH2>
         <span class="text-zinc-400">Create a title</span>

@@ -6,14 +6,16 @@ import type {
   BooksResponse,
   AssetsResponse,
   BookMetadataResponse,
+  PublicationsResponse,
 } from "@/types/pb";
 
 const { pending, update, remove } = useBook();
+const { update: updateP } = usePublication();
 const asset = useAsset();
 const bookMetadata = useBookMetadata();
-const { publication } = useReleasePage();
 
 const props = defineProps<{
+  publication: PublicationsResponse;
   book: BooksResponse<
     unknown,
     {
@@ -45,7 +47,7 @@ const schema = z.object({
         ...asset,
         file: new File(
           [asset.file],
-          slug(publication.value?.name || "") +
+          slug(props.publication.name || "") +
             "." +
             asset.file.name.split(".").at(-1),
           {
@@ -139,6 +141,16 @@ async function handleSubmit(event: FormSubmitEvent<Schema>) {
   }
 }
 
+async function handleDefault() {
+  const res = await updateP(props.publication.id, {
+    defaultBook: props.book.id,
+  });
+
+  if (res) {
+    emit("change");
+  }
+}
+
 async function handleRemove() {
   const res = await remove(props.book.id);
 
@@ -181,11 +193,15 @@ async function handleRemove() {
       <div class="space-y-3">
         <AppAssetsList
           v-if="book.expand?.assets_via_book"
-          :assets="book.expand.assets_via_book"
           v-model:remove-files="state['assets-']"
+          :assets="book.expand.assets_via_book"
         />
         <div class="flex space-x-3 max-w-full overflow-x-auto">
-          <div v-for="(asset, i) in state.assets" class="space-y-3">
+          <div
+            v-for="(a, i) in state.assets"
+            :key="a.file.name"
+            class="space-y-3"
+          >
             <div class="relative">
               <UButton
                 class="absolute top-1 right-1"
@@ -196,11 +212,11 @@ async function handleRemove() {
                 @click="handleFileRemove(i)"
               />
               <img
-                :src="asset.preview"
+                :src="a.preview"
                 class="w-24 aspect-[2/3] object-cover rounded"
               />
             </div>
-            <InputAssetTypes v-model="asset.type" />
+            <InputAssetTypes v-model="a.type" />
           </div>
         </div>
         <input
@@ -257,15 +273,26 @@ async function handleRemove() {
       </UFormGroup>
     </div>
 
-    <div class="text-right space-x-3">
+    <div class="flex justify-between gap-3">
       <UButton
-        label="Delete"
+        label="Set Default"
         :pending="pending"
         variant="ghost"
-        color="red"
-        @click="handleRemove"
+        color="gray"
+        :disabled="publication.defaultBook === book.id"
+        @click="handleDefault"
       />
-      <UButton label="Save" :pending="pending" type="submit" />
+
+      <div class="space-x-3">
+        <UButton
+          label="Delete"
+          :pending="pending"
+          variant="ghost"
+          color="red"
+          @click="handleRemove"
+        />
+        <UButton label="Save" :pending="pending" type="submit" />
+      </div>
     </div>
   </UForm>
 </template>

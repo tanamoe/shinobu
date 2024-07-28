@@ -6,8 +6,10 @@ import {
   type StaffsResponse,
   type WorksResponse,
 } from "@/types/pb";
+import { SlideoverWorkCreate } from "#components";
 
 const { $pb } = useNuxtApp();
+const slideover = useSlideover();
 const { updatePriority } = useWorks();
 
 const props = defineProps<{
@@ -16,7 +18,7 @@ const props = defineProps<{
 
 const {
   data: works,
-  pending,
+  status,
   refresh,
 } = await useLazyAsyncData(() =>
   $pb.collection(Collections.Works).getFullList<
@@ -24,11 +26,15 @@ const {
       staff: StaffsResponse;
     }>
   >({
-    filter: `title='${props.title.id}'`,
+    filter: $pb.filter("title = {:title}", { title: props.title.id }),
     expand: "staff",
     sort: "+priority",
   }),
 );
+
+function create(title: TitlesResponse) {
+  slideover.open(SlideoverWorkCreate, { title, onChange: () => refresh() });
+}
 </script>
 
 <template>
@@ -40,12 +46,19 @@ const {
           variant="ghost"
           color="gray"
           icon="i-fluent-arrow-clockwise-20-filled"
-          :loading="pending"
+          :loading="status === 'pending'"
           @click="refresh()"
         >
           Refresh
         </UButton>
-        <PageTitleWorkCreate :title="title" @change="refresh" />
+        <UButton
+          color="gray"
+          icon="i-fluent-add-square-multiple-20-filled"
+          class="float-right"
+          @click="create(title)"
+        >
+          Create
+        </UButton>
       </span>
     </AppH2>
 

@@ -67,11 +67,11 @@ const { data, status, refresh } = await useLazyAsyncData(
       </div>
 
       <div v-else-if="data" class="space-y-6">
-        <UCard v-for="book in data">
-          <BookEdit :book="book" @change="refresh" />
+        <UCard v-for="book in data" :key="book.id">
+          <BookEdit :book :publication @change="refresh" />
         </UCard>
 
-        <PageReleaseBookCreate @change="refresh" />
+        <BookCreate :publication @change="refresh" />
       </div>
     </div>
   </USlideover>

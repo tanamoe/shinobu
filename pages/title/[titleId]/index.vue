@@ -28,17 +28,17 @@ useHead({
 
     <section class="flex gap-6">
       <div class="flex-1 space-y-12">
-        <PageTitleDetails :title="title" @change="refresh()" />
+        <TitleDetails :title="title" @change="refresh()" />
 
-        <PageTitleReleases :title="title" />
+        <TitleReleases :title="title" />
 
         <div class="flex gap-6">
-          <PageTitleLinks class="flex-1" :title="title" />
-          <PageTitleWorks class="flex-1" :title="title" />
+          <TitleLinks class="flex-1" :title="title" />
+          <TitleWorks class="flex-1" :title="title" />
         </div>
       </div>
       <div>
-        <PageTitleCover :title="title" @change="refresh()" />
+        <TitleCover :title="title" @change="refresh()" />
       </div>
     </section>
   </div>

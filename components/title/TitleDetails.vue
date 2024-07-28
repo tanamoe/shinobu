@@ -3,24 +3,23 @@ import slug from "slug";
 import { type TitlesResponse } from "@/types/pb";
 
 const { update, pending } = useTitle();
-const state = useTitlePage();
 
 const props = defineProps<{
   title: TitlesResponse;
 }>();
 
 const emit = defineEmits<{
-  change: [void];
+  change: [];
 }>();
 
-state.value = {
+const state = ref({
   name: props.title.name,
   description: props.title.description,
   format: props.title.format,
   genres: props.title.genres,
   demographic: props.title.demographic,
   slugGroup: props.title.slugGroup,
-};
+});
 
 function generateSlug() {
   state.value.slugGroup = slug(state.value.name);
@@ -38,9 +37,15 @@ async function handleUpdate() {
       <UFormGroup name="name" label="Name">
         <UInput v-model="state.name" />
       </UFormGroup>
-      <PageTitleDetailsFormat />
-      <PageTitleDetailsGenres />
-      <PageTitleDetailsDemographic />
+      <UFormGroup name="Format" label="Format">
+        <InputFormat v-model="state.format" />
+      </UFormGroup>
+      <UFormGroup name="genres" label="Genres">
+        <InputGenre v-model="state.genres" multiple />
+      </UFormGroup>
+      <UFormGroup name="demographic" label="Demographic">
+        <InputDemographic v-model="state.demographic" />
+      </UFormGroup>
     </div>
 
     <div class="flex items-end gap-3">

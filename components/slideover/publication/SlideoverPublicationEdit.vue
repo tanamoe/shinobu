@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { PublicationsResponse } from "@/types/pb";
 
-const props = defineProps<{
+defineProps<{
   publication: PublicationsResponse;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   change: [];
 }>();
 </script>
@@ -18,7 +18,7 @@ const emit = defineEmits<{
         {{ publication.name }}
       </AppH2>
 
-      <PublicationEdit :publication />
+      <PublicationEdit :publication @change="$emit('change')" />
     </div>
   </USlideover>
 </template>

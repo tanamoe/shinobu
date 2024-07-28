@@ -8,6 +8,7 @@ import {
 import type { FormSubmitEvent } from "#ui/types";
 
 const { $pb } = useNuxtApp();
+const slideover = useSlideover();
 const { pending, create } = useWork();
 
 const props = defineProps<{
@@ -15,7 +16,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  change: [void];
+  change: [];
 }>();
 
 const { data: staff } = await useLazyAsyncData(
@@ -42,8 +43,6 @@ const schema = z.object({
 });
 
 type Schema = z.output<typeof schema>;
-
-const isOpen = ref(false);
 
 const state = ref<Partial<Schema>>({
   title: props.title.id,
@@ -91,7 +90,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
   });
 
   if (res) {
-    isOpen.value = false;
+    slideover.close();
     state.value = {
       title: props.title.id,
       name: undefined,
@@ -103,15 +102,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UButton
-    color="gray"
-    icon="i-fluent-add-square-multiple-20-filled"
-    class="float-right"
-    @click="isOpen = true"
-  >
-    Create
-  </UButton>
-  <USlideover v-model="isOpen">
+  <USlideover>
     <div class="p-6">
       <AppH2>
         <span class="text-zinc-400">Attach a staff for</span>

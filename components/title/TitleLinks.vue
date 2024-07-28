@@ -14,7 +14,7 @@ const props = defineProps<{
 
 const {
   data: links,
-  pending,
+  status,
   refresh,
 } = await useLazyAsyncData(() =>
   $pb.collection(Collections.Links).getFullList<
@@ -22,7 +22,7 @@ const {
       source: LinkSourcesResponse;
     }>
   >({
-    filter: `title='${props.title.id}'`,
+    filter: $pb.filter("title = {:title}", { title: props.title.id }),
     expand: "source",
   }),
 );
@@ -37,7 +37,7 @@ const {
           variant="ghost"
           color="gray"
           icon="i-fluent-arrow-clockwise-20-filled"
-          :loading="pending"
+          :loading="status === 'pending'"
           @click="refresh()"
         >
           Refresh

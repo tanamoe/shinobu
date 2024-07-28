@@ -10,7 +10,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  change: [void];
+  change: [];
 }>();
 
 const schema = z.object({
@@ -62,11 +62,11 @@ async function submit(event: FormSubmitEvent<Schema>) {
         />
       </UFormGroup>
       <UFormGroup name="publisher" label="Publisher">
-        <AppPublisherSelect v-model="state.publisher" />
+        <InputPublisher v-model="state.publisher" />
       </UFormGroup>
       <UFormGroup name="partner" label="Partner">
         <div class="flex gap-3">
-          <AppPublisherSelect v-model="state.partner" class="flex-1" />
+          <InputPublisher v-model="state.partner" class="flex-1" />
           <UButton
             v-if="state.partner != ''"
             label="Clear"

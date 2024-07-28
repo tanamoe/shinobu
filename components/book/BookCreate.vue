@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
+import type { PublicationsResponse } from "@/types/pb";
 
 const { pending, create } = useBook();
-const { publication } = useReleasePage();
+
+const props = defineProps<{
+  publication: PublicationsResponse;
+}>();
 
 const emit = defineEmits<{
-  change: [void];
+  change: [];
 }>();
 
 const schema = z.object({
@@ -14,16 +18,13 @@ const schema = z.object({
   edition: z.string().optional(),
   publishDate: z.string().optional(),
   note: z.string().optional(),
-  price: z.coerce.number().min(0).optional(),
+  price: z.coerce.number().optional(),
 });
 
 type Schema = z.output<typeof schema>;
 
-const state = ref<{
-  [k: string]: any;
-  publication?: string;
-}>({
-  publication: undefined,
+const state = ref<Schema>({
+  publication: props.publication.id,
   edition: undefined,
   publishDate: undefined,
   note: undefined,
@@ -37,10 +38,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
     emit("change");
   }
 }
-
-watchEffect(() => {
-  state.value.publication = publication.value?.id;
-});
 </script>
 
 <template>

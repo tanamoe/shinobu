@@ -6,23 +6,27 @@ import {
   type ReleasesResponse,
   type PublishersResponse,
 } from "@/types/pb";
+import { SlideoverReleaseCreate } from "#components";
 
 const { $pb } = useNuxtApp();
+const slideover = useSlideover();
 
 const props = defineProps<{
   title: TitlesResponse;
 }>();
 
 const {
-  pending,
   data: releases,
+  status,
   refresh,
 } = await useLazyAsyncData(
   () =>
     $pb
       .collection(Collections.Releases)
       .getFullList<ReleasesResponse<{ publisher: PublishersResponse }>>({
-        filter: `title='${props.title.id}'`,
+        filter: $pb.filter("title = {:title}", {
+          title: props.title.id,
+        }),
         expand: "publisher",
       }),
   {
@@ -33,6 +37,10 @@ const {
       })),
   },
 );
+
+function create(title: TitlesResponse) {
+  slideover.open(SlideoverReleaseCreate, { title, onChange: () => refresh() });
+}
 
 const columns = [
   {
@@ -62,13 +70,19 @@ const columns = [
           variant="ghost"
           color="gray"
           icon="i-fluent-arrow-clockwise-20-filled"
-          :loading="pending"
+          :loading="status === 'pending'"
           @click="refresh()"
         >
           Refresh
         </UButton>
-
-        <PageTitleReleaseCreate :title="title" @change="refresh" />
+        <UButton
+          color="gray"
+          icon="i-fluent-add-square-multiple-20-filled"
+          class="float-right"
+          @click="create(title)"
+        >
+          Create
+        </UButton>
       </span>
     </AppH2>
 
@@ -77,9 +91,19 @@ const columns = [
       :rows="releases"
       class="dark:divide-gray-700 gap-1 rounded-md border border-gray-300 dark:border-gray-700"
       @select="
-        (row: BaseSystemFields) => navigateTo(`/title/${title!.id}/${row.id}`)
+        (row: BaseSystemFields) => navigateTo(`/title/${title.id}/${row.id}`)
       "
     >
+      <template #name-data="{ row }">
+        <span>{{ row.name }}</span>
+
+        <span v-if="row.disambiguation" class="text-sm">
+          {{ " " }}({{ row.disambiguation }})
+        </span>
+
+        <UBadge v-if="row.digital" color="red" class="ml-3">Digital</UBadge>
+      </template>
+
       <template #actions-data>
         <div class="flex justify-end">
           <UButton

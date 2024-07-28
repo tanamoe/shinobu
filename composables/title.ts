@@ -71,21 +71,3 @@ export function useTitle() {
 
   return { pending, create, update };
 }
-
-export function useTitlePage() {
-  return useState<{
-    name: string;
-    description: string;
-    format: string;
-    genres: string[];
-    demographic: string;
-    slugGroup: string;
-  }>(() => ({
-    name: "",
-    description: "",
-    format: "",
-    genres: [],
-    demographic: "",
-    slugGroup: "",
-  }));
-}
