@@ -26,5 +26,9 @@ export default defineNuxtConfig({
     },
   },
 
+  icon: {
+    serverBundle: "remote",
+  },
+
   compatibilityDate: "2024-07-09",
 });
