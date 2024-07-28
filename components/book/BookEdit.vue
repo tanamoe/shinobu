@@ -34,28 +34,13 @@ const schema = z.object({
   publishDate: z.string().optional(),
   price: z.coerce.number().min(0).optional(),
   note: z.string().optional(),
-  assets: z
-    .array(
-      z.object({
-        file: z.instanceof(File),
-        type: z.string(),
-        preview: z.string(),
-      }),
-    )
-    .transform((assets) =>
-      assets.map((asset) => ({
-        ...asset,
-        file: new File(
-          [asset.file],
-          slug(props.publication.name || "") +
-            "." +
-            asset.file.name.split(".").at(-1),
-          {
-            type: asset.type,
-          },
-        ),
-      })),
-    ),
+  assets: z.array(
+    z.object({
+      file: z.instanceof(File),
+      type: z.string(),
+      preview: z.string(),
+    }),
+  ),
   "assets-": z.array(z.string()),
   bookMetadata: z.object({
     isbn: z.string().optional(),
@@ -70,6 +55,7 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
+const fahasaURL = ref("");
 const state = ref<Schema>({
   edition: props.book.edition,
   publishDate: props.book.publishDate,
@@ -94,7 +80,15 @@ function handleFileChange(e: Event) {
   if (target?.files && state.value.assets) {
     state.value.assets = state.value.assets.concat(
       [...target.files].map((file) => ({
-        file,
+        file: new File(
+          [file],
+          slug(props.publication.name || "") +
+            "." +
+            file.name.split(".").at(-1),
+          {
+            type: file.type,
+          },
+        ),
         type: "",
         preview: URL.createObjectURL(file),
       })),
@@ -111,6 +105,8 @@ function handleFileRemove(i: number) {
 
 async function handleSubmit(event: FormSubmitEvent<Schema>) {
   const res = await update(props.book.id, event.data);
+
+  console.log(event.data);
 
   if (res) {
     const assetCount = props.book.expand?.assets_via_book?.length;
@@ -166,136 +162,189 @@ async function handleRemove() {
     emit("change");
   }
 }
+
+async function handleFahasa() {
+  const [data, err] = await fetchFahasa(fahasaURL.value);
+
+  console.log(err);
+
+  const definedProps = (obj: { [s: string]: unknown }) =>
+    Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+
+  if (!err) {
+    const fahasa = {
+      price: data.price,
+      assets: state.value.assets.concat(
+        data.images
+          ? data.images.map((image) => ({
+              file: new File(
+                [image],
+                slug(props.publication.name || "") +
+                  "." +
+                  image.name.split(".").at(-1),
+                {
+                  type: image.type,
+                },
+              ),
+              type: "",
+              preview: URL.createObjectURL(image),
+            }))
+          : [],
+      ),
+      bookMetadata: {
+        fahasaSKU: data.sku,
+        sizeX: data.size?.x,
+        sizeY: data.size?.y,
+        sizeZ: data.size?.z,
+        pageCount: data.pageCount,
+        weight: data.weight,
+      },
+    };
+
+    state.value = Object.assign(state.value, definedProps(fahasa));
+  }
+}
 </script>
 
 <template>
-  <UForm
-    :schema="schema"
-    :state="state"
-    class="space-y-6"
-    @submit="handleSubmit"
-  >
-    <UFormGroup label="Edition" name="edition">
-      <UInput v-model="state.edition" />
-    </UFormGroup>
-    <UFormGroup label="Publish date" name="publishDate">
-      <UInput v-model="state.publishDate" type="date" />
-    </UFormGroup>
-    <UFormGroup label="Price" name="price">
-      <UInput v-model="state.price" type="number">
-        <template #trailing>
-          <span class="text-gray-500 dark:text-gray-400 text-xs">VND</span>
-        </template>
-      </UInput>
-    </UFormGroup>
-    <UFormGroup label="Note" name="note">
-      <UTextarea v-model="state.note" />
-    </UFormGroup>
-
-    <UFormGroup label="Assets" name="assets">
-      <div class="space-y-3">
-        <AppAssetsList
-          v-if="book.expand?.assets_via_book"
-          v-model:remove-files="state['assets-']"
-          :assets="book.expand.assets_via_book"
-        />
-        <div class="flex space-x-3 max-w-full overflow-x-auto">
-          <div
-            v-for="(a, i) in state.assets"
-            :key="a.file.name"
-            class="space-y-3"
-          >
-            <div class="relative">
-              <UButton
-                class="absolute top-1 right-1"
-                variant="ghost"
-                size="2xs"
-                icon="i-fluent-delete-20-filled"
-                color="red"
-                @click="handleFileRemove(i)"
-              />
-              <img
-                :src="a.preview"
-                class="w-24 aspect-[2/3] object-cover rounded"
-              />
-            </div>
-            <InputAssetTypes v-model="a.type" />
-          </div>
-        </div>
-        <input
-          class="mt-3"
-          type="file"
-          multiple
-          ref="inputForm"
-          @change="handleFileChange"
-        />
-      </div>
-    </UFormGroup>
-
-    <UFormGroup label="ISBN" name="bookMetadata.isbn">
-      <UInput v-model="state.bookMetadata.isbn" />
-    </UFormGroup>
-    <UFormGroup label="FAHASA SKU" name="bookMetadata.fahasaSKU">
-      <UInput v-model="state.bookMetadata.fahasaSKU" />
-    </UFormGroup>
-
-    <div class="grid grid-cols-3 gap-6">
-      <UFormGroup label="X" name="bookMetadata.sizeX">
-        <UInput v-model="state.bookMetadata.sizeX">
-          <template #trailing>
-            <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
-          </template>
-        </UInput>
-      </UFormGroup>
-      <UFormGroup label="Y" name="bookMetadata.sizeY">
-        <UInput v-model="state.bookMetadata.sizeY">
-          <template #trailing>
-            <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
-          </template>
-        </UInput>
-      </UFormGroup>
-      <UFormGroup label="Z" name="bookMetadata.sizeZ">
-        <UInput v-model="state.bookMetadata.sizeZ">
-          <template #trailing>
-            <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
-          </template>
-        </UInput>
-      </UFormGroup>
-    </div>
-
-    <div class="grid grid-cols-2 gap-6">
-      <UFormGroup label="Page Count" name="bookMetadata.pageCount">
-        <UInput v-model="state.bookMetadata.pageCount" />
-      </UFormGroup>
-      <UFormGroup label="Weight" name="bookMetadata.weight">
-        <UInput v-model="state.bookMetadata.weight">
-          <template #trailing>
-            <span class="text-gray-500 dark:text-gray-400 text-xs">g</span>
-          </template>
-        </UInput>
-      </UFormGroup>
-    </div>
-
-    <div class="flex justify-between gap-3">
+  <div class="space-y-6">
+    <div class="flex gap-3">
+      <UInput v-model="fahasaURL" class="flex-1" placeholder="FAHASA URL" />
       <UButton
-        label="Set Default"
-        :pending="pending"
-        variant="ghost"
+        icon="i-fluent-sparkle-20-filled"
         color="gray"
-        :disabled="publication.defaultBook === book.id"
-        @click="handleDefault"
+        @click="handleFahasa"
       />
+    </div>
 
-      <div class="space-x-3">
+    <UForm
+      :schema="schema"
+      :state="state"
+      class="space-y-6"
+      @submit="handleSubmit"
+    >
+      <UFormGroup label="Edition" name="edition">
+        <UInput v-model="state.edition" />
+      </UFormGroup>
+      <UFormGroup label="Publish date" name="publishDate">
+        <UInput v-model="state.publishDate" type="date" />
+      </UFormGroup>
+      <UFormGroup label="Price" name="price">
+        <UInput v-model="state.price" type="number">
+          <template #trailing>
+            <span class="text-gray-500 dark:text-gray-400 text-xs">VND</span>
+          </template>
+        </UInput>
+      </UFormGroup>
+      <UFormGroup label="Note" name="note">
+        <UTextarea v-model="state.note" />
+      </UFormGroup>
+
+      <UFormGroup label="Assets" name="assets">
+        <div class="space-y-3">
+          <AppAssetsList
+            v-if="book.expand?.assets_via_book"
+            v-model:remove-files="state['assets-']"
+            :assets="book.expand.assets_via_book"
+          />
+          <div class="flex space-x-3 max-w-full overflow-x-auto">
+            <div
+              v-for="(a, i) in state.assets"
+              :key="a.file.name"
+              class="space-y-3 min-w-24"
+            >
+              <div class="relative">
+                <UButton
+                  class="absolute top-1 right-1"
+                  variant="ghost"
+                  size="2xs"
+                  icon="i-fluent-delete-20-filled"
+                  color="red"
+                  @click="handleFileRemove(i)"
+                />
+                <img
+                  :src="a.preview"
+                  class="w-24 aspect-[2/3] object-cover rounded"
+                />
+              </div>
+              <InputAssetTypes v-model="a.type" />
+            </div>
+          </div>
+          <input
+            class="mt-3"
+            type="file"
+            multiple
+            ref="inputForm"
+            @change="handleFileChange"
+          />
+        </div>
+      </UFormGroup>
+
+      <UFormGroup label="ISBN" name="bookMetadata.isbn">
+        <UInput v-model="state.bookMetadata.isbn" />
+      </UFormGroup>
+      <UFormGroup label="FAHASA SKU" name="bookMetadata.fahasaSKU">
+        <UInput v-model="state.bookMetadata.fahasaSKU" />
+      </UFormGroup>
+
+      <div class="grid grid-cols-3 gap-6">
+        <UFormGroup label="X" name="bookMetadata.sizeX">
+          <UInput v-model="state.bookMetadata.sizeX">
+            <template #trailing>
+              <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
+            </template>
+          </UInput>
+        </UFormGroup>
+        <UFormGroup label="Y" name="bookMetadata.sizeY">
+          <UInput v-model="state.bookMetadata.sizeY">
+            <template #trailing>
+              <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
+            </template>
+          </UInput>
+        </UFormGroup>
+        <UFormGroup label="Z" name="bookMetadata.sizeZ">
+          <UInput v-model="state.bookMetadata.sizeZ">
+            <template #trailing>
+              <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
+            </template>
+          </UInput>
+        </UFormGroup>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <UFormGroup label="Page Count" name="bookMetadata.pageCount">
+          <UInput v-model="state.bookMetadata.pageCount" />
+        </UFormGroup>
+        <UFormGroup label="Weight" name="bookMetadata.weight">
+          <UInput v-model="state.bookMetadata.weight">
+            <template #trailing>
+              <span class="text-gray-500 dark:text-gray-400 text-xs">g</span>
+            </template>
+          </UInput>
+        </UFormGroup>
+      </div>
+
+      <div class="flex justify-between gap-3">
         <UButton
-          label="Delete"
+          label="Set Default"
           :pending="pending"
           variant="ghost"
-          color="red"
-          @click="handleRemove"
+          color="gray"
+          :disabled="publication.defaultBook === book.id"
+          @click="handleDefault"
         />
-        <UButton label="Save" :pending="pending" type="submit" />
+
+        <div class="space-x-3">
+          <UButton
+            label="Delete"
+            :pending="pending"
+            variant="ghost"
+            color="red"
+            @click="handleRemove"
+          />
+          <UButton label="Save" :pending="pending" type="submit" />
+        </div>
       </div>
-    </div>
-  </UForm>
+    </UForm>
+  </div>
 </template>
