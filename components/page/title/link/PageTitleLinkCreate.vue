@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 import { Collections, type TitlesResponse } from "@/types/pb";
-import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import type { FormSubmitEvent } from "#ui/types";
 
 const { $pb } = useNuxtApp();
 const { pending, create } = useTitleLink();
@@ -48,8 +48,8 @@ const state = ref<Partial<Schema>>({
   source: undefined,
 });
 
-const current = computed(
-  () => sources.value?.find((source) => source.id === state.value.source),
+const current = computed(() =>
+  sources.value?.find((source) => source.id === state.value.source),
 );
 
 async function search(query: string) {

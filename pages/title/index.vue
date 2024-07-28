@@ -5,15 +5,17 @@ import {
   type FormatsResponse,
   type TitlesResponse,
 } from "@/types/pb";
+import { SlideoverTitleCreate } from "#components";
 
 const { $pb } = useNuxtApp();
+const slideover = useSlideover();
 
 const page = ref(1);
 const searchQuery = ref("");
 
 const {
-  pending,
   data: rows,
+  status,
   refresh,
 } = await useAsyncData(
   () =>
@@ -45,6 +47,10 @@ const columns = [
   },
 ];
 
+function create() {
+  slideover.open(SlideoverTitleCreate, { onChange: () => refresh() });
+}
+
 useHead({
   title: "Title listing",
 });
@@ -68,7 +74,9 @@ useHead({
           color="white"
         />
       </div>
-      <UButton type="submit" :loading="pending" color="gray">Search</UButton>
+      <UButton type="submit" :loading="status === 'pending'" color="gray">
+        Search
+      </UButton>
     </form>
 
     <div class="flex items-center justify-end gap-3">
@@ -76,19 +84,26 @@ useHead({
         variant="ghost"
         color="gray"
         icon="i-fluent-arrow-clockwise-20-filled"
-        :loading="pending"
+        :loading="status === 'pending'"
         @click="refresh()"
       >
         Refresh
       </UButton>
-      <TitleCreate @change="refresh" />
+      <UButton
+        color="gray"
+        icon="i-fluent-add-square-multiple-20-filled"
+        class="float-right"
+        @click="create"
+      >
+        Create
+      </UButton>
     </div>
 
     <div class="flex-1 overflow-y-scroll">
       <UTable
         :columns="columns"
         :rows="rows?.items || []"
-        :loading="pending"
+        :loading="status === 'pending'"
         @select="
           async (row: BaseSystemFields) => await navigateTo(`/title/${row.id}`)
         "

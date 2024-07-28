@@ -13,12 +13,11 @@ const { data: release, refresh } = await useAsyncData(
   () =>
     $pb
       .collection(Collections.Releases)
-      .getOne<ReleasesResponse<{ title: TitlesResponse }>>(
-        route.params.releaseId as string,
-        {
-          expand: "title",
-        },
-      ),
+      .getOne<
+        ReleasesResponse<{ title: TitlesResponse }>
+      >(route.params.releaseId as string, {
+        expand: "title",
+      }),
 );
 
 if (!release.value?.expand?.title)
@@ -40,8 +39,8 @@ useHead({
       ]"
     />
 
-    <PageReleaseDetails :release="release" @change="refresh()" />
+    <ReleaseDetails :release="release" @change="refresh()" />
 
-    <PageReleasePublications :release="release" />
+    <ReleasePublications :release="release" />
   </div>
 </template>
