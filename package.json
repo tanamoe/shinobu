@@ -49,6 +49,7 @@
     "@tiptap/pm": "^2.5.7",
     "@tiptap/starter-kit": "^2.5.7",
     "@tiptap/vue-3": "^2.5.7",
+    "cheerio": "^1.0.0-rc.12",
     "pinia": "^2.2.0",
     "pocketbase": "0.21",
     "slug": "^9.1.0",
