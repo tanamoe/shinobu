@@ -113,11 +113,14 @@ async function handleSubmit(event: FormSubmitEvent<Schema>) {
   const res = await update(props.book.id, event.data);
 
   if (res) {
-    for (const image of event.data.assets) {
+    const assetCount = props.book.expand?.assets_via_book?.length;
+
+    for (const [i, image] of event.data.assets.entries()) {
       await asset.create({
         book: res.id,
         image: image.file,
         type: image.type,
+        priority: (assetCount ?? 0) + 1 + i,
       });
     }
 
