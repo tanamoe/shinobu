@@ -5,7 +5,7 @@ import {
   type FormatsResponse,
   type TitlesResponse,
 } from "@/types/pb";
-import SlideoverTitleCreate from "#components";
+import { SlideoverTitleCreate } from "#components";
 
 const { $pb } = useNuxtApp();
 const slideover = useSlideover();
@@ -48,9 +48,7 @@ const columns = [
 ];
 
 function create() {
-  slideover.open(SlideoverTitleCreate, {
-    onChange: () => refresh(),
-  });
+  slideover.open(SlideoverTitleCreate, { onChange: () => refresh() });
 }
 
 useHead({
