@@ -4,10 +4,12 @@ import {
   type BooksRecord,
 } from "@/types/pb";
 
-export type BulkBook = Pick<BooksRecord, "edition" | "price" | "publishDate">;
+export type BulkBook = Pick<BooksRecord, "edition" | "publishDate"> & {
+  price: string;
+};
 
-export type BulkPublication = Pick<PublicationsRecord, "volume" | "name"> & {
-  asset: string[];
+export type BulkPublication = Pick<PublicationsRecord, "name"> & {
+  volume: string;
   books: BulkBook[];
 };
 
@@ -19,20 +21,19 @@ export type BulkData = {
 
 export const bulkDefaultBook = {
   edition: "",
-  price: 0,
+  price: "",
   publishDate: "",
 };
 
 export const bulkDefaultPublication: BulkPublication = {
-  volume: 0,
+  volume: "",
   name: "",
-  asset: [],
-  books: [bulkDefaultBook],
+  books: [structuredClone(bulkDefaultBook)],
 };
 
 export const bulkDefaultData: BulkData = {
   priority: 1,
-  publications: [bulkDefaultPublication],
+  publications: [structuredClone(bulkDefaultPublication)],
 };
 
 export const useBulkStore = defineStore("bulk", () => {
