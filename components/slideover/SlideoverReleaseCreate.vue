@@ -17,17 +17,23 @@ const emit = defineEmits<{
 const schema = z.object({
   title: z.string(),
   name: z.string(),
+  type: z.string(),
+  disambiguation: z.string(),
   publisher: z.string(),
+  partner: z.string(),
   status: z.nativeEnum(ReleasesStatusOptions),
 });
 
 type Schema = z.output<typeof schema>;
 
-const state = ref({
+const state = ref<Schema>({
   title: props.title.id,
-  name: undefined,
+  name: "",
+  type: "",
+  disambiguation: "",
   publisher: "",
-  status: undefined,
+  partner: "",
+  status: ReleasesStatusOptions.ON_GOING,
 });
 
 async function submit(event: FormSubmitEvent<Schema>) {
@@ -52,8 +58,17 @@ async function submit(event: FormSubmitEvent<Schema>) {
         <UFormGroup label="Name" name="name">
           <UInput v-model="state.name" />
         </UFormGroup>
+        <UFormGroup label="Type" name="type">
+          <UInput v-model="state.type" />
+        </UFormGroup>
+        <UFormGroup label="Disambiguation" name="disambiguation">
+          <UInput v-model="state.disambiguation" />
+        </UFormGroup>
         <UFormGroup label="Publisher" name="publisher">
           <InputPublisher v-model="state.publisher" />
+        </UFormGroup>
+        <UFormGroup label="Partner" name="partner">
+          <InputPublisher v-model="state.partner" />
         </UFormGroup>
         <UFormGroup label="Status" name="status">
           <USelect
