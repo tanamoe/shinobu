@@ -25,14 +25,15 @@ export async function fetchFahasa(url: string): Promise<FahasaResponse> {
 
     const _price = $(".price-block .old-price .price")
       .text()
+      .trim()
       .replace(/\D/g, "");
 
-    const _sku = $(".data_sku").text();
-    const _count = $(".data_qty_of_page").text();
-    const _weight = $(".data_weight").text();
+    const _sku = $(".data_sku").text().trim();
+    const _count = $(".data_qty_of_page").text().trim();
+    const _weight = $(".data_weight").text().trim();
 
-    const _size = $(".data_size").text();
-    const _sizes = _size.match(/\d[,.]*\d/g);
+    const _size = $(".data_size").text().trim();
+    const _sizes = _size.match(/(?<=^| )\d+(\.\d+)?(?=$| )/g);
 
     const _gallery = $("#lightgallery-product-media img");
 

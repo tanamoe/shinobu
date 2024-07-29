@@ -4,26 +4,22 @@ const { $pb } = useNuxtApp();
 const name = $pb.authStore.model.email;
 
 const links = [
-  {
-    label: "Home",
-    icon: "i-fluent-home-20-filled",
-    to: "/",
-  },
-  {
-    label: "Title",
-    icon: "i-fluent-book-20-filled",
-    to: "/title",
-  },
-];
-
-const items = [
   [
     {
-      label: "Logout",
-      to: "/logout",
+      label: "Home",
+      icon: "i-fluent-home-20-filled",
+      to: "/",
+    },
+    {
+      label: "Title",
+      icon: "i-fluent-book-20-filled",
+      to: "/title",
     },
   ],
+  [{ label: "Bulk", icon: "i-fluent-library-20-filled", to: "/tools/bulk" }],
 ];
+
+const items = [[{ label: "Logout", to: "/logout" }]];
 </script>
 
 <template>
