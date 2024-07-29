@@ -31,7 +31,8 @@ async function save() {
             publication: publicationResponse.id,
           });
 
-          if (bookResponse && i == 1) {
+          // TODO: better handling this on server
+          if (bookResponse && i == 0) {
             await _publication.update(publicationResponse.id, {
               defaultBook: bookResponse.id,
             });
