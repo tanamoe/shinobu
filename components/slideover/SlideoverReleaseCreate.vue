@@ -16,10 +16,10 @@ const emit = defineEmits<{
 
 const schema = z.object({
   title: z.string(),
-  name: z.string(),
-  type: z.string(),
-  disambiguation: z.string(),
-  publisher: z.string(),
+  name: z.string().min(1),
+  type: z.string().min(1),
+  disambiguation: z.string().optional(),
+  publisher: z.string().min(1),
   partner: z.string(),
   status: z.nativeEnum(ReleasesStatusOptions),
 });

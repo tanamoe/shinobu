@@ -1,11 +1,29 @@
 <script setup lang="ts">
-import { Collections } from "@/types/pb";
+import {
+  Collections,
+  type AdditionalTitleNamesResponse,
+  type TitlesResponse,
+} from "@/types/pb";
+import { joinURL } from "ufo";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
 
-const { data: title, refresh } = await useAsyncData(() =>
-  $pb.collection(Collections.Titles).getOne(route.params.titleId as string),
+const {
+  data: title,
+  status,
+  refresh,
+} = await useAsyncData(() =>
+  $pb.collection(Collections.Titles).getOne<
+    TitlesResponse<
+      unknown,
+      {
+        additionalTitleNames_via_title?: AdditionalTitleNamesResponse[];
+      }
+    >
+  >(route.params.titleId as string, {
+    expand: "additionalTitleNames_via_title",
+  }),
 );
 
 if (!title.value)
@@ -30,15 +48,25 @@ useHead({
       <div class="flex-1 space-y-12">
         <TitleDetails :title="title" @change="refresh()" />
 
-        <TitleReleases :title="title" />
+        <TitleReleases :title="title" @change="refresh" />
 
         <div class="flex gap-6">
           <TitleLinks class="flex-1" :title="title" />
           <TitleWorks class="flex-1" :title="title" />
+          <TitleAdditionalNames class="flex-1" :title @change="refresh" />
         </div>
       </div>
-      <div>
+      <div class="space-y-3">
         <TitleCover :title="title" @change="refresh()" />
+        <UButton
+          :to="joinURL('https://tana.moe/title/', title.slug)"
+          target="_blank"
+          color="gray"
+          icon="i-fluent-window-arrow-up-20-filled"
+          block
+        >
+          Preview
+        </UButton>
       </div>
     </section>
   </div>
