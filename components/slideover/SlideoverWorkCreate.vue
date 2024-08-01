@@ -57,7 +57,7 @@ const label = computed({
 
     if (staff?.label) {
       const res = await $pb.collection(Collections.Staffs).create({
-        name: staff.label,
+        name: staff.label.trim(),
       });
 
       if (res)
