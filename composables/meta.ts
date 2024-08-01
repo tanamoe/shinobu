@@ -15,6 +15,23 @@ export function useMeta() {
   const formats = useState<FormatsResponse[]>(() => []);
   const genres = useState<GenresResponse[]>(() => []);
   const assetTypes = useState<AssetTypesResponse[]>(() => []);
+  const languages = useState(() => [
+    {
+      id: "en",
+      label: "English",
+      emoji: "🇬🇧",
+    },
+    {
+      id: "vi",
+      label: "Vietnamese",
+      emoji: "🇻🇳",
+    },
+    {
+      id: "jp",
+      label: "Japanese",
+      emoji: "🇯🇵",
+    },
+  ]);
 
   async function update() {
     const p = await $pb.collection(Collections.Publishers).getFullList();
@@ -43,5 +60,13 @@ export function useMeta() {
     }
   }
 
-  return { publishers, demographics, formats, genres, assetTypes, update };
+  return {
+    publishers,
+    demographics,
+    formats,
+    genres,
+    assetTypes,
+    languages,
+    update,
+  };
 }
