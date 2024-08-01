@@ -5,7 +5,7 @@ const selected = defineModel<string>({ required: true });
 </script>
 
 <template>
-  <USelectMenu
+  <USelect
     v-model="selected"
     :options="assetTypes"
     value-attribute="id"
