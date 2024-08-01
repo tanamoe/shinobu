@@ -27,6 +27,7 @@ const { data, status, refresh } = await useLazyAsyncData(
       filter: $pb.filter("publication.id = {:publication}", {
         publication: props.publication.id,
       }),
+      sort: "+edition",
       expand: "assets_via_book,bookMetadata_via_book",
     }),
   {
