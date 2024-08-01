@@ -29,6 +29,10 @@ const emit = defineEmits<{
   change: [];
 }>();
 
+const isDefault = computed(
+  () => props.publication.defaultBook === props.book.id,
+);
+
 const schema = z.object({
   edition: z.string().optional(),
   publishDate: z.string().optional(),
@@ -169,7 +173,7 @@ async function handleFahasa() {
   console.log(err);
 
   const definedProps = (obj: { [s: string]: unknown }) =>
-    Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
+    Object.fromEntries(Object.entries(obj).filter(([, v]) => v));
 
   if (!err) {
     const fahasa = {
@@ -192,6 +196,7 @@ async function handleFahasa() {
           : [],
       ),
       bookMetadata: {
+        ...state.value.bookMetadata,
         fahasaSKU: data.sku,
         sizeX: data.size?.x,
         sizeY: data.size?.y,
@@ -208,6 +213,9 @@ async function handleFahasa() {
 
 <template>
   <div class="space-y-6">
+    <div v-if="isDefault" class="text-right">
+      <UBadge>Default</UBadge>
+    </div>
     <div class="flex gap-3">
       <UInput v-model="fahasaURL" class="flex-1" placeholder="FAHASA URL" />
       <UButton
@@ -330,7 +338,7 @@ async function handleFahasa() {
           :pending="pending"
           variant="ghost"
           color="gray"
-          :disabled="publication.defaultBook === book.id"
+          :disabled="isDefault"
           @click="handleDefault"
         />
 
