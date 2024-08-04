@@ -209,6 +209,22 @@ async function handleFahasa() {
     state.value = Object.assign(state.value, definedProps(fahasa));
   }
 }
+
+function parseSize() {
+  if (
+    state.value.bookMetadata.sizeX &&
+    state.value.bookMetadata.sizeX.toString().includes("x")
+  ) {
+    const _sizes = state.value.bookMetadata.sizeX.toString().split("x");
+
+    state.value.bookMetadata = {
+      ...state.value.bookMetadata,
+      sizeX: parseFloat(_sizes[0]) || 0,
+      sizeY: parseFloat(_sizes[1]) || 0,
+      sizeZ: parseFloat(_sizes[2]) || 0,
+    };
+  }
+}
 </script>
 
 <template>
@@ -297,7 +313,7 @@ async function handleFahasa() {
 
       <div class="grid grid-cols-3 gap-6">
         <UFormGroup label="X" name="bookMetadata.sizeX">
-          <UInput v-model="state.bookMetadata.sizeX">
+          <UInput v-model="state.bookMetadata.sizeX" @change="parseSize">
             <template #trailing>
               <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
             </template>
