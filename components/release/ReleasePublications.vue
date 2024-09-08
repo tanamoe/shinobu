@@ -68,12 +68,14 @@ const columns = [
 function create(release: ReleasesResponse) {
   slideover.open(SlideoverPublicationCreate, {
     release,
+    onChange: () => refresh(),
   });
 }
 
 function quickCreate(release: ReleasesResponse<{ title: TitlesResponse }>) {
   modal.open(ModalPublicationQuickCreate, {
     release,
+    onChange: () => refresh(),
   });
 }
 
