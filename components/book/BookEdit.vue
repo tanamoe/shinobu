@@ -275,7 +275,7 @@ function parseSize() {
             <div
               v-for="(a, i) in state.assets"
               :key="a.file.name"
-              class="space-y-3 min-w-24"
+              class="space-y-3 min-w-32"
             >
               <div class="relative">
                 <UButton
@@ -288,7 +288,7 @@ function parseSize() {
                 />
                 <img
                   :src="a.preview"
-                  class="w-24 aspect-[2/3] object-cover rounded"
+                  class="rounded w-32 w-full object-contain aspect-[2/3] bg-gray-200 dark:bg-gray-800"
                 />
               </div>
               <InputAssetTypes v-model="a.type" />
