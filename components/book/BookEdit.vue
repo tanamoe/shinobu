@@ -288,7 +288,7 @@ function parseSize() {
                 />
                 <img
                   :src="a.preview"
-                  class="rounded w-32 w-full object-contain aspect-[2/3] bg-gray-200 dark:bg-gray-800"
+                  class="rounded w-32 object-contain aspect-[2/3] bg-gray-200 dark:bg-gray-800"
                 />
               </div>
               <InputAssetTypes v-model="a.type" />
