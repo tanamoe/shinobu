@@ -50,24 +50,7 @@ const state = ref<Partial<Schema>>({
   staff: undefined,
 });
 
-const label = computed({
-  get: () => state.value.staff,
-  set: async (staff) => {
-    if (staff?.id) return (state.value.staff = staff);
-
-    if (staff?.label) {
-      const res = await $pb.collection(Collections.Staffs).create({
-        name: staff.label.trim(),
-      });
-
-      if (res)
-        state.value.staff = {
-          id: res.id,
-          label: res.name,
-        };
-    }
-  },
-});
+const label = computed(() => state.value.staff);
 
 async function search(query: string) {
   const res = await $pb
@@ -117,7 +100,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
             by="id"
             :options="staff"
             :searchable="search"
-            creatable
           >
             <template #option="{ option }">
               <span class="truncate">{{ option.label }}</span>

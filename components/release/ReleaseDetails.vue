@@ -14,7 +14,8 @@ const emit = defineEmits<{
 }>();
 
 const schema = z.object({
-  name: z.string(),
+  name: z.string().min(1),
+  type: z.string().min(1),
   disambiguation: z.string(),
   status: z.nativeEnum(ReleasesStatusOptions),
   publisher: z.string(),
@@ -26,6 +27,7 @@ type Schema = z.output<typeof schema>;
 
 const state = ref<Schema>({
   name: props.release.name,
+  type: props.release.type,
   disambiguation: props.release.disambiguation,
   status: props.release.status,
   publisher: props.release.publisher,
@@ -45,9 +47,12 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <UForm :schema="schema" :state="state" class="space-y-3" @submit="submit">
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
       <UFormGroup name="name" label="Name">
         <UInput v-model="state.name" />
+      </UFormGroup>
+      <UFormGroup name="type" label="Type">
+        <UInput v-model="state.type" />
       </UFormGroup>
       <UFormGroup name="disambiguation" label="Disambiguation">
         <UInput v-model="state.disambiguation" />
