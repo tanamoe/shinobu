@@ -8,10 +8,12 @@ import {
 import { SlideoverTitleCreate } from "#components";
 
 const { $pb } = useNuxtApp();
+const { query } = useRoute();
+const { replace } = useRouter();
 const slideover = useSlideover();
 
 const page = ref(1);
-const searchQuery = ref("");
+const searchQuery = ref(query.q ? (query.q as string) : "");
 
 const {
   data: rows,
@@ -24,7 +26,7 @@ const {
         format: FormatsResponse;
       }>
     >(page.value, 20, {
-      filter: `name~'${searchQuery.value}'`,
+      filter: $pb.filter("name ~ {:name}", { name: searchQuery.value }),
       expand: "format",
       sort: "-updated",
     }),
@@ -32,6 +34,10 @@ const {
     watch: [page],
   },
 );
+
+watch(searchQuery, () => {
+  replace({ query: { q: searchQuery.value } });
+});
 
 const columns = [
   {
