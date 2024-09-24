@@ -124,9 +124,7 @@ function remove(publication: PublicationsResponse) {
 
     <UTable :columns="columns" :rows="publications || []">
       <template #volume-data="{ row }">
-        <UBadge color="gray">
-          {{ Math.floor(row.volume / 10000) + (row.volume % 10) * 0.1 }}
-        </UBadge>
+        <AppVolume :volume="row.volume" />
       </template>
 
       <template #name-data="{ row }">
