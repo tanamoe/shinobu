@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type BooksRecord } from "@/types/pb";
+import type { BooksRecord } from "@/types/pb";
 
 const book = defineModel<
   Pick<BooksRecord, "edition" | "publishDate"> & {
