@@ -1,7 +1,7 @@
-import {
-  type PublicationsRecord,
-  type ReleasesResponse,
-  type BooksRecord,
+import type {
+  PublicationsRecord,
+  ReleasesResponse,
+  BooksRecord,
 } from "@/types/pb";
 
 export type BulkBook = Pick<BooksRecord, "edition" | "publishDate"> & {
@@ -37,7 +37,7 @@ export const bulkDefaultData: BulkData = {
 };
 
 export const useBulkStore = defineStore("bulk", () => {
-  const data = ref<BulkData[]>([bulkDefaultData]);
+  const data = ref<BulkData[]>([structuredClone(bulkDefaultData)]);
 
   function latest() {
     return data.value[data.value.length - 1];
