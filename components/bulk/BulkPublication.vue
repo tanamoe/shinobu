@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { type BulkPublication } from "~/stores/bulk";
+import type { BulkPublication } from "~/stores/bulk";
 
 const publication = defineModel<BulkPublication>({ required: true });
 const props = defineProps<{ release?: string }>();
 
 function append() {
-  publication.value.books.push(structuredClone(bulkDefaultBook));
+  const { edition, price, publishDate } =
+    publication.value.books.at(-1) ?? bulkDefaultBook;
+  publication.value.books.push({
+    edition,
+    price,
+    publishDate,
+  });
 }
 
 function remove(i: number) {
