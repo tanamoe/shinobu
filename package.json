@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@iconify-json/fluent": "^1.2.2",
-    "@pinia/nuxt": "^0.5.5",
+    "@pinia/nuxt": "^0.7.0",
     "@std/csv": "npm:@jsr/std__csv",
     "@tiptap/extension-underline": "^2.8.0",
     "@tiptap/pm": "^2.8.0",
