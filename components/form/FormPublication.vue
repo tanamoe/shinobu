@@ -29,7 +29,7 @@ const state = ref<Schema>({
   name: props.publication?.name ?? "",
   release: props.publication?.release ?? "",
   volume: props.publication?.volume,
-  description: props.publication?.description ?? "",
+  description: props.publication?.description,
   subtitle: props.publication?.subtitle,
 });
 
