@@ -28,11 +28,11 @@ export async function fetchFahasa(url: string): Promise<FahasaResponse> {
       .trim()
       .replace(/\D/g, "");
 
-    const _sku = $(".data_sku").text().trim();
-    const _count = $(".data_qty_of_page").text().trim();
-    const _weight = $(".data_weight").text().trim();
+    const _sku = $(".data_0").text().trim();
+    const _count = $(".data_11").text().trim();
+    const _weight = $(".data_9").text().trim();
 
-    const _size = $(".data_size").text().trim();
+    const _size = $(".data_10").text().trim();
     const _sizes = _size.match(/(?<=^| )\d+(\.\d+)?(?=$| )/g);
 
     const _gallery = $("#lightgallery-product-media img");
@@ -69,8 +69,8 @@ export async function fetchFahasa(url: string): Promise<FahasaResponse> {
                 z: parseFloat(_sizes[2]),
               }
             : undefined,
-        pageCount: parseInt(_count),
-        weight: parseInt(_weight),
+        pageCount: _count ? parseInt(_count) : undefined,
+        weight: _count ? parseInt(_weight) : undefined,
       },
       null,
     ];

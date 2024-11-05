@@ -11,6 +11,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       pocketbaseUrl: process.env.POCKETBASE_URL,
+      imageUrl: process.env.IMAGE_URL,
     },
   },
 

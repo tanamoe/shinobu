@@ -41,8 +41,8 @@ const schema = z.object({
   assets: z.array(
     z.object({
       file: z.instanceof(File),
+      description: z.string(),
       type: z.string(),
-      preview: z.string(),
     }),
   ),
   "assets-": z.array(z.string()),
@@ -77,35 +77,6 @@ const state = ref<Schema>({
   assets: [],
   "assets-": [],
 });
-
-function handleFileChange(e: Event) {
-  const target = e.target as HTMLInputElement | null;
-
-  if (target?.files && state.value.assets) {
-    state.value.assets = state.value.assets.concat(
-      [...target.files].map((file) => ({
-        file: new File(
-          [file],
-          slug(props.publication.name || "") +
-            "." +
-            file.name.split(".").at(-1),
-          {
-            type: file.type,
-          },
-        ),
-        type: "",
-        preview: URL.createObjectURL(file),
-      })),
-    );
-
-    // reset on update
-    target.value = "";
-  }
-}
-
-function handleFileRemove(i: number) {
-  state.value.assets.splice(i, 1);
-}
 
 async function handleSubmit(event: FormSubmitEvent<Schema>) {
   const res = await update(props.book.id, event.data);
@@ -190,8 +161,8 @@ async function handleFahasa() {
                   type: image.type,
                 },
               ),
+              description: "",
               type: "",
-              preview: URL.createObjectURL(image),
             }))
           : [],
       ),
@@ -271,36 +242,7 @@ function parseSize() {
             v-model:remove-files="state['assets-']"
             :assets="book.expand.assets_via_book"
           />
-          <div class="flex space-x-3 max-w-full overflow-x-auto">
-            <div
-              v-for="(a, i) in state.assets"
-              :key="a.file.name"
-              class="space-y-3 min-w-32"
-            >
-              <div class="relative">
-                <UButton
-                  class="absolute top-1 right-1"
-                  variant="ghost"
-                  size="2xs"
-                  icon="i-fluent-delete-20-filled"
-                  color="red"
-                  @click="handleFileRemove(i)"
-                />
-                <img
-                  :src="a.preview"
-                  class="rounded w-32 object-contain aspect-[2/3] bg-gray-200 dark:bg-gray-800"
-                />
-              </div>
-              <InputAssetTypes v-model="a.type" />
-            </div>
-          </div>
-          <input
-            class="mt-3"
-            type="file"
-            multiple
-            ref="inputForm"
-            @change="handleFileChange"
-          />
+          <InputAsset v-model="state.assets" multiple />
         </div>
       </UFormGroup>
 

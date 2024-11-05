@@ -1,9 +1,13 @@
 <script setup lang="ts">
-const emits = defineEmits<{
-  change: [];
+const props = defineProps<{
+  multiple?: boolean;
 }>();
 
-const file = defineModel<File>();
+const model = defineModel<File | File[]>();
+
+const emit = defineEmits<{
+  change: [File | File[]];
+}>();
 
 const input = ref<HTMLInputElement>();
 const dragging = ref(false);
@@ -20,20 +24,31 @@ function dragleave() {
   dragging.value = false;
 }
 
-function drop(event: DragEvent) {
-  const _file = event.dataTransfer?.files.item(0);
-  if (_file) {
-    file.value = _file;
-    dragging.value = false;
-    emits("change");
-  }
-}
+function change(event: Event | DragEvent) {
+  const files =
+    event instanceof DragEvent
+      ? event.dataTransfer?.files
+      : (event.target as HTMLInputElement).files;
 
-function change() {
-  const _file = input.value?.files?.item(0);
-  if (_file) {
-    file.value = _file;
-    emits("change");
+  // reset on change
+  model.value = undefined;
+
+  if (files) {
+    for (const file of files) {
+      if (props.multiple) {
+        if (Array.isArray(model.value)) model.value = model.value.concat(file);
+        // uninitiated
+        else model.value = [file];
+      } else {
+        model.value = file;
+        // set only the first file
+        break;
+      }
+    }
+
+    dragging.value = false;
+
+    if (model.value) emit("change", model.value);
   }
 }
 
@@ -47,9 +62,9 @@ const ui = {
 </script>
 
 <template>
-  <input ref="input" type="file" class="hidden" @change="change" />
+  <input ref="input" type="file" class="hidden" :multiple @change="change" />
   <div
-    @drop.prevent="drop"
+    @drop.prevent="change"
     @dragover.prevent="dragover"
     @dragleave="dragleave"
     @click="open"
@@ -57,7 +72,13 @@ const ui = {
     <UCard :ui>
       <UIcon name="i-fluent-arrow-upload-20-filled" class="w-8 h-8" />
       <template v-if="dragging">Release to upload</template>
-      <template v-else-if="file">{{ file.name }}</template>
+      <template v-else-if="model">
+        {{
+          Array.isArray(model)
+            ? model.map(({ name }) => name).join(", ")
+            : model.name
+        }}
+      </template>
       <template v-else>
         <span><b>Choose a file</b> or drag to upload</span>
       </template>

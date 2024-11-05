@@ -40,10 +40,14 @@ const { data, status, refresh } = await useLazyAsyncData(
       })),
   },
 );
+
+const ui = {
+  width: "max-w-2xl",
+};
 </script>
 
 <template>
-  <USlideover>
+  <USlideover :ui>
     <div class="p-6 overflow-y-scroll">
       <AppH2>
         {{ publication.name }}
