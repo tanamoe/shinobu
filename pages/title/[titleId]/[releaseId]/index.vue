@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import {
   Collections,
+  type AssetsResponse,
   type ReleasesResponse,
   type TitlesResponse,
 } from "@/types/pb";
+import type { MetadataImages } from "~/types/common";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
@@ -11,20 +13,23 @@ const route = useRoute();
 const { data: release, refresh } = await useAsyncData(
   route.params.releaseId as string,
   () =>
-    $pb
-      .collection(Collections.Releases)
-      .getOne<
-        ReleasesResponse<{ title: TitlesResponse }>
-      >(route.params.releaseId as string, {
-        expand: "title",
-      }),
+    $pb.collection(Collections.Releases).getOne<
+      ReleasesResponse<{
+        title: TitlesResponse;
+        front: AssetsResponse<MetadataImages>;
+        banner: AssetsResponse<MetadataImages>;
+        logo: AssetsResponse<MetadataImages>;
+      }>
+    >(route.params.releaseId as string, {
+      expand: "title, front, banner, logo",
+    }),
 );
 
 if (!release.value?.expand?.title)
   throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
 
 useHead({
-  title: release.value.expand.title.name + " / " + release.value.name,
+  title: release.value.name,
 });
 </script>
 
@@ -39,7 +44,7 @@ useHead({
       ]"
     />
 
-    <ReleaseDetails :release="release" @change="refresh()" />
+    <FormRelease :release @change="refresh" />
 
     <ReleasePublications :release="release" />
   </div>

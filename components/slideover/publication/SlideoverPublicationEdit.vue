@@ -18,7 +18,7 @@ defineEmits<{
         {{ publication.name }}
       </AppH2>
 
-      <PublicationEdit :publication @change="$emit('change')" />
+      <FormPublication :publication @change="$emit('change')" />
     </div>
   </USlideover>
 </template>
