@@ -8,16 +8,15 @@ import {
   type TitlesResponse,
 } from "@/types/pb";
 import { joinURL } from "ufo";
-import type { MetadataImages } from "~/types/common";
+import type { MetadataImages } from "@/types/common";
+import SlideoverRelease from "@/components/slideover/SlideoverRelease.vue";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
+const slideover = useSlideover();
+const { update } = useTitle();
 
-const {
-  data: title,
-  status,
-  refresh,
-} = await useAsyncData(() =>
+const { data: title, refresh } = await useAsyncData(() =>
   $pb.collection(Collections.Titles).getOne<
     TitlesResponse<
       unknown,
@@ -47,6 +46,13 @@ const image = computed(
 if (!title.value)
   throw createError({ statusCode: 404, statusMessage: "Page Not Found" });
 
+async function makeDefault(id: string) {
+  if (title.value) {
+    const res = await update(title.value.id, { defaultRelease: id });
+    if (res) refresh();
+  }
+}
+
 useHead({
   title: title.value.name,
 });
@@ -66,19 +72,41 @@ useHead({
       <div class="flex-1 space-y-12">
         <TitleDetails :title="title" @change="refresh()" />
 
-        <div
-          class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-        >
-          <AppRelease
-            v-for="release in releases"
-            :key="release.id"
-            :title
-            :release
-            :publisher="release.expand?.publisher"
-            :partner="release.expand?.partner"
-            :image="release.expand?.front"
-            wide
-          />
+        <div class="space-y-6">
+          <div
+            class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
+          >
+            <AppRelease
+              v-for="release in releases"
+              :key="release.id"
+              :title
+              :release
+              :publisher="release.expand?.publisher"
+              :partner="release.expand?.partner"
+              :image="release.expand?.front"
+              wide
+            >
+              <template #after>
+                <UButton
+                  block
+                  color="gray"
+                  :disabled="title.defaultRelease == release.id"
+                  @click.prevent="makeDefault(release.id)"
+                >
+                  Default
+                </UButton>
+              </template>
+            </AppRelease>
+          </div>
+          <UButton
+            color="gray"
+            icon="i-fluent-add-square-multiple-20-filled"
+            @click="
+              slideover.open(SlideoverRelease, { title, onChange: refresh })
+            "
+          >
+            Create
+          </UButton>
         </div>
 
         <div class="flex gap-6">
