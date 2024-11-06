@@ -44,7 +44,14 @@ useHead({
       ]"
     />
 
-    <FormRelease :release @change="refresh" />
+    <div class="flex gap-6">
+      <FormRelease class="flex-1" :release @change="refresh" />
+      <FormReleaseFront
+        :release
+        :front="release.expand?.front"
+        @change="refresh"
+      />
+    </div>
 
     <ReleasePublications :release="release" />
   </div>
