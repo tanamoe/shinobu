@@ -30,7 +30,7 @@ defineProps<Props>();
   <div
     v-else
     :class="[
-      'flex h-full w-full items-center justify-center text-center',
+      'flex h-auto w-full items-center justify-center text-center',
       'bg-gray-200 text-gray-500',
       'dark:bg-gray-800 dark:text-gray-400',
       'font-condensed font-bold',

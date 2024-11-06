@@ -71,6 +71,8 @@ const ui = computed(() => ({
       </h3>
 
       <div v-if="release.disambiguation">{{ release.disambiguation }}</div>
+
+      <slot name="after" />
     </div>
   </NuxtLink>
 </template>
