@@ -29,10 +29,10 @@ export async function fetchFahasa(url: string): Promise<FahasaResponse> {
       .replace(/\D/g, "");
 
     const _sku = $(".data_0").text().trim();
-    const _count = $(".data_11").text().trim();
-    const _weight = $(".data_9").text().trim();
+    const _count = $(".data_12").text().trim();
+    const _weight = $(".data_10").text().trim();
 
-    const _size = $(".data_10").text().trim();
+    const _size = $(".data_11").text().trim();
     const _sizes = _size.match(/(?<=^| )\d+(\.\d+)?(?=$| )/g);
 
     const _gallery = $("#lightgallery-product-media img");
