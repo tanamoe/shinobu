@@ -2,7 +2,7 @@
 const { $pb } = useNuxtApp();
 const { publishers } = useMeta();
 
-const model = defineModel<string>({ required: true });
+const model = defineModel<string>();
 
 const current = computed(() =>
   publishers.value.find((p) => model.value === p.id),
