@@ -7,7 +7,10 @@ import type {
   AssetsResponse,
   BookMetadataResponse,
   PublicationsResponse,
+  AssetTypesResponse,
 } from "@/types/pb";
+import type { ThirdPartySchema } from "~/server/utils/common";
+import type { MetadataImages } from "~/types/common";
 
 const { pending, update, remove } = useBook();
 const { update: updateP } = usePublication();
@@ -16,13 +19,9 @@ const bookMetadata = useBookMetadata();
 
 const props = defineProps<{
   publication: PublicationsResponse;
-  book: BooksResponse<
-    unknown,
-    {
-      assets_via_book?: AssetsResponse[];
-      bookMetadata_via_book?: BookMetadataResponse;
-    }
-  >;
+  book: BooksResponse;
+  assets?: AssetsResponse<MetadataImages, { type: AssetTypesResponse }>[];
+  metadata?: BookMetadataResponse;
 }>();
 
 const emit = defineEmits<{
@@ -59,20 +58,19 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const fahasaURL = ref("");
 const state = ref<Schema>({
   edition: props.book.edition,
-  publishDate: props.book.publishDate,
+  publishDate: props.book.publishDate.split(" ")[0],
   price: props.book.price,
   note: props.book.note,
   bookMetadata: {
-    isbn: props.book.expand?.bookMetadata_via_book?.isbn,
-    fahasaSKU: props.book.expand?.bookMetadata_via_book?.fahasaSKU,
-    sizeX: props.book.expand?.bookMetadata_via_book?.sizeX,
-    sizeY: props.book.expand?.bookMetadata_via_book?.sizeY,
-    sizeZ: props.book.expand?.bookMetadata_via_book?.sizeZ,
-    pageCount: props.book.expand?.bookMetadata_via_book?.pageCount,
-    weight: props.book.expand?.bookMetadata_via_book?.weight,
+    isbn: props.metadata?.isbn,
+    fahasaSKU: props.metadata?.fahasaSKU,
+    sizeX: props.metadata?.sizeX,
+    sizeY: props.metadata?.sizeY,
+    sizeZ: props.metadata?.sizeZ,
+    pageCount: props.metadata?.pageCount,
+    weight: props.metadata?.weight,
   },
   assets: [],
   "assets-": [],
@@ -84,7 +82,7 @@ async function handleSubmit(event: FormSubmitEvent<Schema>) {
   console.log(event.data);
 
   if (res) {
-    const assetCount = props.book.expand?.assets_via_book?.length;
+    const assetCount = props.assets?.length;
 
     for (const [i, image] of event.data.assets.entries()) {
       await asset.create({
@@ -99,11 +97,8 @@ async function handleSubmit(event: FormSubmitEvent<Schema>) {
       await asset.remove(image);
     }
 
-    if (props.book.expand?.bookMetadata_via_book?.id) {
-      await bookMetadata.update(
-        props.book.expand.bookMetadata_via_book.id,
-        event.data.bookMetadata,
-      );
+    if (props.metadata?.id) {
+      await bookMetadata.update(props.metadata.id, event.data.bookMetadata);
     } else {
       await bookMetadata.create({
         book: res.id,
@@ -129,8 +124,8 @@ async function handleRemove() {
   const res = await remove(props.book.id);
 
   if (res) {
-    if (props.book.expand?.assets_via_book) {
-      for (const image of props.book.expand.assets_via_book) {
+    if (props.assets) {
+      for (const image of props.assets) {
         await asset.remove(image.id);
       }
     }
@@ -138,46 +133,46 @@ async function handleRemove() {
   }
 }
 
-async function handleFahasa() {
-  const [data, err] = await fetchFahasa(fahasaURL.value);
-
-  console.log(err);
-
+async function handleThirdParty(response: ThirdPartySchema) {
   const definedProps = (obj: { [s: string]: unknown }) =>
     Object.fromEntries(Object.entries(obj).filter(([, v]) => v));
 
-  if (!err) {
-    const fahasa = {
-      price: data.price,
-      assets: state.value.assets.concat(
-        data.images
-          ? data.images.map((image) => ({
-              file: new File(
-                [image],
-                slug(props.publication.name || "") +
-                  "." +
-                  image.name.split(".").at(-1),
-                {
-                  type: image.type,
-                },
-              ),
-              description: "",
-              type: "",
-            }))
-          : [],
-      ),
-      bookMetadata: {
-        ...state.value.bookMetadata,
-        fahasaSKU: data.sku,
-        sizeX: data.size?.x,
-        sizeY: data.size?.y,
-        sizeZ: data.size?.z,
-        pageCount: data.pageCount,
-        weight: data.weight,
-      },
-    };
+  const data = {
+    price: response.price,
+    note: response.note,
+    bookMetadata: {
+      ...state.value.bookMetadata,
+      isbn: response.isbn,
+      fahasaSKU: response.sku,
+      sizeX: response.size?.x,
+      sizeY: response.size?.y,
+      sizeZ: response.size?.z,
+      pageCount: response.pageCount,
+      weight: response.weight,
+    },
+  };
 
-    state.value = Object.assign(state.value, definedProps(fahasa));
+  state.value = Object.assign(state.value, definedProps(data));
+
+  if (response.images) {
+    for (const src of response.images) {
+      const { data } = await useFetch("/api/proxy", {
+        query: {
+          url: src,
+        },
+        transform: (image: Blob) => ({
+          file: new File(
+            [image],
+            slug(props.publication.name) + "." + src.split(".").at(-1),
+          ),
+          description: "",
+          type: "",
+        }),
+      });
+      if (data.value) {
+        state.value.assets.push(data.value);
+      }
+    }
   }
 }
 
@@ -196,6 +191,16 @@ function parseSize() {
     };
   }
 }
+
+function toggleAsset(asset: AssetsResponse) {
+  if (state.value["assets-"].includes(asset.id)) {
+    state.value["assets-"] = state.value["assets-"].filter(
+      (f) => f !== asset.id,
+    );
+  } else {
+    state.value["assets-"].push(asset.id);
+  }
+}
 </script>
 
 <template>
@@ -203,14 +208,7 @@ function parseSize() {
     <div v-if="isDefault" class="text-right">
       <UBadge>Default</UBadge>
     </div>
-    <div class="flex gap-3">
-      <UInput v-model="fahasaURL" class="flex-1" placeholder="FAHASA URL" />
-      <UButton
-        icon="i-fluent-sparkle-20-filled"
-        color="gray"
-        @click="handleFahasa"
-      />
-    </div>
+    <BookEditThirdParty @change="handleThirdParty" />
 
     <UForm
       :schema="schema"
@@ -235,21 +233,12 @@ function parseSize() {
         <UTextarea v-model="state.note" />
       </UFormGroup>
 
-      <UFormGroup label="Assets" name="assets">
-        <div class="space-y-3">
-          <AppAssetsList
-            v-if="book.expand?.assets_via_book"
-            v-model:remove-files="state['assets-']"
-            :assets="book.expand.assets_via_book"
-          />
-          <InputAsset v-model="state.assets" multiple />
-        </div>
-      </UFormGroup>
+      <UDivider />
 
       <UFormGroup label="ISBN" name="bookMetadata.isbn">
         <UInput v-model="state.bookMetadata.isbn" />
       </UFormGroup>
-      <UFormGroup label="FAHASA SKU" name="bookMetadata.fahasaSKU">
+      <UFormGroup label="SKU" name="bookMetadata.fahasaSKU">
         <UInput v-model="state.bookMetadata.fahasaSKU" />
       </UFormGroup>
 
@@ -289,6 +278,25 @@ function parseSize() {
           </UInput>
         </UFormGroup>
       </div>
+
+      <UDivider />
+
+      <UFormGroup label="Assets" name="assets">
+        <div class="space-y-3">
+          <div v-if="assets" class="space-y-3">
+            <AppAsset
+              v-for="asset in assets"
+              :key="asset.id"
+              :asset
+              :type="asset.expand?.type"
+              :strikethrough="state['assets-'].includes(asset.id)"
+              @toggle="toggleAsset"
+            />
+          </div>
+
+          <InputAsset v-model="state.assets" multiple />
+        </div>
+      </UFormGroup>
 
       <div class="flex justify-between gap-3">
         <UButton
