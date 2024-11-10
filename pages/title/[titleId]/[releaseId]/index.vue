@@ -2,6 +2,10 @@
 import {
   Collections,
   type AssetsResponse,
+  type AssetTypesResponse,
+  type BookMetadataResponse,
+  type BooksResponse,
+  type PublicationsResponse,
   type ReleasesResponse,
   type TitlesResponse,
 } from "@/types/pb";
@@ -19,9 +23,25 @@ const { data: release, refresh } = await useAsyncData(
         front: AssetsResponse<MetadataImages>;
         banner: AssetsResponse<MetadataImages>;
         logo: AssetsResponse<MetadataImages>;
+        publications_via_release: PublicationsResponse<
+          unknown,
+          {
+            books_via_publication?: BooksResponse<
+              unknown,
+              {
+                assets_via_book?: AssetsResponse<
+                  MetadataImages,
+                  { type: AssetTypesResponse }
+                >[];
+                bookMetadata_via_book?: BookMetadataResponse;
+              }
+            >[];
+          }
+        >[];
       }>
     >(route.params.releaseId as string, {
-      expand: "title, front, banner, logo",
+      expand:
+        "title, front, banner, logo, publications_via_release.books_via_publication.assets_via_book.type, publications_via_release.books_via_publication.bookMetadata_via_book",
     }),
 );
 
@@ -34,7 +54,7 @@ useHead({
 </script>
 
 <template>
-  <div v-if="release && release.expand?.title" class="p-6">
+  <div v-if="release && release.expand?.title" class="p-6 space-y-6">
     <UBreadcrumb
       class="mb-6"
       :links="[
@@ -53,6 +73,12 @@ useHead({
       />
     </div>
 
-    <ReleasePublications :release="release" />
+    <UDivider />
+
+    <AppPublications
+      :publications="release.expand?.publications_via_release"
+      :release
+      @change="refresh"
+    />
   </div>
 </template>
