@@ -77,6 +77,7 @@ watch(files, () => {
           class="rounded w-32 object-contain aspect-[2/3] bg-gray-200 dark:bg-gray-800"
         />
         <div class="flex-1 flex justify-between flex-col">
+          {{ file.file.name }}
           <div class="space-y-3">
             <UTextarea v-model="file.description" placeholder="Description" />
             <InputAssetTypes v-model="file.type" placeholder="Type" />
