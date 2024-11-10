@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type ReleasesResponse, type TitlesResponse } from "@/types/pb";
+import type { ReleasesResponse } from "@/types/pb";
 import type { FormSubmitEvent } from "#ui/types";
 
 import { z } from "zod";
@@ -8,9 +8,7 @@ const modal = useModal();
 const { pending, quickCreate } = usePublication();
 
 const props = defineProps<{
-  release: ReleasesResponse<{
-    title: TitlesResponse;
-  }>;
+  release: ReleasesResponse;
 }>();
 
 const emit = defineEmits<{
@@ -19,8 +17,8 @@ const emit = defineEmits<{
 
 const schema = z.object({
   from: z.coerce.number().min(0),
-  to: z.coerce.number().min(0),
-  price: z.coerce.number().min(0).nullable(),
+  to: z.coerce.number().min(0).optional(),
+  price: z.coerce.number().min(0).optional(),
 });
 
 type Schema = z.output<typeof schema>;
@@ -34,9 +32,8 @@ const state = ref({
 async function submit(event: FormSubmitEvent<Schema>) {
   await quickCreate(
     props.release,
-    props.release.expand!.title,
     event.data.from,
-    event.data.to,
+    event.data.to ?? event.data.from,
     event.data.price || undefined,
   );
 
@@ -48,9 +45,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
 <template>
   <UModal>
     <UCard>
-      <template #header
-        >Quick create {{ props.release.expand!.title.name }}</template
-      >
+      <template #header> Quick create {{ props.release.name }}</template>
 
       <UForm class="space-y-6" :schema="schema" :state="state" @submit="submit">
         <div class="flex gap-6 items-center">
