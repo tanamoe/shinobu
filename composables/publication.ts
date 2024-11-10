@@ -3,7 +3,6 @@ import {
   type PublicationsRecord,
   type PublicationsResponse,
   type ReleasesResponse,
-  type TitlesResponse,
   type BooksResponse,
 } from "@/types/pb";
 import { ClientResponseError } from "pocketbase";
@@ -51,7 +50,6 @@ export function usePublication() {
 
   async function quickCreate(
     release: ReleasesResponse,
-    title: TitlesResponse,
     from: number,
     to: number,
     price?: number,
@@ -65,7 +63,7 @@ export function usePublication() {
           .collection(Collections.Publications)
           .create<PublicationsResponse>({
             release: release.id,
-            name: `${title.name} - Tập ${i}`,
+            name: `${release.name} - Tập ${i}`,
             volume: i * 10000,
             digital,
           });
