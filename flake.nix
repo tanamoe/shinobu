@@ -8,8 +8,8 @@
     nixpkgs,
   }: let
     overlays = [
-      (final: prev: rec {
-        nodejs = prev.nodejs_20;
+      (final: prev: {
+        nodejs = prev.nodejs_22;
       })
     ];
     supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
