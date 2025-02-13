@@ -1,12 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    "@vueuse/nuxt",
-    "@nuxt/ui",
-    "@pinia/nuxt",
-    "@nuxtjs/google-fonts",
-    "@nuxt/eslint",
-  ],
+  modules: ["@vueuse/nuxt", "@nuxt/ui", "@pinia/nuxt", "@nuxt/eslint"],
 
   runtimeConfig: {
     public: {
@@ -19,13 +13,9 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
 
-  devtools: { enabled: true },
+  devtools: { enabled: false },
 
-  googleFonts: {
-    families: {
-      Inter: "200..700",
-    },
-  },
+  css: ["~/assets/css/main.css"],
 
   icon: {
     serverBundle: "remote",

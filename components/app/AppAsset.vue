@@ -42,7 +42,7 @@ defineEmits<{
           ? 'i-fluent-delete-arrow-back-20-filled'
           : 'i-fluent-delete-20-filled'
       "
-      color="red"
+      color="warning"
       square
       @click="$emit('toggle', asset)"
     />

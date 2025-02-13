@@ -19,8 +19,8 @@ defineProps<Props>();
     v-if="src"
     class="h-auto w-full object-cover"
     :class="aspect === 'full' ? '' : 'aspect-[2/3]'"
-    :src="src"
-    :srcset="srcset"
+    :src
+    :srcset
     :title="name"
     :alt="name"
     :sizes

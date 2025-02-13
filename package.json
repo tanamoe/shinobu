@@ -18,7 +18,6 @@
     "node": ">=16.0.0"
   },
   "devDependencies": {
-    "@nuxt/devtools": "latest",
     "@nuxt/eslint": "^1.0.1",
     "@nuxt/ui": "^3.0.0-alpha.12",
     "@tailwindcss/typography": "^0.5.16",

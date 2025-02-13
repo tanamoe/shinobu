@@ -36,11 +36,8 @@ const image = computed(() => {
 });
 
 const ui = {
-  base: "relative overflow-hidden",
-  shadow: "shadow",
-  body: {
-    padding: "p-0 sm:p-0",
-  },
+  root: "shadow relative overflow-hidden",
+  body: "p-0 sm:p-0",
 };
 </script>
 
@@ -58,7 +55,7 @@ const ui = {
         <UBadge
           v-if="book.edition"
           class="absolute right-2 top-2 z-20 text-gray-900"
-          color="amber"
+          color="secondary"
         >
           {{ book.edition }}
         </UBadge>
@@ -82,7 +79,7 @@ const ui = {
 
     <div>
       <template v-if="wide">
-        <UBadge v-if="book.edition" class="text-gray-900" color="amber">
+        <UBadge v-if="book.edition" class="text-gray-900" color="secondary">
           {{ book.edition }}
         </UBadge>
       </template>

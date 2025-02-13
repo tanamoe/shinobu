@@ -14,42 +14,51 @@ import type {
   AssetTypesResponse,
   BookMetadataResponse,
 } from "@/types/pb";
+import type { TableColumn } from "@nuxt/ui";
 import type { MetadataImages } from "~/types/common";
+import AppVolume from "../AppVolume.vue";
 
 const slideover = useSlideover();
 const modal = useModal();
 
-const props = defineProps<{
+type Publication = PublicationsResponse<
+  unknown,
+  {
+    books_via_publication?: BooksResponse<
+      unknown,
+      {
+        assets_via_book?: AssetsResponse<
+          MetadataImages,
+          { type: AssetTypesResponse }
+        >[];
+        bookMetadata_via_book?: BookMetadataResponse;
+      }
+    >[];
+  }
+>;
+
+defineProps<{
   release: ReleasesResponse;
-  publications: PublicationsResponse<
-    unknown,
-    {
-      books_via_publication?: BooksResponse<
-        unknown,
-        {
-          assets_via_book?: AssetsResponse<
-            MetadataImages,
-            { type: AssetTypesResponse }
-          >[];
-          bookMetadata_via_book?: BookMetadataResponse;
-        }
-      >[];
-    }
-  >[];
+  publications: Publication[];
 }>();
 
-const columns = [
+const columns: TableColumn<Publication>[] = [
   {
-    key: "volume",
-    label: "Volume",
-    sortable: true,
+    accessorKey: "volume",
+    header: "Volume",
+    cell: ({ row }) => {
+      return h(AppVolume, { volume: row.getValue("volume") as number });
+    },
   },
   {
-    key: "name",
-    label: "Name",
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => {
+      return h("span", () => row.getValue("name"));
+    },
   },
   {
-    key: "actions",
+    accessorKey: "actions",
   },
 ];
 
@@ -117,7 +126,7 @@ const expand = ref({
   <div>
     <div class="flex items-center justify-end gap-3 mt-12">
       <UButton
-        color="gray"
+        color="neutral"
         icon="i-fluent-collections-add-20-filled"
         class="float-right"
         @click="quickCreate(release)"
@@ -126,7 +135,7 @@ const expand = ref({
       </UButton>
 
       <UButton
-        color="gray"
+        color="neutral"
         icon="i-fluent-add-square-multiple-20-filled"
         class="float-right"
         @click="create(release)"
@@ -135,22 +144,7 @@ const expand = ref({
       </UButton>
     </div>
 
-    <UTable
-      v-model:expand="expand"
-      :columns="columns"
-      :rows="publications || []"
-    >
-      <template #volume-data="{ row }">
-        <AppVolume :volume="row.volume" />
-      </template>
-
-      <template #name-data="{ row }">
-        <span>
-          {{ row.name }}
-          <span v-if="row.subtitle">({{ row.subtitle }})</span>
-        </span>
-      </template>
-
+    <UTable v-model:expand="expand" :columns :rows="publications">
       <template #expand="{ row }">
         <div class="grid grid-cols-4 py-6 gap-6">
           <AppBook
