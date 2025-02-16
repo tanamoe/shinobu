@@ -41,32 +41,30 @@ async function submit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UCard>
-    <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
-      <UFormField label="Edition" name="edition">
-        <UInput v-model="state.edition" />
-      </UFormField>
-      <UFormField label="Publish date" name="publishDate">
-        <UInput v-model="state.publishDate" type="date" />
-      </UFormField>
-      <UFormField label="Price" name="price">
-        <UInput v-model="state.price" type="number">
-          <template #trailing>
-            <span class="text-gray-500 dark:text-gray-400 text-xs"> VND </span>
-          </template>
-        </UInput>
-      </UFormField>
-      <UFormField label="Note" name="note">
-        <UTextarea v-model="state.note" />
-      </UFormField>
-      <div class="text-right space-x-3">
-        <UButton
-          label="Create"
-          icon="i-fluent-add-20-filled"
-          type="submit"
-          :pending="pending"
-        />
-      </div>
-    </UForm>
-  </UCard>
+  <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
+    <UFormField label="Edition" name="edition">
+      <UInput v-model="state.edition" class="w-full" />
+    </UFormField>
+    <UFormField label="Publish date" name="publishDate">
+      <UInput v-model="state.publishDate" type="date" class="w-full" />
+    </UFormField>
+    <UFormField label="Price" name="price">
+      <UInput v-model="state.price" type="number" class="w-full">
+        <template #trailing>
+          <span class="text-gray-500 dark:text-gray-400 text-xs">VND</span>
+        </template>
+      </UInput>
+    </UFormField>
+    <UFormField label="Note" name="note">
+      <UTextarea v-model="state.note" class="w-full" />
+    </UFormField>
+    <div class="text-right space-x-3">
+      <UButton
+        label="Create"
+        icon="i-fluent-add-20-filled"
+        type="submit"
+        :pending="pending"
+      />
+    </div>
+  </UForm>
 </template>

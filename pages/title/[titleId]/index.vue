@@ -74,7 +74,7 @@ useHead({
 
         <div class="space-y-6">
           <div
-            class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6"
+            class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-6"
           >
             <AppRelease
               v-for="release in releases"

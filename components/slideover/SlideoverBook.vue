@@ -21,7 +21,10 @@ defineEmits<{
 </script>
 
 <template>
-  <USlideover :title="publication.name">
+  <USlideover
+    :title="publication.name"
+    :description="book?.id === publication.defaultBook ? 'Default' : ''"
+  >
     <template #body>
       <BookEdit
         v-if="book"

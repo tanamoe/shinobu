@@ -72,7 +72,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
     <UFormField name="status" label="Status" required>
       <USelect
         v-model="state.status"
-        :options="Object.values(ReleasesStatusOptions)"
+        :items="Object.values(ReleasesStatusOptions)"
         class="w-full"
       />
     </UFormField>
@@ -91,7 +91,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
     </UFormField>
 
     <UFormField name="digital">
-      <UCheckbox v-model="state.digital" required label="Digital" />
+      <UCheckbox v-model="state.digital" label="Digital" />
     </UFormField>
 
     <div class="text-right">

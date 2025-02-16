@@ -67,16 +67,10 @@ async function submit(event: FormSubmitEvent<Schema>) {
     <template #body>
       <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
         <UFormField label="Staff" name="staff">
-          <UInputMenu
-            v-model="state.staff"
-            value-attribute="id"
-            option-attribute="label"
-            :search="search"
-            trailing
-          />
+          <InputStaff v-model="state.staff" class="w-full" />
         </UFormField>
         <UFormField label="Name" name="name">
-          <UInput v-model="state.name" />
+          <UInput v-model="state.name" class="w-full" />
         </UFormField>
         <div class="text-right">
           <UButton type="submit" label="Save" :loading="pending" />

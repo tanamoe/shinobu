@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {
   SlideoverBook,
-  SlideoverPublicationEdit,
   ModalPublicationQuickCreate,
   SlideoverPublicationCreate,
   ModalPublicationRemove,
@@ -83,6 +82,13 @@ function quickCreate(release: ReleasesResponse) {
   });
 }
 
+function addBook(publication: PublicationsResponse) {
+  modal.open(SlideoverBook, {
+    publication,
+    onChange: () => emit("change"),
+  });
+}
+
 function editBook(
   publication: PublicationsResponse,
   book: BooksResponse<
@@ -101,13 +107,6 @@ function editBook(
     book,
     assets: book.expand?.assets_via_book,
     metadata: book.expand?.bookMetadata_via_book,
-    onChange: () => emit("change"),
-  });
-}
-
-function edit(publication: PublicationsResponse) {
-  slideover.open(SlideoverPublicationEdit, {
-    publication,
     onChange: () => emit("change"),
   });
 }
@@ -144,6 +143,7 @@ function remove(publication: PublicationsResponse) {
 
     <UTable :columns :data="publications">
       <template #expanded="{ row }">
+        <FormPublicationDescription :publication="row.original" class="mb-6" />
         <div class="grid grid-cols-4 gap-6">
           <AppBook
             v-for="book in row.original.expand?.books_via_publication"
@@ -179,16 +179,15 @@ function remove(publication: PublicationsResponse) {
       </template>
 
       <template #actions-cell="{ row }">
-        <div class="space-x-3">
+        <div class="space-y-3">
           <UButton
             color="neutral"
             variant="ghost"
-            icon="i-fluent-edit-20-filled"
-            square
-            @click="edit(row.original)"
+            icon="i-fluent-add-20-filled"
+            @click="addBook(row.original)"
           />
           <UButton
-            color="warning"
+            color="error"
             variant="ghost"
             icon="i-fluent-delete-20-filled"
             @click="remove(row.original)"

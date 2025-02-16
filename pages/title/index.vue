@@ -138,12 +138,16 @@ useHead({
       class="h-full flex-1"
     />
 
-    <UPagination
-      v-model="page"
-      class="justify-center p-3"
-      :page-count="20"
-      :total="data?.totalItems || 0"
-      :ui="{ list: 'justify-center' }"
-    />
+    <div v-if="data" class="flex justify-between items-center p-3">
+      <div>{{ data.totalItems }} titles</div>
+
+      <UPagination
+        v-model:page="page"
+        class="justify-center"
+        :items-per-page="20"
+        :total="data.totalItems"
+        :ui="{ list: 'justify-center' }"
+      />
+    </div>
   </div>
 </template>

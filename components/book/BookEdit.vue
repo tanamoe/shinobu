@@ -205,9 +205,6 @@ function toggleAsset(asset: AssetsResponse) {
 
 <template>
   <div class="space-y-6">
-    <div v-if="isDefault" class="text-right">
-      <UBadge>Default</UBadge>
-    </div>
     <BookEditThirdParty @change="handleThirdParty" />
 
     <UForm
