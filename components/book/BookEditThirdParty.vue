@@ -29,6 +29,11 @@ function handleFetch() {
     provider.value = "/api/nxbtre";
   } else if (parsedURL.host?.includes("amakstore.vn")) {
     provider.value = "/api/amak";
+  } else {
+    emit("change", {
+      images: [url.value],
+    });
+    return;
   }
 
   console.log(url.value, provider.value);
@@ -46,7 +51,7 @@ watch([data], () => {
     <UInput v-model="url" class="flex-1" placeholder="URL" />
     <UButton
       icon="i-fluent-sparkle-20-filled"
-      color="gray"
+      color="neutral"
       :loading="status === 'pending'"
       @click="handleFetch"
     />

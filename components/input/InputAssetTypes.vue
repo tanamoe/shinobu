@@ -1,14 +1,16 @@
 <script setup lang="ts">
-const { assetTypes } = useMeta();
+const meta = useMeta();
+
+const assetTypes = computed(() =>
+  meta.assetTypes.value.map(({ id, name }) => ({
+    value: id,
+    label: name,
+  })),
+);
 
 const selected = defineModel<string>({ required: true });
 </script>
 
 <template>
-  <USelect
-    v-model="selected"
-    :options="assetTypes"
-    value-attribute="id"
-    option-attribute="name"
-  />
+  <USelect v-model="selected" :items="assetTypes" />
 </template>

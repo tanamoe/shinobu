@@ -59,10 +59,10 @@ useHead({
 </script>
 
 <template>
-  <div v-if="title" class="p-6">
+  <div v-if="title" class="px-3 py-6">
     <UBreadcrumb
       class="mb-6"
-      :links="[
+      :items="[
         { label: 'Title', to: '/title', icon: 'i-fluent-book-20-filled' },
         { label: title.name, to: `/title/${title.id}` },
       ]"
@@ -86,20 +86,21 @@ useHead({
               :image="release.expand?.front"
               wide
             >
-              <template #after>
+              <template v-if="title.defaultRelease != release.id" #after>
                 <UButton
                   block
-                  color="gray"
+                  color="secondary"
+                  variant="soft"
                   :disabled="title.defaultRelease == release.id"
                   @click.prevent="makeDefault(release.id)"
                 >
-                  Default
+                  Set as Default
                 </UButton>
               </template>
             </AppRelease>
           </div>
           <UButton
-            color="gray"
+            color="neutral"
             icon="i-fluent-add-square-multiple-20-filled"
             @click="
               slideover.open(SlideoverRelease, { title, onChange: refresh })
@@ -127,7 +128,7 @@ useHead({
         <UButton
           :to="joinURL('https://tana.moe/title/', title.slug)"
           target="_blank"
-          color="gray"
+          color="neutral"
           icon="i-fluent-window-arrow-up-20-filled"
           block
         >

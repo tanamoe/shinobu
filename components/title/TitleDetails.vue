@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import slug from "slug";
-import { type TitlesResponse } from "@/types/pb";
+import type { TitlesResponse } from "@/types/pb";
 
 const { update, pending } = useTitle();
 
@@ -34,41 +34,40 @@ async function handleUpdate() {
 <template>
   <form class="space-y-3" @submit.prevent="handleUpdate">
     <div class="grid grid-cols-2 gap-3">
-      <UFormGroup name="name" label="Name">
-        <UInput v-model="state.name" />
-      </UFormGroup>
-      <UFormGroup name="Format" label="Format">
-        <InputFormat v-model="state.format" />
-      </UFormGroup>
-      <UFormGroup name="genres" label="Genres">
-        <InputGenre v-model="state.genres" multiple />
-      </UFormGroup>
-      <UFormGroup name="demographic" label="Demographic">
-        <InputDemographic v-model="state.demographic" />
-      </UFormGroup>
+      <UFormField name="name" label="Name">
+        <UInput v-model="state.name" class="w-full" />
+      </UFormField>
+      <UFormField name="Format" label="Format">
+        <InputFormat v-model="state.format" class="w-full" />
+      </UFormField>
+      <UFormField name="genres" label="Genres">
+        <InputGenre v-model="state.genres" multiple class="w-full" />
+      </UFormField>
+      <UFormField name="demographic" label="Demographic">
+        <InputDemographic v-model="state.demographic" class="w-full" />
+      </UFormField>
     </div>
 
     <div class="flex items-end gap-3">
-      <UFormGroup name="slugGroup" label="Slug" class="flex-1">
-        <UInput v-model="state.slugGroup" />
-      </UFormGroup>
+      <UFormField name="slugGroup" label="Slug" class="flex-1">
+        <UInput v-model="state.slugGroup" class="w-full" />
+      </UFormField>
       <UButton
         icon="i-fluent-sparkle-20-filled"
-        color="gray"
+        color="neutral"
+        variant="subtle"
         @click="generateSlug"
       />
     </div>
 
-    <ClientOnly>
+    <UFormField name="description" label="Description">
       <AppEditor v-model="state.description" />
-      <template #fallback>
-        <USkeleton class="w-full h-[40vh] rounded-md" />
-      </template>
-    </ClientOnly>
+    </UFormField>
 
     <div class="text-right">
       <UButton
-        color="gray"
+        color="neutral"
+        variant="subtle"
         icon="i-fluent-save-20-filled"
         :loading="pending"
         type="submit"

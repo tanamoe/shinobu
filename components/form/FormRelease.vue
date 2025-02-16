@@ -60,42 +60,43 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <UForm :schema="schema" :state="state" class="space-y-3" @submit="submit">
-    <UFormGroup name="name" label="Name">
-      <UInput v-model="state.name" />
-    </UFormGroup>
-    <UFormGroup name="type" label="Type">
-      <UInput v-model="state.type" />
-    </UFormGroup>
-    <UFormGroup name="disambiguation" label="Disambiguation">
-      <UInput v-model="state.disambiguation" />
-    </UFormGroup>
-    <UFormGroup name="status" label="Status">
+    <UFormField name="name" label="Name" required>
+      <UInput v-model="state.name" class="w-full" />
+    </UFormField>
+    <UFormField name="type" label="Type" required>
+      <UInput v-model="state.type" class="w-full" />
+    </UFormField>
+    <UFormField name="disambiguation" label="Disambiguation">
+      <UInput v-model="state.disambiguation" class="w-full" />
+    </UFormField>
+    <UFormField name="status" label="Status" required>
       <USelect
         v-model="state.status"
         :options="Object.values(ReleasesStatusOptions)"
+        class="w-full"
       />
-    </UFormGroup>
-    <UFormGroup name="publisher" label="Publisher">
-      <InputPublisher v-model="state.publisher" />
-    </UFormGroup>
-    <UFormGroup name="partner" label="Partner">
+    </UFormField>
+    <UFormField name="publisher" label="Publisher" required>
+      <InputPublisher v-model="state.publisher" class="w-full" />
+    </UFormField>
+    <UFormField name="partner" label="Partner">
       <div class="flex gap-3">
-        <InputPublisher v-model="state.partner" class="flex-1" />
+        <InputPublisher v-model="state.partner" class="flex-1 w-full" />
         <UButton
           v-if="state.partner != ''"
           label="Clear"
           @click="clearPartner"
         />
       </div>
-    </UFormGroup>
+    </UFormField>
 
-    <UFormGroup name="digital" label="Digital">
-      <UToggle v-model="state.digital" />
-    </UFormGroup>
+    <UFormField name="digital">
+      <UCheckbox v-model="state.digital" required label="Digital" />
+    </UFormField>
 
     <div class="text-right">
       <UButton
-        color="gray"
+        color="primary"
         icon="i-fluent-save-20-filled"
         :loading="pending"
         type="submit"

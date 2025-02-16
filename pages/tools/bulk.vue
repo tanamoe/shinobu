@@ -62,7 +62,7 @@ useHead({
     />
 
     <div class="space-y-6">
-      <template v-for="(_, i) in data">
+      <template v-for="(_, i) in data" :key="i">
         <BulkRelease v-model="data[i]"></BulkRelease>
       </template>
 

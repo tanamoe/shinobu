@@ -6,13 +6,11 @@ import type {
   FormatsResponse,
   TitlesResponse,
 } from "@/types/pb";
+import type { CardProps } from "@nuxt/ui";
 
-const ui = {
-  base: "relative overflow-hidden",
-  shadow: "shadow",
-  body: {
-    padding: "p-0 sm:p-0",
-  },
+const ui: CardProps["ui"] = {
+  root: "relative overflow-hidden",
+  body: "p-0 sm:p-0 shadow",
 };
 
 defineProps<{
@@ -42,7 +40,7 @@ defineProps<{
     </UCard>
     <div class="space-y-1">
       <div class="flex flex-wrap items-center gap-1">
-        <UBadge v-if="format" color="gray">
+        <UBadge v-if="format" color="neutral">
           {{ format.name }}
         </UBadge>
       </div>

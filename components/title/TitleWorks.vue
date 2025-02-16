@@ -44,7 +44,7 @@ function create(title: TitlesResponse) {
       <span class="float-right space-x-3">
         <UButton
           variant="ghost"
-          color="gray"
+          color="neutral"
           icon="i-fluent-arrow-clockwise-20-filled"
           :loading="status === 'pending'"
           @click="refresh()"
@@ -52,7 +52,7 @@ function create(title: TitlesResponse) {
           Refresh
         </UButton>
         <UButton
-          color="gray"
+          color="neutral"
           icon="i-fluent-add-square-multiple-20-filled"
           class="float-right"
           @click="create(title)"
@@ -83,9 +83,7 @@ function create(title: TitlesResponse) {
             :key="element.id"
             class="cursor-grab"
             :ui="{
-              body: {
-                base: 'prose dark:prose-invert prose-sm',
-              },
+              body: 'prose dark:prose-invert prose-sm',
             }"
           >
             <div class="font-bold">
@@ -97,7 +95,7 @@ function create(title: TitlesResponse) {
       </Sortable>
       <div class="text-right mt-3">
         <UButton
-          color="gray"
+          color="neutral"
           icon="i-fluent-save-20-filled"
           @click="updatePriority(works)"
         >

@@ -6,19 +6,27 @@ const {
   public: { imageUrl },
 } = useRuntimeConfig();
 
-const props = defineProps<{
-  src: string;
-  srcset?: MetadataImages | null;
-  loading?: HTMLImageElement["loading"];
-  sizes?: HTMLImageElement["sizes"];
-  draggable?: HTMLImageElement["draggable"];
-}>();
+const props = withDefaults(
+  defineProps<{
+    src: string;
+    srcset?: MetadataImages | null;
+    loading?: HTMLImageElement["loading"];
+    sizes?: HTMLImageElement["sizes"];
+    draggable?: HTMLImageElement["draggable"];
+  }>(),
+  {
+    srcset: undefined,
+    loading: "lazy",
+    sizes: undefined,
+    draggable: undefined,
+  },
+);
 
-const _src = computed(() =>
+const src = computed(() =>
   !parseURL(props.src).host ? joinURL(imageUrl, props.src) : props.src,
 );
 
-const _srcset = computed(() => {
+const srcset = computed(() => {
   if (props.srcset) {
     const ss: string[] = [];
     let src: keyof typeof props.srcset;
@@ -35,11 +43,5 @@ const _srcset = computed(() => {
 </script>
 
 <template>
-  <img
-    :src="_src"
-    :srcset="_srcset"
-    :sizes
-    :draggable
-    :loading="loading ?? 'lazy'"
-  />
+  <img :src :srcset :sizes :draggable :loading />
 </template>

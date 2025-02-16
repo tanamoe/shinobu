@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
-import { type ReleasesResponse } from "@/types/pb";
+import type { ReleasesResponse } from "@/types/pb";
 
 const slideover = useSlideover();
 const { pending, create } = usePublication();
@@ -22,7 +22,7 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = ref({
+const state = reactive<Partial<Schema>>({
   release: props.release.id,
   name: undefined,
   volume: undefined,
@@ -38,24 +38,19 @@ async function submit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <USlideover>
-    <div class="p-6">
-      <AppH2>
-        <span class="text-zinc-400">Create a publication for</span>
-        {{ release.name }}
-      </AppH2>
-
+  <USlideover :title="`Create a publication for ${release.name}`">
+    <template #body>
       <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
-        <UFormGroup label="Name" name="name">
+        <UFormField label="Name" name="name">
           <UInput v-model="state.name" />
-        </UFormGroup>
-        <UFormGroup label="Volume" name="volume">
+        </UFormField>
+        <UFormField label="Volume" name="volume">
           <UInput v-model="state.volume" />
-        </UFormGroup>
+        </UFormField>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />
         </div>
       </UForm>
-    </div>
+    </template>
   </USlideover>
 </template>

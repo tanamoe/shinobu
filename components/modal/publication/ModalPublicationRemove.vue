@@ -23,26 +23,24 @@ async function handleDelete() {
 </script>
 
 <template>
-  <UModal v-if="publication">
-    <UCard>
-      <template #header>Remove Publication</template>
-
+  <UModal title="Remove publication">
+    <template #body>
       <p>
         Do you want to remove
         <b>{{ publication.name }}</b>
         ?
       </p>
+    </template>
 
-      <template #footer>
-        <div class="space-x-3 justify-end flex">
-          <UButton variant="ghost" color="gray" @click="modal.close">
-            Cancel
-          </UButton>
-          <UButton color="red" :pending="pending" @click="handleDelete()">
-            Delete
-          </UButton>
-        </div>
-      </template>
-    </UCard>
+    <template #footer>
+      <div class="space-x-3 justify-end flex">
+        <UButton variant="ghost" color="neutral" @click="modal.close">
+          Cancel
+        </UButton>
+        <UButton color="warning" :pending="pending" @click="handleDelete()">
+          Delete
+        </UButton>
+      </div>
+    </template>
   </UModal>
 </template>

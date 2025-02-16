@@ -6,7 +6,7 @@ const { $pb } = useNuxtApp();
 const page = ref(1);
 const query = ref("");
 
-const { data, pending, execute } = await useAsyncData(
+const { data, status, execute } = await useAsyncData(
   () =>
     $pb.collection(Collections.Staffs).getList(page.value, 15, {
       filter: $pb.filter("name ~ {:name}", { name: query.value }),
@@ -15,16 +15,6 @@ const { data, pending, execute } = await useAsyncData(
     watch: [page],
   },
 );
-
-const columns = [
-  {
-    key: "name",
-    label: "Name",
-  },
-  {
-    key: "action",
-  },
-];
 </script>
 
 <template>
@@ -37,22 +27,14 @@ const columns = [
           v-model="query"
           icon="i-fluent-search-20-filled"
           placeholder="Search..."
-          color="white"
         />
       </div>
-      <UButton type="submit" :loading="pending" color="gray">Search</UButton>
+      <UButton type="submit" :loading="status === 'pending'" color="neutral">
+        Search
+      </UButton>
     </form>
 
-    <UTable :rows="data.items || []" :columns="columns" :loading="pending">
-      <template #action-data>
-        <UButton
-          icon="i-fluent-pen-20-filled"
-          variant="ghost"
-          color="gray"
-          square
-        />
-      </template>
-    </UTable>
+    <UTable :rows="data.items || []" :loading="status === 'pending'" />
 
     <div class="flex items-center justify-center">
       <UPagination

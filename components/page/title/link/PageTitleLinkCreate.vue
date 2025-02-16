@@ -85,7 +85,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <UButton
-    color="gray"
+    color="neutral"
     icon="i-fluent-add-square-multiple-20-filled"
     class="float-right"
     @click="isOpen = true"
@@ -100,7 +100,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
       </AppH2>
 
       <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
-        <UFormGroup label="Source" name="source">
+        <UFormField label="Source" name="source">
           <USelectMenu
             v-if="sources"
             v-model="state.source"
@@ -108,18 +108,11 @@ async function submit(event: FormSubmitEvent<Schema>) {
             value-attribute="id"
             option-attribute="label"
             :searchable="search"
-          >
-            <template #label>
-              <span v-if="current" class="truncate flex gap-1.5 items-center">
-                <img :src="current.avatar.src" class="h-4 w-auto" />
-                <span>{{ current?.label }}</span>
-              </span>
-            </template>
-          </USelectMenu>
-        </UFormGroup>
-        <UFormGroup label="URL" name="url">
+          />
+        </UFormField>
+        <UFormField label="URL" name="url">
           <UInput v-model="state.url" />
-        </UFormGroup>
+        </UFormField>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />
         </div>

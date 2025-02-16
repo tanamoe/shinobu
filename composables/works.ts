@@ -21,7 +21,7 @@ export function useWorks() {
         toast.add({
           title: `Success`,
           icon: "i-fluent-checkmark-circle-20-filled",
-          color: "green",
+          color: "success",
         });
       } catch (error) {
         if (error instanceof ClientResponseError)
@@ -29,7 +29,7 @@ export function useWorks() {
             title: "Error",
             description: error.message,
             icon: "i-fluent-error-circle-20-filled",
-            color: "red",
+            color: "error",
           });
         else console.error(error);
       }

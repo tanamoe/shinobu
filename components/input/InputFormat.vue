@@ -1,5 +1,12 @@
 <script setup lang="ts">
-const { formats } = useMeta();
+const meta = useMeta();
+
+const formats = computed(() =>
+  meta.formats.value.map(({ id, name }) => ({
+    value: id,
+    label: name,
+  })),
+);
 
 const model = defineModel<string>({ required: true });
 </script>
@@ -7,10 +14,9 @@ const model = defineModel<string>({ required: true });
 <template>
   <USelectMenu
     v-model="model"
-    :options="formats"
-    placeholder="Select a demographic"
-    value-attribute="id"
-    option-attribute="name"
+    :items="formats"
+    placeholder="Select a format"
+    value-key="value"
     searchable
   />
 </template>

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-const { genres } = useMeta();
+const meta = useMeta();
+
+const genres = computed(() =>
+  meta.genres.value.map(({ id, name }) => ({
+    value: id,
+    label: name,
+  })),
+);
 
 const model = defineModel<string | string[]>({ required: true });
 </script>
@@ -7,10 +14,10 @@ const model = defineModel<string | string[]>({ required: true });
 <template>
   <USelectMenu
     v-model="model"
-    :options="genres"
+    :items="genres"
     placeholder="Select a demographic"
-    value-attribute="id"
-    option-attribute="name"
+    value-key="value"
     searchable
+    :multiple="Array.isArray(model)"
   />
 </template>

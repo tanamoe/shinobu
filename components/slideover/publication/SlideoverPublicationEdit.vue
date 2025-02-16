@@ -11,14 +11,9 @@ defineEmits<{
 </script>
 
 <template>
-  <USlideover v-if="publication">
-    <div class="p-6">
-      <AppH2>
-        <span class="text-zinc-400">Update</span>
-        {{ publication.name }}
-      </AppH2>
-
+  <USlideover :title="`Update ${publication.name}`">
+    <template #body>
       <FormPublication :publication @change="$emit('change')" />
-    </div>
+    </template>
   </USlideover>
 </template>

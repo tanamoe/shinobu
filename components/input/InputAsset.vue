@@ -79,15 +79,23 @@ watch(files, () => {
         <div class="flex-1 flex justify-between flex-col">
           {{ file.file.name }}
           <div class="space-y-3">
-            <UTextarea v-model="file.description" placeholder="Description" />
-            <InputAssetTypes v-model="file.type" placeholder="Type" />
+            <UTextarea
+              v-model="file.description"
+              placeholder="Description"
+              class="w-full"
+            />
+            <InputAssetTypes
+              v-model="file.type"
+              placeholder="Type"
+              class="w-full"
+            />
           </div>
           <div class="text-right">
             <UButton
               variant="ghost"
               size="sm"
               icon="i-fluent-delete-20-filled"
-              color="red"
+              color="error"
               @click="remove(i)"
             />
           </div>

@@ -9,12 +9,12 @@ import type {
   PublicationsResponse,
   AssetTypesResponse,
 } from "@/types/pb";
-import type { ThirdPartySchema } from "~/server/utils/common";
-import type { MetadataImages } from "~/types/common";
+import type { ThirdPartySchema } from "@/server/utils/common";
+import type { MetadataImages } from "@/types/common";
 
 const { pending, update, remove } = useBook();
 const { update: updateP } = usePublication();
-const asset = useAsset();
+const { create, remove: assetRemove } = useAsset();
 const bookMetadata = useBookMetadata();
 
 const props = defineProps<{
@@ -85,7 +85,7 @@ async function handleSubmit(event: FormSubmitEvent<Schema>) {
     const assetCount = props.assets?.length;
 
     for (const [i, image] of event.data.assets.entries()) {
-      await asset.create({
+      await create({
         book: res.id,
         image: image.file,
         type: image.type,
@@ -94,7 +94,7 @@ async function handleSubmit(event: FormSubmitEvent<Schema>) {
     }
 
     for (const image of event.data["assets-"]) {
-      await asset.remove(image);
+      await assetRemove(image);
     }
 
     if (props.metadata?.id) {
@@ -126,7 +126,7 @@ async function handleRemove() {
   if (res) {
     if (props.assets) {
       for (const image of props.assets) {
-        await asset.remove(image.id);
+        await remove(image.id);
       }
     }
     emit("change");
@@ -216,72 +216,70 @@ function toggleAsset(asset: AssetsResponse) {
       class="space-y-6"
       @submit="handleSubmit"
     >
-      <UFormGroup label="Edition" name="edition">
-        <UInput v-model="state.edition" />
-      </UFormGroup>
-      <UFormGroup label="Publish date" name="publishDate">
-        <UInput v-model="state.publishDate" type="date" />
-      </UFormGroup>
-      <UFormGroup label="Price" name="price">
-        <UInput v-model="state.price" type="number">
+      <UFormField label="Edition" name="edition">
+        <UInput v-model="state.edition" class="w-full" />
+      </UFormField>
+      <UFormField label="Publish date" name="publishDate">
+        <UInput v-model="state.publishDate" type="date" class="w-full" />
+      </UFormField>
+      <UFormField label="Price" name="price">
+        <UInput v-model="state.price" type="number" class="w-full">
           <template #trailing>
             <span class="text-gray-500 dark:text-gray-400 text-xs">VND</span>
           </template>
         </UInput>
-      </UFormGroup>
-      <UFormGroup label="Note" name="note">
-        <UTextarea v-model="state.note" />
-      </UFormGroup>
+      </UFormField>
+      <UFormField label="Note" name="note">
+        <UTextarea v-model="state.note" class="w-full" />
+      </UFormField>
 
-      <UDivider />
-
-      <UFormGroup label="ISBN" name="bookMetadata.isbn">
-        <UInput v-model="state.bookMetadata.isbn" />
-      </UFormGroup>
-      <UFormGroup label="SKU" name="bookMetadata.fahasaSKU">
-        <UInput v-model="state.bookMetadata.fahasaSKU" />
-      </UFormGroup>
+      <UFormField label="ISBN" name="bookMetadata.isbn">
+        <UInput v-model="state.bookMetadata.isbn" class="w-full" />
+      </UFormField>
+      <UFormField label="SKU" name="bookMetadata.fahasaSKU">
+        <UInput v-model="state.bookMetadata.fahasaSKU" class="w-full" />
+      </UFormField>
 
       <div class="grid grid-cols-3 gap-6">
-        <UFormGroup label="X" name="bookMetadata.sizeX">
+        <UFormField label="X" name="bookMetadata.sizeX">
           <UInput v-model="state.bookMetadata.sizeX" @change="parseSize">
             <template #trailing>
               <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
             </template>
           </UInput>
-        </UFormGroup>
-        <UFormGroup label="Y" name="bookMetadata.sizeY">
+        </UFormField>
+        <UFormField label="Y" name="bookMetadata.sizeY">
           <UInput v-model="state.bookMetadata.sizeY">
             <template #trailing>
               <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
             </template>
           </UInput>
-        </UFormGroup>
-        <UFormGroup label="Z" name="bookMetadata.sizeZ">
+        </UFormField>
+        <UFormField label="Z" name="bookMetadata.sizeZ">
           <UInput v-model="state.bookMetadata.sizeZ">
             <template #trailing>
               <span class="text-gray-500 dark:text-gray-400 text-xs">cm</span>
             </template>
           </UInput>
-        </UFormGroup>
+        </UFormField>
       </div>
 
       <div class="grid grid-cols-2 gap-6">
-        <UFormGroup label="Page Count" name="bookMetadata.pageCount">
+        <UFormField label="Page Count" name="bookMetadata.pageCount">
           <UInput v-model="state.bookMetadata.pageCount" />
-        </UFormGroup>
-        <UFormGroup label="Weight" name="bookMetadata.weight">
+        </UFormField>
+        <UFormField label="Weight" name="bookMetadata.weight">
           <UInput v-model="state.bookMetadata.weight">
             <template #trailing>
               <span class="text-gray-500 dark:text-gray-400 text-xs">g</span>
             </template>
           </UInput>
-        </UFormGroup>
+        </UFormField>
       </div>
 
       <UDivider />
 
-      <UFormGroup label="Assets" name="assets">
+      <UFormField label="Assets" name="assets">
         <div class="space-y-3">
           <div v-if="assets" class="space-y-3">
             <AppAsset
@@ -296,14 +294,14 @@ function toggleAsset(asset: AssetsResponse) {
 
           <InputAsset v-model="state.assets" multiple />
         </div>
-      </UFormGroup>
+      </UFormField>
 
       <div class="flex justify-between gap-3">
         <UButton
           label="Set Default"
           :pending="pending"
           variant="ghost"
-          color="gray"
+          color="neutral"
           :disabled="isDefault"
           @click="handleDefault"
         />
@@ -313,7 +311,7 @@ function toggleAsset(asset: AssetsResponse) {
             label="Delete"
             :pending="pending"
             variant="ghost"
-            color="red"
+            color="error"
             @click="handleRemove"
           />
           <UButton label="Save" :pending="pending" type="submit" />

@@ -53,11 +53,8 @@ function change(event: Event | DragEvent) {
 }
 
 const ui = {
-  base: "text-center",
-  body: {
-    base: "flex items-center justify-center flex-col gap-3 cursor-pointer",
-    background: "hover:dark:bg-gray-800/30 transition-colors hover:bg-gray-100",
-  },
+  root: "text-center",
+  body: "flex items-center justify-center flex-col gap-3 cursor-pointer hover:dark:bg-gray-800/30 transition-colors hover:bg-gray-100",
 };
 </script>
 

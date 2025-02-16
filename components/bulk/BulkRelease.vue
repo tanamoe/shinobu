@@ -22,7 +22,7 @@ function remove(i: number) {
       <div v-for="(_, i) in release.publications" :key="i" class="flex gap-6">
         <UButton
           icon="i-fluent-delete-20-filled"
-          color="red"
+          color="warning"
           variant="ghost"
           @click.stop="remove(i)"
         />

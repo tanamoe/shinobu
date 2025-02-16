@@ -19,7 +19,7 @@ export function useBookMetadata() {
         title: "Success!",
         description: `Uploaded metadata`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -29,7 +29,7 @@ export function useBookMetadata() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {
@@ -49,7 +49,7 @@ export function useBookMetadata() {
         title: "Success!",
         description: `Updated metadata`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -59,7 +59,7 @@ export function useBookMetadata() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {
@@ -76,7 +76,7 @@ export function useBookMetadata() {
       toast.add({
         title: "Success!",
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -86,7 +86,7 @@ export function useBookMetadata() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {

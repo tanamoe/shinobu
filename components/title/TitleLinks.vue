@@ -35,7 +35,7 @@ const {
       <span class="float-right space-x-3">
         <UButton
           variant="ghost"
-          color="gray"
+          color="neutral"
           icon="i-fluent-arrow-clockwise-20-filled"
           :loading="status === 'pending'"
           @click="refresh()"
@@ -48,9 +48,7 @@ const {
     <div v-for="link in links" :key="link.id" class="space-y-3">
       <UCard
         :ui="{
-          body: {
-            base: 'prose dark:prose-invert prose-sm prose-img:my-0',
-          },
+          body: 'prose dark:prose-invert prose-sm prose-img:my-0',
         }"
       >
         <div

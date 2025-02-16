@@ -1,9 +1,4 @@
-import {
-  Collections,
-  type AssetsRecord,
-  type BooksRecord,
-  type BooksResponse,
-} from "@/types/pb";
+import { Collections, type AssetsRecord } from "@/types/pb";
 import { ClientResponseError } from "pocketbase";
 
 export function useAsset() {
@@ -26,7 +21,7 @@ export function useAsset() {
         title: "Success!",
         description: `Uploaded ${asset.image.name}`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -36,7 +31,7 @@ export function useAsset() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {
@@ -59,7 +54,7 @@ export function useAsset() {
         title: "Success!",
         description: `Updated ${res.image}`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -69,7 +64,7 @@ export function useAsset() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {
@@ -86,7 +81,7 @@ export function useAsset() {
       toast.add({
         title: "Success!",
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -96,7 +91,7 @@ export function useAsset() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {

@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import {
-  type BaseSystemFields,
+  type AssetsResponse,
   Collections,
   type FormatsResponse,
+  type ReleasesResponse,
   type TitlesResponse,
 } from "@/types/pb";
-import { SlideoverTitleCreate } from "#components";
+import { SlideoverTitleCreate, UBadge, ULink } from "#components";
+import type { TableColumn } from "@nuxt/ui";
+import { joinURL } from "ufo";
 
 const { $pb } = useNuxtApp();
 const { query } = useRoute();
@@ -13,25 +16,31 @@ const { replace } = useRouter();
 const slideover = useSlideover();
 
 const page = ref(1);
+const sort = ref("-updated");
 const searchQuery = ref(query.q ? (query.q as string) : "");
 
-const {
-  data: rows,
-  status,
-  refresh,
-} = await useAsyncData(
+type TableRow = TitlesResponse<
+  unknown,
+  {
+    format: FormatsResponse;
+    defaultRelease: ReleasesResponse<{
+      front: AssetsResponse;
+    }>;
+  }
+>;
+
+const { data, status, refresh } = await useAsyncData(
   () =>
-    $pb.collection(Collections.Titles).getList<
-      TitlesResponse<{
-        format: FormatsResponse;
-      }>
-    >(page.value, 20, {
-      filter: $pb.filter("name ~ {:name}", { name: searchQuery.value }),
-      expand: "format",
-      sort: "-updated",
+    $pb.collection(Collections.Titles).getList<TableRow>(page.value, 20, {
+      filter: $pb.filter(
+        "additionalTitleNames_via_title.name ?~ {:name} || name ~ {:name}",
+        { name: searchQuery.value },
+      ),
+      expand: "format, defaultRelease, defaultRelease.front",
+      sort: sort.value,
     }),
   {
-    watch: [page],
+    watch: [page, sort],
   },
 );
 
@@ -39,17 +48,39 @@ watch(searchQuery, () => {
   replace({ query: { q: searchQuery.value } });
 });
 
-const columns = [
+const columns: TableColumn<TableRow>[] = [
   {
-    key: "cover",
-    label: "Cover",
+    accessorKey: "cover",
+    header: "",
+    cell: ({ row }) => {
+      if (row.original?.expand?.defaultRelease?.expand?.front.image) {
+        return h("img", {
+          class: "h-14 aspect-[2/3] object-cover rounded",
+          src: $pb.files.getUrl(
+            row.original.expand.defaultRelease.expand.front,
+            row.original.expand.defaultRelease.expand.front.image,
+          ),
+        });
+      }
+    },
   },
   {
-    key: "name",
-    label: "Name",
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => {
+      return h("div", [
+        h(UBadge, () => row.original.expand?.format.name),
+        h(
+          ULink,
+          { class: "mt-1.5 block", href: joinURL("/title", row.original.id) },
+          row.original.name,
+        ),
+      ]);
+    },
   },
   {
-    key: "actions",
+    accessorKey: "actions",
+    header: "",
   },
 ];
 
@@ -63,88 +94,56 @@ useHead({
 </script>
 
 <template>
-  <div class="p-6 max-h-screen flex-col flex space-y-6">
-    <UBreadcrumb
-      class="mb-6"
-      :links="[
-        { label: 'Title', to: '/title', icon: 'i-fluent-book-20-filled' },
-      ]"
-    />
-
-    <form class="flex gap-3" @submit.prevent="() => refresh()">
-      <div class="flex-1">
-        <UInput
-          v-model="searchQuery"
-          icon="i-fluent-search-20-filled"
-          placeholder="Search..."
-          color="white"
-        />
-      </div>
-      <UButton type="submit" :loading="status === 'pending'" color="gray">
+  <div
+    class="max-h-screen flex-col flex divide-y divide-(--ui-border-accented)"
+  >
+    <form class="p-3 flex gap-3" @submit.prevent="() => refresh()">
+      <UInput
+        v-model="searchQuery"
+        icon="i-fluent-search-20-filled"
+        placeholder="Search..."
+        color="neutral"
+      />
+      <UButton
+        type="submit"
+        :loading="status === 'pending'"
+        color="neutral"
+        variant="outline"
+      >
         Search
       </UButton>
+
+      <div class="flex items-center justify-end gap-3 ml-auto">
+        <TitleSort v-model="sort" />
+        <UButton
+          variant="outline"
+          color="neutral"
+          icon="i-fluent-arrow-clockwise-20-filled"
+          :loading="status === 'pending'"
+          @click="refresh()"
+        >
+          Refresh
+        </UButton>
+        <UButton icon="i-fluent-add-square-multiple-20-filled" @click="create">
+          Create
+        </UButton>
+      </div>
     </form>
 
-    <div class="flex items-center justify-end gap-3">
-      <UButton
-        variant="ghost"
-        color="gray"
-        icon="i-fluent-arrow-clockwise-20-filled"
-        :loading="status === 'pending'"
-        @click="refresh()"
-      >
-        Refresh
-      </UButton>
-      <UButton
-        color="gray"
-        icon="i-fluent-add-square-multiple-20-filled"
-        class="float-right"
-        @click="create"
-      >
-        Create
-      </UButton>
-    </div>
-
-    <div class="flex-1 overflow-y-scroll">
-      <UTable
-        :columns="columns"
-        :rows="rows?.items || []"
-        :loading="status === 'pending'"
-        @select="
-          async (row: BaseSystemFields) => await navigateTo(`/title/${row.id}`)
-        "
-      >
-        <template #cover-data="{ row }">
-          <div v-if="row.cover" class="space-x-3">
-            <img
-              class="h-14 aspect-[2/3] object-cover rounded"
-              :src="$pb.files.getUrl(row, row.cover)"
-            />
-          </div>
-        </template>
-        <template #name-data="{ row }">
-          <div class="space-y-1.5">
-            <UBadge color="gray">{{ row.expand.format.name }}</UBadge>
-            <div>{{ row.name }}</div>
-          </div>
-        </template>
-        <template #actions-data>
-          <div class="flex justify-end">
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-fluent-arrow-right-20-filled"
-            />
-          </div>
-        </template>
-      </UTable>
-    </div>
+    <UTable
+      :columns
+      :data="data?.items"
+      :loading="status === 'pending'"
+      sticky
+      class="h-full flex-1"
+    />
 
     <UPagination
       v-model="page"
-      class="justify-center"
+      class="justify-center p-3"
       :page-count="20"
-      :total="rows?.totalItems || 0"
+      :total="data?.totalItems || 0"
+      :ui="{ list: 'justify-center' }"
     />
   </div>
 </template>

@@ -23,7 +23,7 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = ref({
+const state = reactive<Partial<Schema>>({
   from: undefined,
   to: undefined,
   price: undefined,
@@ -43,10 +43,8 @@ async function submit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal>
-    <UCard>
-      <template #header> Quick create {{ props.release.name }}</template>
-
+  <UModal :title="`Quick create ${release.name}`">
+    <template #body>
       <UForm class="space-y-6" :schema="schema" :state="state" @submit="submit">
         <div class="flex gap-6 items-center">
           <UFormGroup name="from">
@@ -71,6 +69,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
         <UButton type="submit" :pending="pending">Create</UButton>
       </UForm>
-    </UCard>
+    </template>
   </UModal>
 </template>

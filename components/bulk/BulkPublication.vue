@@ -22,15 +22,15 @@ function remove(i: number) {
 <template>
   <div class="grid grid-cols-2 gap-6">
     <div class="space-y-3">
-      <UFormGroup label="Volume">
+      <UFormField label="Volume">
         <UInput v-model="publication.volume" placeholder="1" />
-      </UFormGroup>
-      <UFormGroup label="Name">
+      </UFormField>
+      <UFormField label="Name">
         <UInput
           v-model="publication.name"
           :placeholder="`${props.release} - Tập ${publication.volume || 1}`"
         />
-      </UFormGroup>
+      </UFormField>
     </div>
 
     <div class="space-y-6">
@@ -38,7 +38,7 @@ function remove(i: number) {
         <BulkBook v-model="publication.books[i]" />
         <UButton
           icon="i-fluent-delete-20-filled"
-          color="red"
+          color="error"
           variant="ghost"
           @click.stop="remove(i)"
         />

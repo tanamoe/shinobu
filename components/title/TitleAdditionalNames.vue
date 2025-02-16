@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import {
-  type TitlesResponse,
-  type AdditionalTitleNamesResponse,
-} from "@/types/pb";
+import type { TitlesResponse, AdditionalTitleNamesResponse } from "@/types/pb";
 import { ModalAdditionalTitleNameCreate } from "#components";
 
 const modal = useModal();
@@ -40,14 +37,14 @@ function create(title: TitlesResponse) {
       <span class="float-right space-x-3">
         <UButton
           variant="ghost"
-          color="gray"
+          color="neutral"
           icon="i-fluent-arrow-clockwise-20-filled"
           @click="() => $emit('change')"
         >
           Refresh
         </UButton>
         <UButton
-          color="gray"
+          color="neutral"
           icon="i-fluent-add-square-multiple-20-filled"
           class="float-right"
           @click="create(title)"

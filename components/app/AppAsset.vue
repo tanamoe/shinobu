@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AssetsResponse, AssetTypesResponse } from "@/types/pb";
-import type { MetadataImages } from "~/types/common";
+import type { MetadataImages } from "@/types/common";
 
 defineProps<{
   asset: AssetsResponse<MetadataImages>;
@@ -21,7 +21,7 @@ defineEmits<{
     <AppImage
       :src="$pb.files.getUrl(asset, asset.image, { thumb: '100x100' })"
       :srcset="asset.resizedImage"
-      class="rounded w-32 object-contain aspect-[2/3] bg-gray-200 dark:bg-gray-800"
+      class="rounded w-32 object-contain aspect-[2/3] bg-(--ui-bg-muted)"
     />
     <div
       class="overflow-hidden whitespace-nowrap text-ellipsis flex-1 space-y-3"

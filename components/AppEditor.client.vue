@@ -7,8 +7,6 @@ import Link from "@tiptap/extension-link";
 
 const model = defineModel<string>();
 
-const { metaSymbol } = useShortcuts();
-
 const url = ref<string>();
 
 const editor = useEditor({
@@ -28,16 +26,16 @@ const editor = useEditor({
 
 <template>
   <div
-    class="shadow-sm bg-white dark:bg-gray-900 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 rounded-md"
+    class="dark:text-white ring-1 ring-inset ring-(--ui-border-accented) focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 rounded-md"
   >
     <div
       v-if="editor"
-      class="flex divide-x divide-gray-300 dark:divide-gray-700 gap-1 border-b border-gray-300 dark:border-gray-700"
+      class="flex divide-x divide-(--ui-border-accented) gap-1 border-b border-(--ui-border-accented)"
     >
       <div class="flex gap-1 px-2.5 py-1.5">
-        <UTooltip text="Bold" :shortcuts="[metaSymbol, 'B']">
+        <UTooltip text="Bold" :kbds="['meta', 'B']">
           <UButton
-            color="gray"
+            color="neutral"
             :variant="editor.isActive('bold') ? 'soft' : 'ghost'"
             icon="i-fluent-text-bold-20-filled"
             :disabled="!editor.can().chain().focus().toggleBold().run()"
@@ -46,9 +44,9 @@ const editor = useEditor({
             @click="editor.chain().focus().toggleBold().run()"
           />
         </UTooltip>
-        <UTooltip text="Italic" :shortcuts="[metaSymbol, 'I']">
+        <UTooltip text="Italic" :kbds="['meta', 'I']">
           <UButton
-            color="gray"
+            color="neutral"
             :variant="editor.isActive('italic') ? 'soft' : 'ghost'"
             icon="i-fluent-text-italic-20-filled"
             :disabled="!editor.can().chain().focus().toggleItalic().run()"
@@ -57,9 +55,9 @@ const editor = useEditor({
             @click="editor.chain().focus().toggleItalic().run()"
           />
         </UTooltip>
-        <UTooltip text="Underline" :shortcuts="[metaSymbol, 'U']">
+        <UTooltip text="Underline" :kbds="['meta', 'U']">
           <UButton
-            color="gray"
+            color="neutral"
             :variant="editor.isActive('underline') ? 'soft' : 'ghost'"
             icon="i-fluent-text-underline-20-filled"
             :disabled="!editor.can().chain().focus().toggleUnderline().run()"
@@ -68,9 +66,9 @@ const editor = useEditor({
             @click="editor.chain().focus().toggleUnderline().run()"
           />
         </UTooltip>
-        <UTooltip text="Strikethrough" :shortcuts="[metaSymbol, 'Shift', 'X']">
+        <UTooltip text="Strikethrough" :kbds="['meta', 'Shift', 'X']">
           <UButton
-            color="gray"
+            color="neutral"
             :variant="editor.isActive('strike') ? 'soft' : 'ghost'"
             icon="i-fluent-text-strikethrough-20-filled"
             :disabled="!editor.can().chain().focus().toggleStrike().run()"
@@ -82,21 +80,21 @@ const editor = useEditor({
       </div>
       <div class="flex gap-1 px-2.5 py-1.5">
         <UButton
-          color="gray"
+          color="neutral"
           :variant="editor.isActive('heading', { level: 1 }) ? 'soft' : 'ghost'"
           icon="i-fluent-text-header-1-20-filled"
           square
           @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
         />
         <UButton
-          color="gray"
+          color="neutral"
           :variant="editor.isActive('heading', { level: 2 }) ? 'soft' : 'ghost'"
           icon="i-fluent-text-header-2-20-filled"
           square
           @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
         />
         <UButton
-          color="gray"
+          color="neutral"
           :variant="editor.isActive('heading', { level: 3 }) ? 'soft' : 'ghost'"
           icon="i-fluent-text-header-3-20-filled"
           square
@@ -106,7 +104,7 @@ const editor = useEditor({
       <div class="flex gap-1 px-2.5 py-1.5">
         <UPopover>
           <UButton
-            color="gray"
+            color="neutral"
             variant="ghost"
             icon="i-fluent-link-20-filled"
             square
@@ -121,7 +119,7 @@ const editor = useEditor({
               <UButton
                 size="xs"
                 icon="i-fluent-link-remove-20-filled"
-                color="red"
+                color="error"
                 variant="outline"
                 class="mr-3"
                 @click="
@@ -140,12 +138,12 @@ const editor = useEditor({
                 icon="i-fluent-add-20-filled"
                 @click="
                   url &&
-                    editor
-                      .chain()
-                      .focus()
-                      .extendMarkRange('link')
-                      .setLink({ href: url })
-                      .run()
+                  editor
+                    .chain()
+                    .focus()
+                    .extendMarkRange('link')
+                    .setLink({ href: url })
+                    .run()
                 "
               >
                 Add
@@ -155,6 +153,6 @@ const editor = useEditor({
         </UPopover>
       </div>
     </div>
-    <EditorContent :editor="editor" spellcheck="false" />
+    <EditorContent :editor spellcheck="false" />
   </div>
 </template>

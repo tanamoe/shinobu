@@ -43,22 +43,22 @@ async function submit(event: FormSubmitEvent<Schema>) {
 <template>
   <UCard>
     <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
-      <UFormGroup label="Edition" name="edition">
+      <UFormField label="Edition" name="edition">
         <UInput v-model="state.edition" />
-      </UFormGroup>
-      <UFormGroup label="Publish date" name="publishDate">
+      </UFormField>
+      <UFormField label="Publish date" name="publishDate">
         <UInput v-model="state.publishDate" type="date" />
-      </UFormGroup>
-      <UFormGroup label="Price" name="price">
+      </UFormField>
+      <UFormField label="Price" name="price">
         <UInput v-model="state.price" type="number">
           <template #trailing>
             <span class="text-gray-500 dark:text-gray-400 text-xs"> VND </span>
           </template>
         </UInput>
-      </UFormGroup>
-      <UFormGroup label="Note" name="note">
+      </UFormField>
+      <UFormField label="Note" name="note">
         <UTextarea v-model="state.note" />
-      </UFormGroup>
+      </UFormField>
       <div class="text-right space-x-3">
         <UButton
           label="Create"

@@ -186,10 +186,10 @@ async function submit() {
             </h2>
             <UTable :rows="books">
               <template #name-data="{ row }">
-                <UInput v-model="row.name" />
+                <UInput v-model="row.original.name" />
               </template>
               <template #edition-data="{ row }">
-                <UInput v-model="row.edition" />
+                <UInput v-model="row.original.edition" />
               </template>
             </UTable>
           </template>

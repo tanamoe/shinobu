@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import slug from "slug";
-import { type TitlesResponse } from "@/types/pb";
+import type { TitlesResponse } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
 const { update, pending } = useTitle();
@@ -94,7 +94,7 @@ function handleShowPreview() {
       <div v-if="showUpload" class="z-10 absolute top-3 right-3 space-x-3">
         <UButton
           icon="i-fluent-arrow-upload-20-filled"
-          color="gray"
+          color="neutral"
           :pending="pending"
           @click="handleUploadCover"
         >
@@ -102,7 +102,7 @@ function handleShowPreview() {
         </UButton>
         <UButton
           icon="i-fluent-delete-20-filled"
-          color="gray"
+          color="neutral"
           square
           :pending="pending"
           @click="handleDeleteCover"

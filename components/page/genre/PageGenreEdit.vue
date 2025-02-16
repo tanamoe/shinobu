@@ -38,13 +38,13 @@ async function submit(event: FormSubmitEvent<Schema>) {
       </AppH2>
 
       <UForm :schema="schema" :state="state" class="space-y-3" @submit="submit">
-        <UFormGroup label="Name">
+        <UFormField label="Name">
           <UInput v-model="state.name" />
-        </UFormGroup>
+        </UFormField>
 
-        <UFormGroup label="Slug">
+        <UFormField label="Slug">
           <UInput v-model="state.slug" />
-        </UFormGroup>
+        </UFormField>
 
         <UButton type="submit" :loading="pending">Submit</UButton>
       </UForm>

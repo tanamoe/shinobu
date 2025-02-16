@@ -22,7 +22,7 @@ export function useRelease() {
       toast.add({
         title: `Success`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -32,7 +32,7 @@ export function useRelease() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {
@@ -54,7 +54,7 @@ export function useRelease() {
       toast.add({
         title: `Success`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -64,7 +64,7 @@ export function useRelease() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {

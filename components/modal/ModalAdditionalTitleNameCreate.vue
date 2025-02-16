@@ -40,26 +40,24 @@ async function submit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UModal>
-    <UCard>
-      <template #header>Additional Names</template>
-
+  <UModal title="Additional names">
+    <template #body>
       <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
-        <UFormGroup label="Language" name="language">
+        <UFormField label="Language" name="language">
           <USelectMenu
             v-model="state.language"
             value-attribute="id"
             option-attribute="label"
             :options="languages"
           />
-        </UFormGroup>
-        <UFormGroup label="Name" name="name">
+        </UFormField>
+        <UFormField label="Name" name="name">
           <UInput v-model="state.name" />
-        </UFormGroup>
+        </UFormField>
         <div class="text-right">
           <UButton type="submit" label="Save" :pending="pending" />
         </div>
       </UForm>
-    </UCard>
+    </template>
   </UModal>
 </template>

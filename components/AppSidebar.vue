@@ -1,9 +1,9 @@
-<script setup>
-const { $pb } = useNuxtApp();
+<script setup lang="ts">
+import { UNavigationMenu } from "#components";
 
-const name = $pb.authStore.model.email;
+const route = useRoute();
 
-const links = [
+const items = computed(() => [
   [
     {
       label: "Home",
@@ -14,12 +14,23 @@ const links = [
       label: "Title",
       icon: "i-fluent-book-20-filled",
       to: "/title",
+      active: route.path.includes("/title"),
     },
   ],
-  [{ label: "Bulk", icon: "i-fluent-library-20-filled", to: "/tools/bulk" }],
-];
-
-const items = [[{ label: "Logout", to: "/logout" }]];
+  [
+    {
+      label: "Tools",
+      icon: "i-fluent-wrench-20-filled",
+      children: [
+        {
+          label: "Bulk",
+          icon: "i-fluent-library-20-filled",
+          to: "/tools/bulk",
+        },
+      ],
+    },
+  ],
+]);
 </script>
 
 <template>
@@ -30,17 +41,7 @@ const items = [[{ label: "Logout", to: "/logout" }]];
       <NuxtLink to="/">
         <img src="/logo.png" class="h-8 mx-auto my-6" />
       </NuxtLink>
-      <UVerticalNavigation :links="links" />
+      <UNavigationMenu orientation="vertical" :items />
     </div>
-
-    <UDropdown :items="items" :popper="{ placement: 'top-start' }">
-      <UButton
-        truncate
-        class="w-full"
-        color="gray"
-        :label="name"
-        trailing-icon="i-heroicons-chevron-down-20-solid"
-      />
-    </UDropdown>
   </div>
 </template>

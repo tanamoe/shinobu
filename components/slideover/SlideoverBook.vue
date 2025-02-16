@@ -9,7 +9,7 @@ import type {
 import type { MetadataImages } from "~/types/common";
 
 defineProps<{
-  book: BooksResponse;
+  book?: BooksResponse;
   publication: PublicationsResponse;
   metadata?: BookMetadataResponse;
   assets?: AssetsResponse<MetadataImages, { type: AssetTypesResponse }>[];
@@ -18,27 +18,21 @@ defineProps<{
 defineEmits<{
   change: [];
 }>();
-
-const ui = {
-  width: "max-w-2xl",
-};
 </script>
 
 <template>
-  <USlideover :ui>
-    <div class="p-6 overflow-y-scroll">
-      <AppH2>
-        {{ publication.name }}
-        <span class="text-zinc-400">books</span>
-      </AppH2>
-
+  <USlideover :title="publication.name">
+    <template #body>
       <BookEdit
+        v-if="book"
         :book
         :publication
         :metadata
         :assets
         @change="$emit('change')"
       />
-    </div>
+
+      <BookCreate v-else :publication @change="$emit('change')" />
+    </template>
   </USlideover>
 </template>

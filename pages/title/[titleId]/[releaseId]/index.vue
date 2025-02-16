@@ -9,7 +9,7 @@ import {
   type ReleasesResponse,
   type TitlesResponse,
 } from "@/types/pb";
-import type { MetadataImages } from "~/types/common";
+import type { MetadataImages } from "@/types/common";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
@@ -54,17 +54,17 @@ useHead({
 </script>
 
 <template>
-  <div v-if="release && release.expand?.title" class="p-6 space-y-6">
+  <div v-if="release && release.expand?.title" class="gap-6">
     <UBreadcrumb
-      class="mb-6"
-      :links="[
+      class="mb-6 px-3 pt-6"
+      :items="[
         { label: 'Title', to: '/title', icon: 'i-fluent-book-20-filled' },
         { label: release.expand?.title.name, to: `/title/${release.title}` },
         { label: release.name, to: `/title/${release.title}/${release.id}` },
       ]"
     />
 
-    <div class="flex gap-6">
+    <div class="flex gap-6 p-3">
       <FormRelease class="flex-1" :release @change="refresh" />
       <FormReleaseFront
         :release
@@ -72,8 +72,6 @@ useHead({
         @change="refresh"
       />
     </div>
-
-    <UDivider />
 
     <AppPublications
       :publications="release.expand?.publications_via_release"

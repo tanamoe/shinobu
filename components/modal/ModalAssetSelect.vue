@@ -41,17 +41,11 @@ function select(asset: AssetsResponse<MetadataImages>) {
   emit("select", asset);
   modal.close();
 }
-
-const ui = {
-  width: "w-full sm:max-w-screen-lg",
-};
 </script>
 
 <template>
-  <UModal :ui>
-    <UCard>
-      <template #header>Assets</template>
-
+  <UModal title="Assets">
+    <template #body>
       <div v-if="assets" class="grid grid-cols-6 gap-3">
         <AppImage
           v-for="asset in assets.items"
@@ -62,6 +56,6 @@ const ui = {
           @click="() => select(asset)"
         />
       </div>
-    </UCard>
+    </template>
   </UModal>
 </template>

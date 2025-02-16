@@ -54,7 +54,7 @@ const ui = {
       <template v-if="!wide">
         <UBadge
           v-if="book.edition"
-          class="absolute right-2 top-2 z-20 text-gray-900"
+          class="absolute right-2 top-2 z-20"
           color="secondary"
         >
           {{ book.edition }}
@@ -79,7 +79,7 @@ const ui = {
 
     <div>
       <template v-if="wide">
-        <UBadge v-if="book.edition" class="text-gray-900" color="secondary">
+        <UBadge v-if="book.edition" color="secondary">
           {{ book.edition }}
         </UBadge>
       </template>
@@ -89,7 +89,7 @@ const ui = {
           class="decoration-primary-400 font-condensed text-xl font-black decoration-[.2rem] underline-offset-[.2rem] group-hover:underline"
         >
           {{ publication.name }}
-          <div class="text-gray-500 dark:text-gray-400">
+          <div>
             <span v-if="publication.subtitle">
               ({{ publication.subtitle }})
             </span>
@@ -98,8 +98,13 @@ const ui = {
       </div>
 
       <div v-if="book.price" class="mt-1">
-        <span class="block text-gray-500 dark:text-gray-400">
-          {{ book.price }}
+        <span class="block">
+          {{
+            Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(book.price)
+          }}
         </span>
       </div>
     </div>

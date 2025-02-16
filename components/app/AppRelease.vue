@@ -8,12 +8,12 @@ import type {
 } from "@/types/pb";
 import type { MetadataImages } from "@/types/common";
 import { joinURL } from "ufo";
+import type { CardProps } from "@nuxt/ui";
 
-const props = defineProps<{
+defineProps<{
   release: Pick<ReleasesResponse, "id" | "name" | "disambiguation" | "digital">;
-  title: Pick<TitlesResponse, "slug">;
+  title: Pick<TitlesResponse, "slug" | "defaultRelease">;
   image?: AssetsResponse<MetadataImages>;
-  format?: Pick<FormatsResponse, "name">;
   publisher?: Pick<PublishersResponse, "collectionId" | "id" | "name" | "logo">;
   partner?: Pick<PublishersResponse, "collectionId" | "id" | "name" | "logo">;
   wide?: boolean;
@@ -21,20 +21,16 @@ const props = defineProps<{
   draggable?: boolean;
 }>();
 
-const ui = computed(() => ({
-  base: "relative overflow-hidden",
-  shadow: "shadow",
-  body: {
-    padding: "p-0 sm:p-0",
-  },
-}));
+const ui: CardProps["ui"] = {
+  root: "relative overflow-hidden",
+  body: "p-0 sm:p-0 shadow grid grid-cols-2 ",
+};
 </script>
 
 <template>
   <NuxtLink
     :to="joinURL('/title', title.slug, release.id)"
     class="group h-auto w-full"
-    :class="{ 'grid grid-cols-2 w-full gap-3': wide }"
     :draggable
   >
     <UCard :ui>
@@ -46,33 +42,34 @@ const ui = computed(() => ({
         :sizes
         :draggable
       />
-    </UCard>
-    <div class="space-y-1">
-      <div
-        v-if="format || release.digital || partner || publisher"
-        class="flex flex-wrap items-center gap-1"
-      >
-        <UBadge v-if="format" color="gray">
-          {{ format.name }}
-        </UBadge>
-        <UBadge v-if="release.digital" color="red">Digital</UBadge>
-        <UBadge v-if="partner" color="gray">
-          <AppPublisher :publisher="partner" />
-        </UBadge>
-        <UBadge v-if="publisher" color="gray">
-          <AppPublisher :publisher />
-        </UBadge>
+      <div class="p-4 flex flex-col">
+        <div class="flex-1 space-y-1">
+          <div
+            v-if="release.digital || partner || publisher"
+            class="flex flex-wrap items-center gap-1"
+          >
+            <UBadge v-if="release.digital" color="secondary">Digital</UBadge>
+            <UBadge v-if="partner" color="neutral" variant="subtle">
+              <AppPublisher :publisher="partner" />
+            </UBadge>
+            <UBadge v-if="publisher" color="neutral" variant="subtle">
+              <AppPublisher :publisher />
+            </UBadge>
+            <UBadge v-if="title.defaultRelease == release.id" color="primary">
+              Default
+            </UBadge>
+          </div>
+
+          <h3
+            class="decoration-primary-400 line-clamp-4 font-condensed text-xl font-black decoration-[.2rem] underline-offset-[.2rem] group-hover:underline mt-3"
+          >
+            {{ release.name }}
+          </h3>
+          <p v-if="release.disambiguation">{{ release.disambiguation }}</p>
+        </div>
+
+        <slot name="after" />
       </div>
-
-      <h3
-        class="decoration-primary-400 line-clamp-4 font-condensed text-xl font-black decoration-[.2rem] underline-offset-[.2rem] group-hover:underline"
-      >
-        {{ release.name }}
-      </h3>
-
-      <div v-if="release.disambiguation">{{ release.disambiguation }}</div>
-
-      <slot name="after" />
-    </div>
+    </UCard>
   </NuxtLink>
 </template>

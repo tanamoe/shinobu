@@ -10,20 +10,20 @@ const book = defineModel<
 
 <template>
   <div class="space-y-3">
-    <UFormGroup label="Edition">
+    <UFormField label="Edition">
       <UInput v-model="book.edition" />
-    </UFormGroup>
+    </UFormField>
     <div class="grid grid-cols-2 gap-3">
-      <UFormGroup label="Price" name="price">
+      <UFormField label="Price" name="price">
         <UInput v-model="book.price" type="number">
           <template #trailing>
             <span class="text-gray-500 dark:text-gray-400 text-xs">VND</span>
           </template>
         </UInput>
-      </UFormGroup>
-      <UFormGroup label="Publish Date">
+      </UFormField>
+      <UFormField label="Publish Date">
         <UInput v-model="book.publishDate" type="date" />
-      </UFormGroup>
+      </UFormField>
     </div>
   </div>
 </template>

@@ -18,7 +18,7 @@ export function useBook() {
       toast.add({
         title: `Success`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -28,7 +28,7 @@ export function useBook() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {
@@ -51,7 +51,7 @@ export function useBook() {
         title: `Success!`,
         description: `Updated ${res.edition}`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -61,7 +61,7 @@ export function useBook() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {
@@ -78,7 +78,7 @@ export function useBook() {
       toast.add({
         title: `Success!`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -88,7 +88,7 @@ export function useBook() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {

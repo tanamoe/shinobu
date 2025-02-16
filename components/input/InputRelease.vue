@@ -40,6 +40,7 @@ async function releases(q: string) {
     by="id"
     placeholder="Choose a release"
   >
+    <!--
     <template #option="{ option }">
       <UAvatarGroup
         size="2xs"
@@ -81,5 +82,6 @@ async function releases(q: string) {
       <UBadge v-if="option.digital" color="red">Digital</UBadge>
       <UBadge variant="soft">{{ option.status }}</UBadge>
     </template>
+    -->
   </UInputMenu>
 </template>

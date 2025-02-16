@@ -63,15 +63,10 @@ async function submit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <USlideover>
-    <div class="p-6">
-      <AppH2>
-        <span class="text-zinc-400">Attach a staff for</span>
-        {{ title.name }}
-      </AppH2>
-
+  <USlideover :title="`Attach a staff for ${title.name}`">
+    <template #body>
       <UForm :schema="schema" :state="state" class="space-y-6" @submit="submit">
-        <UFormGroup label="Staff" name="staff">
+        <UFormField label="Staff" name="staff">
           <UInputMenu
             v-model="state.staff"
             value-attribute="id"
@@ -79,14 +74,14 @@ async function submit(event: FormSubmitEvent<Schema>) {
             :search="search"
             trailing
           />
-        </UFormGroup>
-        <UFormGroup label="Name" name="name">
+        </UFormField>
+        <UFormField label="Name" name="name">
           <UInput v-model="state.name" />
-        </UFormGroup>
+        </UFormField>
         <div class="text-right">
           <UButton type="submit" label="Save" :loading="pending" />
         </div>
       </UForm>
-    </div>
+    </template>
   </USlideover>
 </template>

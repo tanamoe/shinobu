@@ -37,7 +37,7 @@ function clear() {
 function change() {
   open(ModalAssetSelect, {
     release: props.release.id,
-    onSelect(asset) {
+    onSelect(asset: AssetsResponse<MetadataImages>) {
       front.value = asset;
       state.value.front = asset.id;
     },
@@ -52,9 +52,9 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <UForm :schema="schema" :state="state" class="space-y-3" @submit="submit">
-    <UFormGroup name="front" label="Front" class="hidden">
+    <UFormField name="front" label="Front" class="hidden">
       <UInput v-model="state.front" />
-    </UFormGroup>
+    </UFormField>
 
     <AppImageCover
       class="max-w-sm rounded hover:brightness-75 transition hover:cursor-pointer"
@@ -69,7 +69,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
       <UButton
         v-if="state.front"
         class="flex-1"
-        color="red"
+        color="warning"
         variant="ghost"
         block
         @click="clear"
@@ -78,7 +78,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
       </UButton>
       <UButton
         class="flex-1"
-        color="gray"
+        color="neutral"
         icon="i-fluent-save-20-filled"
         :loading="pending"
         type="submit"

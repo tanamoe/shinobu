@@ -29,7 +29,7 @@ export function usePublication() {
         title: `Success`,
         description: `Created ${res.name}`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -39,7 +39,7 @@ export function usePublication() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
       console.error(err);
@@ -78,7 +78,7 @@ export function usePublication() {
         title: `Success`,
         description: `Batch created`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
     } catch (err) {
       if (err instanceof ClientResponseError) {
@@ -86,7 +86,7 @@ export function usePublication() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
       console.error(err);
@@ -112,7 +112,7 @@ export function usePublication() {
         title: `Success`,
         description: `Updated ${res.name}`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -122,7 +122,7 @@ export function usePublication() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
       console.error(err);
@@ -141,7 +141,7 @@ export function usePublication() {
         title: `Success`,
         description: `Deleted`,
         icon: "i-fluent-checkmark-circle-20-filled",
-        color: "green",
+        color: "success",
       });
 
       return res;
@@ -151,7 +151,7 @@ export function usePublication() {
           title: "An error occurred.",
           description: err.message,
           icon: "i-fluent-error-circle-20-filled",
-          color: "red",
+          color: "error",
         });
       }
     } finally {

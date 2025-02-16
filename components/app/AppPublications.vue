@@ -5,6 +5,7 @@ import {
   ModalPublicationQuickCreate,
   SlideoverPublicationCreate,
   ModalPublicationRemove,
+  UButton,
 } from "#components";
 import type {
   PublicationsResponse,
@@ -15,7 +16,7 @@ import type {
   BookMetadataResponse,
 } from "@/types/pb";
 import type { TableColumn } from "@nuxt/ui";
-import type { MetadataImages } from "~/types/common";
+import type { MetadataImages } from "@/types/common";
 import AppVolume from "../AppVolume.vue";
 
 const slideover = useSlideover();
@@ -44,21 +45,23 @@ defineProps<{
 
 const columns: TableColumn<Publication>[] = [
   {
+    id: "expand",
+    header: "",
+  },
+  {
     accessorKey: "volume",
     header: "Volume",
     cell: ({ row }) => {
-      return h(AppVolume, { volume: row.getValue("volume") as number });
+      return h(AppVolume, { volume: row.original.volume });
     },
   },
   {
     accessorKey: "name",
     header: "Name",
-    cell: ({ row }) => {
-      return h("span", () => row.getValue("name"));
-    },
   },
   {
-    accessorKey: "actions",
+    id: "actions",
+    header: "",
   },
 ];
 
@@ -115,16 +118,11 @@ function remove(publication: PublicationsResponse) {
     onChange: () => emit("change"),
   });
 }
-
-const expand = ref({
-  openedRows: [],
-  row: null,
-});
 </script>
 
 <template>
-  <div>
-    <div class="flex items-center justify-end gap-3 mt-12">
+  <div class="divide-y divide-(--ui-border-accented)">
+    <div class="flex items-center justify-end gap-3 p-3">
       <UButton
         color="neutral"
         icon="i-fluent-collections-add-20-filled"
@@ -144,42 +142,56 @@ const expand = ref({
       </UButton>
     </div>
 
-    <UTable v-model:expand="expand" :columns :rows="publications">
-      <template #expand="{ row }">
-        <div class="grid grid-cols-4 py-6 gap-6">
+    <UTable :columns :data="publications">
+      <template #expanded="{ row }">
+        <div class="grid grid-cols-4 gap-6">
           <AppBook
-            v-for="book in row.expand?.books_via_publication"
+            v-for="book in row.original.expand?.books_via_publication"
             :key="book.id"
             :book
-            :publication="row"
+            :publication="row.original"
             wide
           >
             <template #button>
               <UButton
-                color="gray"
+                color="neutral"
                 icon="i-fluent-edit-20-filled"
                 square
-                @click="editBook(row, book)"
+                @click="editBook(row.original, book)"
               />
             </template>
           </AppBook>
         </div>
       </template>
 
-      <template #actions-data="{ row }">
+      <template #expand-cell="{ row }">
+        <UButton
+          color="neutral"
+          variant="ghost"
+          icon="i-fluent-chevron-down-20-filled"
+          square
+          @click="() => row.toggleExpanded()"
+        />
+      </template>
+
+      <template #name-cell="{ row }">
+        <FormPublicationName :publication="row.original" />
+      </template>
+
+      <template #actions-cell="{ row }">
         <div class="space-x-3">
           <UButton
-            color="gray"
+            color="neutral"
             variant="ghost"
             icon="i-fluent-edit-20-filled"
             square
-            @click="edit(row)"
+            @click="edit(row.original)"
           />
           <UButton
-            color="red"
+            color="warning"
             variant="ghost"
             icon="i-fluent-delete-20-filled"
-            @click="remove(row)"
+            @click="remove(row.original)"
           />
         </div>
       </template>

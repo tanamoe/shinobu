@@ -25,7 +25,7 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 
-const state = ref<Schema>({
+const state = ref<Partial<Schema>>({
   name: props.publication?.name ?? "",
   release: props.publication?.release ?? "",
   volume: props.publication?.volume,
@@ -48,21 +48,18 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
 <template>
   <UForm :schema :state class="space-y-6" @submit="submit">
-    <UFormGroup label="Name" name="name">
-      <UInput v-model="state.name" />
-    </UFormGroup>
-    <UDivider />
-    <UFormGroup label="Subtitle" name="subtitle">
-      <UInput v-model="state.subtitle" />
-    </UFormGroup>
-    <UFormGroup label="Volume" name="volume">
-      <UInput v-model="state.volume" />
-    </UFormGroup>
-    <UFormGroup label="Description" name="description">
-      <AppEditor v-model="state.description" />
-    </UFormGroup>
+    <UFormField label="Name" name="name">
+      <UInput v-model="state.name" class="w-full" />
+    </UFormField>
+    <UFormField label="Subtitle" name="subtitle">
+      <UInput v-model="state.subtitle" class="w-full" />
+    </UFormField>
+    <UFormField label="Volume" name="volume">
+      <UInput v-model="state.volume" class="w-full" />
+    </UFormField>
+    <AppEditor />
     <div class="text-right">
-      <UButton type="submit" label="Save" :pending="pending" />
+      <UButton type="submit" label="Save" :pending />
     </div>
   </UForm>
 </template>
