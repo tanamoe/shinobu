@@ -47,25 +47,36 @@ async function submit(event: FormSubmitEvent<Schema>) {
     <template #body>
       <UForm class="space-y-6" :schema="schema" :state="state" @submit="submit">
         <div class="flex gap-6 items-center">
-          <UFormGroup name="from">
+          <UFormField name="from">
             <UInput
               v-model="state.from"
               type="number"
               placeholder="From volume"
+              class="w-full"
             />
-          </UFormGroup>
+          </UFormField>
           <UIcon name="i-fluent-arrow-right-20-filled" />
-          <UFormGroup name="to">
-            <UInput v-model="state.to" type="number" placeholder="To volume" />
-          </UFormGroup>
+          <UFormField name="to">
+            <UInput
+              v-model="state.to"
+              type="number"
+              placeholder="To volume"
+              class="w-full"
+            />
+          </UFormField>
         </div>
-        <UFormGroup name="price">
-          <UInput v-model="state.price" type="number" placeholder="Price">
+        <UFormField name="price">
+          <UInput
+            v-model="state.price"
+            type="number"
+            placeholder="Price"
+            class="w-full"
+          >
             <template #trailing>
               <span class="text-gray-500 dark:text-gray-400 text-xs">VND</span>
             </template>
           </UInput>
-        </UFormGroup>
+        </UFormField>
 
         <UButton type="submit" :pending="pending">Create</UButton>
       </UForm>
