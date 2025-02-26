@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { parse } from "@std/csv/parse";
-import { Collections, type ReleasesResponse } from "~/types/pb";
+import {
+  Collections,
+  type ReleasesResponse,
+  type FormatsResponse,
+  type PublishersResponse,
+  type TitlesResponse,
+} from "~/types/pb";
 
 const { $pb } = useNuxtApp();
 const _publication = usePublication();
@@ -22,7 +28,21 @@ const content = ref<
     };
   }[]
 >([]);
-const releases = ref<{ name: string; release?: ReleasesResponse }[]>([]);
+const releases = ref<
+  {
+    name: string;
+    release?: ReleasesResponse<{
+      publisher: PublishersResponse;
+      partner: PublishersResponse;
+      title: TitlesResponse<
+        unknown,
+        {
+          format: FormatsResponse;
+        }
+      >;
+    }>;
+  }[]
+>([]);
 
 const group = computed(() => Object.groupBy(content.value, (c) => c.date));
 
@@ -35,13 +55,19 @@ const disabled = computed(() => {
   return count > 0 ? true : false;
 });
 
-function match(name: string, release?: ReleasesResponse) {
-  if (release)
+function match() {
+  for (const { name, release } of releases.value) {
     for (const book of content.value) {
-      if (book.release === name) {
-        book.normalise.release = release.id;
+      if (book.release === name && release) {
+        book.normalise.release = release?.id ?? null;
+        let volumeName = (book.volume / 10000).toString();
+        if (book.volume % 10000 > 0) {
+          volumeName += `.${book.volume % 10000}`;
+        }
+        book.name = `${release?.name} - Tập ${volumeName}`;
       }
     }
+  }
 }
 
 async function autoMatch() {
@@ -49,7 +75,18 @@ async function autoMatch() {
     try {
       const release = await $pb
         .collection(Collections.Releases)
-        .getFirstListItem($pb.filter("name ~ {:q}", { q: _release.name }));
+        .getFirstListItem<
+          ReleasesResponse<{
+            publisher: PublishersResponse;
+            partner: PublishersResponse;
+            title: TitlesResponse<
+              unknown,
+              {
+                format: FormatsResponse;
+              }
+            >;
+          }>
+        >($pb.filter("name ~ {:q}", { q: _release.name }));
 
       _release.release = release;
     } catch (e: unknown) {
@@ -92,7 +129,19 @@ async function update() {
       a.find((r) => r.name === c.release) !== undefined
         ? a
         : [...a, { name: c.release }],
-    [] as { name: string; release?: ReleasesResponse }[],
+    [] as {
+      name: string;
+      release?: ReleasesResponse<{
+        publisher: PublishersResponse;
+        partner: PublishersResponse;
+        title: TitlesResponse<
+          unknown,
+          {
+            format: FormatsResponse;
+          }
+        >;
+      }>;
+    }[],
   );
 
   error.value = "";
@@ -107,14 +156,9 @@ async function submit() {
     const release = releases.value.find(
       (r) => r.name === books[0].release,
     )?.release;
-    const volume = books[0].volume;
-    let volumeName = (volume / 10000).toString();
-    if (volume % 10000 > 0) {
-      volumeName += `.${volume % 10000}`;
-    }
     const publicationResponse = await _publication.create({
-      name: `${release?.name} - Tập ${volumeName}`,
-      volume: volume,
+      name: books[0].name,
+      volume: books[0].volume,
       release: release?.id,
     });
 
@@ -153,6 +197,7 @@ async function submit() {
           <h2 class="text-gray-700 dark:text-gray-200 text-xl">
             Release matching
           </h2>
+          <UButton @click="match">Update</UButton>
           <UButton @click="autoMatch">Auto</UButton>
         </div>
         <div
@@ -164,16 +209,13 @@ async function submit() {
             </div>
             <NuxtLink
               v-else
-              :to="`/title/${release.title}/${release.id}`"
+              :to="`/title/_/${release}`"
               class="underline decoration-gray-700 hover:decoration-sky-700 decoration-2 transition-colors"
             >
               {{ name }}
             </NuxtLink>
             <UIcon name="i-fluent-arrow-right-20-filled" class="h-4 w-4" />
-            <InputRelease
-              v-model="releases[i].release"
-              @change="match(releases[i].name, releases[i].release)"
-            />
+            <InputRelease v-model="releases[i].release" />
           </template>
         </div>
       </div>
@@ -184,17 +226,22 @@ async function submit() {
             <h2 class="text-gray-700 dark:text-gray-200 text-xl">
               {{ books.at(0)?.date }}
             </h2>
-            <UTable :rows="books">
-              <template #name-data="{ row }">
+            <UTable :data="books">
+              <template #name-cell="{ row }">
                 <UInput v-model="row.original.name" />
               </template>
-              <template #edition-data="{ row }">
+              <template #edition-cell="{ row }">
                 <UInput v-model="row.original.edition" />
+              </template>
+              <template #normalise-cell="{ row }">
+                {{ row.original.normalise }}
               </template>
             </UTable>
           </template>
         </div>
       </div>
+
+      {{ group }}
 
       <UButton block :disabled @click="submit">Submit</UButton>
     </div>

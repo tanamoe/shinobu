@@ -1,87 +1,90 @@
 <script setup lang="ts">
 import {
   Collections,
-  type ReleasesResponse,
-  type PublishersResponse,
-  type TitlesResponse,
   type FormatsResponse,
+  type PublishersResponse,
+  type ReleasesResponse,
+  type TitlesResponse,
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const release = defineModel<ReleasesResponse>();
+const release = defineModel<
+  ReleasesResponse<{
+    publisher: PublishersResponse;
+    partner: PublishersResponse;
+    title: TitlesResponse<
+      unknown,
+      {
+        format: FormatsResponse;
+      }
+    >;
+  }>
+>();
 
-async function releases(q: string) {
-  const releases = await $pb.collection(Collections.Releases).getList<
-    ReleasesResponse<{
-      publisher: PublishersResponse;
-      partner: PublishersResponse;
-      title: TitlesResponse<
-        unknown,
-        {
-          format: FormatsResponse;
-        }
-      >;
-    }>
-  >(1, 10, {
-    filter: $pb.filter("title.name ~ {:q}", { q }),
-    sort: "-created",
-    expand: "publisher, partner, title.format",
-  });
+const query = ref("");
+const queryDebounced = refDebounced(query, 500);
 
-  return releases.items;
-}
+const { data, status } = await useLazyAsyncData(
+  () =>
+    $pb.collection(Collections.Releases).getList<
+      ReleasesResponse<{
+        publisher: PublishersResponse;
+        partner: PublishersResponse;
+        title: TitlesResponse<
+          unknown,
+          {
+            format: FormatsResponse;
+          }
+        >;
+      }>
+    >(1, 10, {
+      filter: $pb.filter("title.name ~ {:q}", { q: queryDebounced.value }),
+      sort: "-created",
+      expand: "publisher, partner, title.format",
+    }),
+  { watch: [queryDebounced] },
+);
 </script>
 
 <template>
   <UInputMenu
     v-model="release"
-    :search="releases"
-    option-attribute="name"
-    by="id"
+    v-model:search-term="query"
+    :items="data?.items"
+    :loading="status === 'pending'"
+    ignore-filter
+    label-key="name"
     placeholder="Choose a release"
   >
-    <!--
-    <template #option="{ option }">
+    <template #item="{ item }">
       <UAvatarGroup
+        v-if="item.expand?.publisher || item.expand?.partner"
         size="2xs"
         :max="2"
-        :ui="{ ring: 'ring-white dark:ring-gray-800' }"
       >
         <UAvatar
           :src="
-            $pb.files.getUrl(
-              option.expand?.publisher,
-              option.expand?.publisher.logo,
-            )
+            $pb.files.getUrl(item.expand.publisher, item.expand.publisher.logo)
           "
-          :alt="option.expand?.publisher.name"
+          :alt="item.expand.publisher.name"
         />
         <UAvatar
-          v-if="option.expand?.partner"
-          :src="
-            $pb.files.getUrl(
-              option.expand?.partner,
-              option.expand?.partner.logo,
-            )
-          "
-          :alt="option.expand?.partner.name"
+          v-if="item.expand.partner"
+          :src="$pb.files.getUrl(item.expand.partner, item.expand.partner.logo)"
+          :alt="item.expand.partner.name"
         />
       </UAvatarGroup>
       <span class="truncate">
-        {{ option.name }}
+        {{ item.name }}
       </span>
-      <span
-        v-if="option.disambiguation"
-        class="text-gray-500 dark:text-gray-400"
-      >
-        ({{ option.disambiguation }})
+      <span v-if="item.disambiguation" class="text-gray-500 dark:text-gray-400">
+        ({{ item.disambiguation }})
       </span>
       <span class="text-gray-500 dark:text-gray-400">
-        {{ option.expand.title.expand.format.name }}
+        {{ item.expand?.title.expand?.format.name }}
       </span>
-      <UBadge v-if="option.digital" color="red">Digital</UBadge>
-      <UBadge variant="soft">{{ option.status }}</UBadge>
+      <UBadge v-if="item.digital" color="error">Digital</UBadge>
+      <UBadge variant="soft">{{ item.status }}</UBadge>
     </template>
-    -->
   </UInputMenu>
 </template>
