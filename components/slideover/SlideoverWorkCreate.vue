@@ -1,14 +1,8 @@
 <script setup lang="ts">
 import { z } from "zod";
-import {
-  Collections,
-  type StaffsResponse,
-  type TitlesResponse,
-} from "@/types/pb";
+import type { TitlesResponse } from "@/types/pb";
 import type { FormSubmitEvent } from "#ui/types";
 
-const { $pb } = useNuxtApp();
-const slideover = useSlideover();
 const { pending, create } = useWork();
 
 const props = defineProps<{
@@ -33,25 +27,10 @@ const state = ref<Partial<Schema>>({
   staff: undefined,
 });
 
-async function search(query: string) {
-  const res = await $pb
-    .collection(Collections.Staffs)
-    .getList<StaffsResponse>(1, 15, {
-      filter: $pb.filter("name ~ {:name}", { name: query }),
-      sort: "-updated",
-    });
-
-  return res.items.map((staff) => ({
-    id: staff.id,
-    label: staff.name,
-  }));
-}
-
 async function submit(event: FormSubmitEvent<Schema>) {
   const res = await create(event.data);
 
   if (res) {
-    slideover.close();
     state.value = {
       title: props.title.id,
       name: undefined,

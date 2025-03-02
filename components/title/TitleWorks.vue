@@ -9,7 +9,7 @@ import {
 import { SlideoverWorkCreate } from "#components";
 
 const { $pb } = useNuxtApp();
-const slideover = useSlideover();
+const overlay = useOverlay();
 const { updatePriority } = useWorks();
 
 const props = defineProps<{
@@ -33,7 +33,11 @@ const {
 );
 
 function create(title: TitlesResponse) {
-  slideover.open(SlideoverWorkCreate, { title, onChange: () => refresh() });
+  overlay
+    .create(SlideoverWorkCreate, {
+      props: { title, onChange: () => refresh() },
+    })
+    .open();
 }
 </script>
 

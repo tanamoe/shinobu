@@ -5,7 +5,7 @@ import type { AssetsResponse, ReleasesResponse } from "@/types/pb";
 import type { MetadataImages } from "@/types/common";
 import { ModalAssetSelect } from "#components";
 
-const { open } = useModal();
+const overlay = useOverlay();
 const { update, pending } = useRelease();
 
 const props = defineProps<{
@@ -34,14 +34,19 @@ function clear() {
   state.value.front = "";
 }
 
-function change() {
-  open(ModalAssetSelect, {
-    release: props.release.id,
-    onSelect(asset: AssetsResponse<MetadataImages>) {
-      front.value = asset;
-      state.value.front = asset.id;
+async function change() {
+  const modal = overlay.create(ModalAssetSelect, {
+    props: {
+      release: props.release.id,
     },
   });
+
+  const asset = await modal.open();
+
+  if (asset) {
+    front.value = asset;
+    state.value.front = asset.id;
+  }
 }
 
 async function submit(event: FormSubmitEvent<Schema>) {

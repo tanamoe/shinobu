@@ -18,8 +18,7 @@ import type { TableColumn } from "@nuxt/ui";
 import type { MetadataImages } from "@/types/common";
 import AppVolume from "../AppVolume.vue";
 
-const slideover = useSlideover();
-const modal = useModal();
+const overlay = useOverlay();
 
 type Publication = PublicationsResponse<
   unknown,
@@ -69,24 +68,36 @@ const emit = defineEmits<{
 }>();
 
 function create(release: ReleasesResponse) {
-  slideover.open(SlideoverPublicationCreate, {
-    release,
-    onChange: () => emit("change"),
-  });
+  overlay
+    .create(SlideoverPublicationCreate, {
+      props: {
+        release,
+        onChange: () => emit("change"),
+      },
+    })
+    .open();
 }
 
 function quickCreate(release: ReleasesResponse) {
-  modal.open(ModalPublicationQuickCreate, {
-    release,
-    onChange: () => emit("change"),
-  });
+  overlay
+    .create(ModalPublicationQuickCreate, {
+      props: {
+        release,
+        onChange: () => emit("change"),
+      },
+    })
+    .open();
 }
 
 function addBook(publication: PublicationsResponse) {
-  modal.open(SlideoverBook, {
-    publication,
-    onChange: () => emit("change"),
-  });
+  overlay
+    .create(SlideoverBook, {
+      props: {
+        publication,
+        onChange: () => emit("change"),
+      },
+    })
+    .open();
 }
 
 function editBook(
@@ -102,20 +113,28 @@ function editBook(
     }
   >,
 ) {
-  slideover.open(SlideoverBook, {
-    publication,
-    book,
-    assets: book.expand?.assets_via_book,
-    metadata: book.expand?.bookMetadata_via_book,
-    onChange: () => emit("change"),
-  });
+  overlay
+    .create(SlideoverBook, {
+      props: {
+        publication,
+        book,
+        assets: book.expand?.assets_via_book,
+        metadata: book.expand?.bookMetadata_via_book,
+        onChange: () => emit("change"),
+      },
+    })
+    .open();
 }
 
 function remove(publication: PublicationsResponse) {
-  modal.open(ModalPublicationRemove, {
-    publication,
-    onChange: () => emit("change"),
-  });
+  overlay
+    .create(ModalPublicationRemove, {
+      props: {
+        publication,
+        onChange: () => emit("change"),
+      },
+    })
+    .open();
 }
 </script>
 

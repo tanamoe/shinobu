@@ -13,7 +13,7 @@ import SlideoverRelease from "@/components/slideover/SlideoverRelease.vue";
 
 const { $pb } = useNuxtApp();
 const route = useRoute();
-const slideover = useSlideover();
+const overlay = useOverlay();
 const { update } = useTitle();
 
 const { data: title, refresh } = await useAsyncData(() =>
@@ -103,7 +103,11 @@ useHead({
             color="neutral"
             icon="i-fluent-add-square-multiple-20-filled"
             @click="
-              slideover.open(SlideoverRelease, { title, onChange: refresh })
+              overlay
+                .create(SlideoverRelease, {
+                  props: { title, onChange: refresh },
+                })
+                .open()
             "
           >
             Create

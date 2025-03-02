@@ -3,7 +3,6 @@ import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 import type { ReleasesResponse } from "@/types/pb";
 
-const slideover = useSlideover();
 const { pending, create } = usePublication();
 
 const props = defineProps<{
@@ -31,7 +30,6 @@ const state = reactive<Partial<Schema>>({
 async function submit(event: FormSubmitEvent<Schema>) {
   const res = await create(event.data);
   if (res) {
-    slideover.close();
     emit("change");
   }
 }

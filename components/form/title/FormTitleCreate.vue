@@ -2,7 +2,6 @@
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 
-const slideover = useSlideover();
 const { formats } = useMeta();
 const { pending, create } = useTitle();
 
@@ -33,7 +32,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
   const res = await create(event.data);
 
   if (res) {
-    slideover.close();
     emit("change");
   }
 }

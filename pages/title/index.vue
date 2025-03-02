@@ -13,7 +13,7 @@ import { joinURL } from "ufo";
 const { $pb } = useNuxtApp();
 const { query } = useRoute();
 const { replace } = useRouter();
-const slideover = useSlideover();
+const overlay = useOverlay();
 
 const page = ref(1);
 const sort = ref("-updated");
@@ -85,7 +85,11 @@ const columns: TableColumn<TableRow>[] = [
 ];
 
 function create() {
-  slideover.open(SlideoverTitleCreate, { onChange: () => refresh() });
+  overlay
+    .create(SlideoverTitleCreate, {
+      props: { onChange: () => refresh() },
+    })
+    .open();
 }
 
 useHead({

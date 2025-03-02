@@ -1,13 +1,10 @@
 <script setup lang="ts">
-const { close } = useSlideover();
-
 const emit = defineEmits<{
   change: [];
 }>();
 
 function change() {
   emit("change");
-  close();
 }
 </script>
 

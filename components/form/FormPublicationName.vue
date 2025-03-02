@@ -37,6 +37,9 @@ async function submit(event: FormSubmitEvent<Schema>) {
 <template>
   <div v-if="!edit" class="flex items-center gap-2">
     {{ props.publication.name }}
+    <span v-if="props.publication.subtitle">
+      ({{ props.publication.subtitle }})
+    </span>
     <UButton
       icon="i-fluent-edit-20-filled"
       square

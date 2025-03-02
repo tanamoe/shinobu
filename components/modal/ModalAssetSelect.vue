@@ -11,7 +11,6 @@ interface Props {
   sort?: string;
 }
 
-const modal = useModal();
 const { $pb } = useNuxtApp();
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  select: [AssetsResponse<MetadataImages>];
+  close: [AssetsResponse<MetadataImages>];
 }>();
 
 const page = ref(1);
@@ -36,11 +35,6 @@ const { data: assets } = await useAsyncData(() =>
       sort: props.sort,
     }),
 );
-
-function select(asset: AssetsResponse<MetadataImages>) {
-  emit("select", asset);
-  modal.close();
-}
 </script>
 
 <template>
@@ -53,7 +47,7 @@ function select(asset: AssetsResponse<MetadataImages>) {
           class="rounded w-full object-contain aspect-[1/1] bg-gray-200 dark:bg-gray-800 hover:brightness-75 transition-all hover:cursor-pointer"
           :src="$pb.files.getUrl(asset, asset.image)"
           :srcset="asset.resizedImage"
-          @click="() => select(asset)"
+          @click="emit('close', asset)"
         />
       </div>
     </template>

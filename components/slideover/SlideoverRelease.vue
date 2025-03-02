@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { ReleasesResponse, TitlesResponse } from "@/types/pb";
 
-const slideover = useSlideover();
-
 defineProps<{
   title?: TitlesResponse;
   release?: ReleasesResponse;
@@ -13,7 +11,6 @@ const emit = defineEmits<{
 }>();
 
 function change() {
-  slideover.close();
   emit("change");
 }
 </script>

@@ -2,7 +2,7 @@
 import type { TitlesResponse, AdditionalTitleNamesResponse } from "@/types/pb";
 import { ModalAdditionalTitleNameCreate } from "#components";
 
-const modal = useModal();
+const overlay = useOverlay();
 const { languages } = useMeta();
 
 const props = defineProps<{
@@ -23,10 +23,14 @@ const emit = defineEmits<{
 }>();
 
 function create(title: TitlesResponse) {
-  modal.open(ModalAdditionalTitleNameCreate, {
-    title,
-    onChange: () => emit("change"),
+  const modal = overlay.create(ModalAdditionalTitleNameCreate, {
+    props: {
+      title,
+      onChange: () => emit("change"),
+    },
   });
+
+  modal.open();
 }
 </script>
 

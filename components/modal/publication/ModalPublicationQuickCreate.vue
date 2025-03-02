@@ -4,7 +4,6 @@ import type { FormSubmitEvent } from "#ui/types";
 
 import { z } from "zod";
 
-const modal = useModal();
 const { pending, quickCreate } = usePublication();
 
 const props = defineProps<{
@@ -37,7 +36,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
     event.data.price || undefined,
   );
 
-  modal.close();
   emit("change");
 }
 </script>
