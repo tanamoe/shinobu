@@ -6,32 +6,40 @@ import {
   type ReleasesResponse,
   type TitlesResponse,
 } from "@/types/pb";
-import { SlideoverTitleCreate, UBadge, ULink } from "#components";
-import type { TableColumn } from "@nuxt/ui";
+import {
+  AppImageCover,
+  SlideoverTitleCreate,
+  UBadge,
+  ULink,
+} from "#components";
+import type { TableColumn, TableRow } from "@nuxt/ui";
 import { joinURL } from "ufo";
+import type { MetadataImages } from "~/types/common";
 
 const { $pb } = useNuxtApp();
 const { query } = useRoute();
 const { replace } = useRouter();
 const overlay = useOverlay();
 
+const titleCreate = overlay.create(SlideoverTitleCreate);
+
 const page = ref(1);
 const sort = ref("-updated");
 const searchQuery = ref(query.q ? (query.q as string) : "");
 
-type TableRow = TitlesResponse<
+type RowData = TitlesResponse<
   unknown,
   {
     format: FormatsResponse;
     defaultRelease: ReleasesResponse<{
-      front: AssetsResponse;
+      front: AssetsResponse<MetadataImages>;
     }>;
   }
 >;
 
 const { data, status, refresh } = await useAsyncData(
   () =>
-    $pb.collection(Collections.Titles).getList<TableRow>(page.value, 20, {
+    $pb.collection(Collections.Titles).getList<RowData>(page.value, 20, {
       filter: $pb.filter(
         "additionalTitleNames_via_title.name ?~ {:name} || name ~ {:name}",
         { name: searchQuery.value },
@@ -48,20 +56,29 @@ watch(searchQuery, () => {
   replace({ query: { q: searchQuery.value } });
 });
 
-const columns: TableColumn<TableRow>[] = [
+const columns: TableColumn<RowData>[] = [
   {
     accessorKey: "cover",
     header: "",
     cell: ({ row }) => {
-      if (row.original?.expand?.defaultRelease?.expand?.front.image) {
-        return h("img", {
-          class: "h-14 aspect-[2/3] object-cover rounded",
-          src: $pb.files.getUrl(
+      return h(AppImageCover, {
+        class: "rounded",
+        name: row.original.name,
+        src:
+          row.original?.expand?.defaultRelease?.expand?.front &&
+          $pb.files.getUrl(
             row.original.expand.defaultRelease.expand.front,
             row.original.expand.defaultRelease.expand.front.image,
           ),
-        });
-      }
+        srcset:
+          row.original?.expand?.defaultRelease?.expand?.front &&
+          row.original.expand.defaultRelease.expand.front.resizedImage,
+      });
+    },
+    meta: {
+      class: {
+        td: "max-w-8",
+      },
     },
   },
   {
@@ -84,12 +101,14 @@ const columns: TableColumn<TableRow>[] = [
   },
 ];
 
-function create() {
-  overlay
-    .create(SlideoverTitleCreate, {
-      props: { onChange: () => refresh() },
-    })
-    .open();
+async function create() {
+  if (await titleCreate.open()) {
+    refresh();
+  }
+}
+
+async function onSelect(row: TableRow<RowData>, _?: Event) {
+  await navigateTo(joinURL("/title", row.original.id));
 }
 
 useHead({
@@ -140,6 +159,7 @@ useHead({
       :loading="status === 'pending'"
       sticky
       class="h-full flex-1"
+      @select="onSelect"
     />
 
     <div v-if="data" class="flex justify-between items-center p-3">

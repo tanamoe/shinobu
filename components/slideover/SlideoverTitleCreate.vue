@@ -1,17 +1,13 @@
 <script setup lang="ts">
-const emit = defineEmits<{
-  change: [];
+defineEmits<{
+  close: [boolean];
 }>();
-
-function change() {
-  emit("change");
-}
 </script>
 
 <template>
   <USlideover title="Create a title">
     <template #body>
-      <FormTitleCreate @change="change" />
+      <FormTitleCreate @change="$emit('close', true)" />
     </template>
   </USlideover>
 </template>
