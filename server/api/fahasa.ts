@@ -33,6 +33,8 @@ export default defineEventHandler(async function (event): Promise<
       .trim()
       .replace(/\D/g, "");
 
+    console.log(body, price);
+
     const table = $(".table-additional");
     const rows = table.find("tr");
 
@@ -46,8 +48,8 @@ export default defineEventHandler(async function (event): Promise<
     };
 
     for (const [key, value] of additionalDetails) {
-      const mappedKey = fahasaAdditionalDetailsKeys[key];
-      rawData[mappedKey] = value;
+      const mappedKey = fahasaAdditionalDetailsKeys[key as string];
+      rawData[mappedKey as keyof typeof rawData] = value;
     }
 
     const gallery = $("#lightgallery-product-media");

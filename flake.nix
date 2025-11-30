@@ -9,7 +9,7 @@
   }: let
     overlays = [
       (final: prev: {
-        nodejs = prev.nodejs_22;
+        nodejs = prev.nodejs_24;
       })
     ];
     supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
@@ -21,7 +21,7 @@
   in {
     devShells = forEachSupportedSystem ({pkgs}: {
       default = pkgs.mkShell {
-        packages = with pkgs; [node2nix nodejs bun];
+        packages = with pkgs; [node2nix nodejs pnpm];
       };
     });
   };

@@ -1,0 +1,91 @@
+<script setup lang="ts">
+import { z } from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
+
+const { $pb } = useNuxtApp();
+const toast = useToast();
+
+const schema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Invalid password"),
+});
+
+type Schema = z.output<typeof schema>;
+
+const state = reactive<Partial<Schema>>({
+  email: undefined,
+  password: undefined,
+});
+const pending = ref(false);
+
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  pending.value = true;
+
+  try {
+    await $pb
+      .collection("_superusers")
+      .authWithPassword(event.data.email, event.data.password);
+
+    toast.add({
+      id: "login_success",
+      title: `Successfully login as ${event.data.email}!`,
+      description: "Redirecting...",
+      icon: "i-fluent-checkmark-circle-20-filled",
+      color: "primary",
+    });
+
+    await navigateTo("/");
+  } catch (err) {
+    toast.add({
+      id: "login_error",
+      title: "An error occurred.",
+      icon: "i-fluent-error-circle-20-filled",
+      color: "error",
+    });
+
+    console.error(err);
+  } finally {
+    pending.value = false;
+  }
+}
+
+definePageMeta({
+  layout: false,
+  middleware: "login",
+});
+</script>
+
+<template>
+  <div class="max-w-sm w-full mx-auto my-24">
+    <img class="h-12 w-auto mx-auto mb-12" src="/logo.png" />
+    <UCard class="mx-6">
+      <UForm
+        :state="state"
+        :schema="schema"
+        class="space-y-3"
+        @submit="onSubmit"
+      >
+        <UFormField name="email" label="Email">
+          <UInput
+            v-model="state.email"
+            placeholder="admin@tana.moe"
+            icon="i-fluent-mail-16-filled"
+            class="w-full"
+          />
+        </UFormField>
+        <UFormField name="password" label="Password">
+          <UInput
+            v-model="state.password"
+            placeholder="•••••••••••••••"
+            icon="i-fluent-key-16-filled"
+            type="password"
+            class="w-full"
+          />
+        </UFormField>
+        <div class="text-right">
+          <UButton type="submit" :loading="pending">Đăng nhập</UButton>
+        </div>
+      </UForm>
+    </UCard>
+  </div>
+</template>

@@ -42,8 +42,8 @@ export default defineEventHandler(async function (event): Promise<
     const rawData: { [k in keyof ThirdPartySchema]: unknown } = {};
 
     for (const [key, value] of additionalDetails) {
-      const mappedKey = amakAdditionalDetailsKeys[key];
-      rawData[mappedKey] = value;
+      const mappedKey = amakAdditionalDetailsKeys[key as string];
+      rawData[mappedKey as keyof typeof rawData] = value;
     }
 
     const gallery = $(".productList-thumb");

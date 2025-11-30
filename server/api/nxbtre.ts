@@ -49,8 +49,8 @@ export default defineEventHandler(async function (event): Promise<
     const rawData: { [k in keyof ThirdPartySchema]: unknown } = {};
 
     for (const [key, value] of additionalDetails) {
-      const mappedKey = nxbtreAdditionalDetailsKeys[key];
-      rawData[mappedKey] = value;
+      const mappedKey = nxbtreAdditionalDetailsKeys[key as string];
+      rawData[mappedKey as keyof typeof rawData] = value;
     }
 
     const image = $("#imgMain, #Content_ctl00_imgMain").attr("src");

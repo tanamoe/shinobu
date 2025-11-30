@@ -11,9 +11,8 @@ export default defineNuxtConfig({
 
   typescript: {
     typeCheck: true,
+    strict: true,
   },
-
-  devtools: { enabled: false },
 
   css: ["~/assets/css/main.css"],
 
