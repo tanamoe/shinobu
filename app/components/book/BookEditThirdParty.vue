@@ -1,48 +1,89 @@
 <script setup lang="ts">
-import { parseURL } from "ufo";
-import type { ThirdPartySchema } from "~/server/utils/common";
-
-type Provider = "/api/fahasa" | "/api/nxbtre" | "/api/amak";
-
+import { z } from "zod";
 const url = ref("");
-const provider = ref<Provider>("/api/fahasa");
 
 const emit = defineEmits<{
   change: [ThirdPartySchema];
 }>();
 
-const { data, status, execute } = await useAsyncData(() =>
-  $fetch(provider.value, {
-    query: {
-      url: encodeURI(url.value),
+const thirdPartySchema = z.object({
+  price: z.preprocess((val) => {
+    if (typeof val === "string") {
+      return val.replace(/\D/g, "");
+    }
+
+    return val;
+  }, z.coerce.number().optional()),
+  sku: z.string().optional(),
+  age: z.string().optional(),
+  supplier: z.string().optional(),
+  author: z.string().optional(),
+  translator: z.string().optional(),
+  publisher: z.string().optional(),
+  language: z.string().optional(),
+  isbn: z.string().optional(),
+  weight: z.preprocess((val) => {
+    if (typeof val === "string") {
+      return val.replace(/\D/g, "");
+    }
+
+    return val;
+  }, z.coerce.number().optional()),
+  size: z.preprocess(
+    (val) => {
+      if (typeof val === "string") {
+        const [x, y, z] = val.replace("cm", "").replaceAll(",", ".").split("x");
+
+        return { x, y, z };
+      }
+
+      return val;
     },
-    immediate: false,
-  }),
-);
+    z
+      .object({
+        x: z.coerce.number().optional(),
+        y: z.coerce.number().optional(),
+        z: z.coerce.number().optional(),
+      })
+      .optional(),
+  ),
+  pageCount: z.preprocess((val) => {
+    if (typeof val === "string") {
+      return val.replace(/\D/g, "");
+    }
+
+    return val;
+  }, z.coerce.number().optional()),
+  printType: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  note: z.string().optional(),
+});
+
+const { data, status, execute } = await useAsyncData(async () => {
+  const { product: data } = await $fetch(
+    "http://localhost:8080/urano.api.v1beta1.AggregateService/GetFahasaProduct",
+    {
+      method: "POST",
+      body: {
+        id: url.value,
+      },
+    },
+  );
+  try {
+    const a = thirdPartySchema.parse(data);
+    console.log(a);
+    return a;
+  } catch (e) {
+    console.log(e);
+  }
+});
 
 function handleFetch() {
-  const parsedURL = parseURL(url.value);
-
-  if (parsedURL.host?.includes("fahasa.com")) {
-    provider.value = "/api/fahasa";
-  } else if (parsedURL.host?.includes("nxbtre.com")) {
-    provider.value = "/api/nxbtre";
-  } else if (parsedURL.host?.includes("amakstore.vn")) {
-    provider.value = "/api/amak";
-  } else {
-    emit("change", {
-      images: [url.value],
-    });
-    return;
-  }
-
-  console.log(url.value, provider.value);
-
   execute();
 }
 
 watch([data], () => {
-  if (data.value?.data) emit("change", data.value.data);
+  if (data.value) emit("change", data.value);
 });
 </script>
 

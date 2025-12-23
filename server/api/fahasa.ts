@@ -1,5 +1,4 @@
 import { z } from "zod";
-import * as cheerio from "cheerio";
 import type { ThirdPartySchema } from "../utils/common";
 import type { CommonResponse } from "../types/common";
 
@@ -24,41 +23,34 @@ export default defineEventHandler(async function (event): Promise<
   const { url } = data;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json",
+        "user-agent": "HTTPie/3.2.4",
+      },
+      keepalive: true,
+      method: "GET",
+    });
     const body = await response.text();
-    const $ = cheerio.load(body);
+    console.log("getting data for", body);
+    const rawData = JSON.parse(body);
+    const attributes = rawData.attributes as
+      | Array<{ name: string; value: unknown }>
+      | undefined;
 
-    const price = $(".price-block .old-price .price")
-      .text()
-      .trim()
-      .replace(/\D/g, "");
-
-    console.log(body, price);
-
-    const table = $(".table-additional");
-    const rows = table.find("tr");
-
-    const additionalDetails = [...rows].map((row) => [
-      $(row).find("th").text().trim(),
-      $(row).find("td").text().trim(),
-    ]);
-
-    const rawData: { [k in keyof ThirdPartySchema]: unknown } = {
-      price,
+    const unparsedData = {
+      price: rawData.price ?? 0,
+      sku: rawData.sku,
+      weight: attributes?.find((v) => v.name == "weight")?.value || 0,
+      size: attributes?.find((v) => v.name == "size")?.value || 0,
+      pageCount: attributes?.find((v) => v.name == "qty_of_page")?.value || 0,
+      images: rawData.media_gallery?.images?.map(
+        (image: { file: string }) => image.file,
+      ),
     };
 
-    for (const [key, value] of additionalDetails) {
-      const mappedKey = fahasaAdditionalDetailsKeys[key as string];
-      rawData[mappedKey as keyof typeof rawData] = value;
-    }
-
-    const gallery = $("#lightgallery-product-media");
-    const images = gallery.find("img");
-
-    rawData.images = [...images].map((img) => $(img).attr("src"));
-
-    const data = thirdPartySchema.parse(rawData);
-
+    const data = thirdPartySchema.parse(unparsedData);
     return {
       success: true,
       data,
@@ -77,19 +69,3 @@ export default defineEventHandler(async function (event): Promise<
     };
   }
 });
-
-const fahasaAdditionalDetailsKeys: {
-  [k: string]: keyof ThirdPartySchema;
-} = {
-  "Mã hàng": "sku",
-  "Độ Tuổi": "age",
-  "Tên Nhà Cung Cấp": "supplier",
-  "Tác giả": "author",
-  "Người Dịch": "translator",
-  NXB: "publisher",
-  "Ngôn Ngữ": "language",
-  "Trọng lượng (gr)": "weight",
-  "Kích Thước Bao Bì": "size",
-  "Số trang": "pageCount",
-  "Hình thức": "printType",
-};
