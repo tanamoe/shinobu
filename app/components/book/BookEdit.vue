@@ -9,13 +9,31 @@ import type {
   PublicationsResponse,
   AssetTypesResponse,
 } from "@/types/pb";
-import type { ThirdPartySchema } from "@/server/utils/common";
 import type { MetadataImages } from "@/types/common";
+import { ModalProductAggregate } from "#components";
+import type { AggregateProduct } from "@buf/tanamoe_urano.bufbuild_es/urano/api/v1beta1/aggreegate_pb";
+
+const { $urano } = useNuxtApp();
 
 const { pending, update, remove } = useBook();
 const { update: updateP } = usePublication();
 const { create, remove: assetRemove } = useAsset();
 const bookMetadata = useBookMetadata();
+const overlay = useOverlay();
+
+const modal = overlay.create(ModalProductAggregate);
+
+async function open() {
+  const instance = modal.open();
+
+  const id = await instance.result;
+
+  const data = await $urano.getFahasaProduct({ id: BigInt(id) });
+
+  if (data.product) {
+    await handleThirdParty(data.product);
+  }
+}
 
 const props = defineProps<{
   publication: PublicationsResponse;
@@ -133,13 +151,12 @@ async function handleRemove() {
   }
 }
 
-async function handleThirdParty(response: ThirdPartySchema) {
+async function handleThirdParty(response: AggregateProduct) {
   const definedProps = (obj: { [s: string]: unknown }) =>
     Object.fromEntries(Object.entries(obj).filter(([, v]) => v));
 
   const data = {
     price: response.price,
-    note: response.note,
     bookMetadata: {
       ...state.value.bookMetadata,
       isbn: response.isbn,
@@ -205,7 +222,7 @@ function toggleAsset(asset: AssetsResponse) {
 
 <template>
   <div class="space-y-6">
-    <BookEditThirdParty @change="handleThirdParty" />
+    <UButton icon="i-fluent-sparkle-20-filled" color="neutral" @click="open" />
 
     <UForm
       :schema="schema"

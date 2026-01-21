@@ -61,7 +61,7 @@ async function handleUpdate() {
     </div>
 
     <UFormField name="description" label="Description">
-      <AppEditor v-model="state.description" />
+      <UEditor v-model="state.description" />
     </UFormField>
 
     <div class="text-right">

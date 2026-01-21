@@ -1,12 +1,23 @@
 import PocketBase, { type AuthModel } from "pocketbase";
 import type { TypedPocketBase } from "@/types/pb";
 
+import { createClient } from "@connectrpc/connect";
+import { createConnectTransport } from "@connectrpc/connect-web";
+import { AggregateService } from "@buf/tanamoe_urano.bufbuild_es/urano/api/v1beta1/aggreegate_pb";
+
 export default defineNuxtPlugin(async () => {
   const runtimeConfig = useRuntimeConfig();
 
   const pb = new PocketBase(
     runtimeConfig.public.pocketbaseUrl,
   ) as TypedPocketBase;
+
+  const urano = createClient(
+    AggregateService,
+    createConnectTransport({
+      baseUrl: "http://localhost:8080",
+    }),
+  );
 
   const cookie = useCookie<{
     token: string;
@@ -39,6 +50,6 @@ export default defineNuxtPlugin(async () => {
   }
 
   return {
-    provide: { pb },
+    provide: { pb, urano },
   };
 });

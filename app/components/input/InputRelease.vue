@@ -8,12 +8,26 @@ import {
 } from "@/types/pb";
 
 const { $pb } = useNuxtApp();
-const release = defineModel<ReleasesResponse>();
+const release = defineModel<
+  Omit<
+    ReleasesResponse<{
+      publisher: PublishersResponse;
+      partner: PublishersResponse;
+      title: TitlesResponse<
+        unknown,
+        {
+          format: FormatsResponse;
+        }
+      >;
+    }>,
+    "type"
+  >
+>();
 
 const query = ref();
 const queryDebounced = refDebounced(query, 500);
 
-const { data, status } = await useAsyncData(
+const { data, status, execute } = await useAsyncData(
   // this is to prevent different form have the same state
   Math.random().toString(),
   () =>
@@ -33,19 +47,48 @@ const { data, status } = await useAsyncData(
       sort: "-created",
       expand: "publisher, partner, title.format",
     }),
-  { watch: [queryDebounced], lazy: true },
+  {
+    watch: [queryDebounced],
+    lazy: true,
+    transform: (response) => ({
+      ...response,
+      items: response.items.map((item) => ({
+        ...item,
+        type: undefined,
+      })),
+    }),
+  },
 );
+
+const items = computed(() => {
+  if (query.value && data.value?.items) {
+    return data.value.items;
+  }
+
+  if (release.value) {
+    return [release.value];
+  }
+
+  return [];
+});
+
+function onOpen() {
+  if (!data.value?.items.length) {
+    execute();
+  }
+}
 </script>
 
 <template>
   <UInputMenu
     v-model="release"
     v-model:search-term="query"
-    :items="query ? data?.items : [release]"
+    :items
     :loading="status === 'pending'"
     ignore-filter
     label-key="name"
     placeholder="Choose a release"
+    @update:open="onOpen"
   >
     <template #item="{ item }">
       <UAvatarGroup

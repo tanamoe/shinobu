@@ -57,7 +57,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
     <UFormField label="Volume" name="volume">
       <UInput v-model="state.volume" class="w-full" />
     </UFormField>
-    <AppEditor />
+    <UEditor />
     <div class="text-right">
       <UButton type="submit" label="Save" :pending />
     </div>
