@@ -8,8 +8,8 @@ importers:
   .:
     dependencies:
       "@buf/tanamoe_urano.bufbuild_es":
-        specifier: 2.10.2-20260106064644-0e21cc540b40.1
-        version: 2.10.2-20260106064644-0e21cc540b40.1(@bufbuild/protobuf@2.10.2)
+        specifier: 2.11.0-20260322084806-7cd501360d6e.1
+        version: 2.11.0-20260322084806-7cd501360d6e.1(@bufbuild/protobuf@2.10.2)
       "@connectrpc/connect":
         specifier: ^2.1.1
         version: 2.1.1(@bufbuild/protobuf@2.10.2)
@@ -335,13 +335,13 @@ packages:
       commander:
         optional: true
 
-  "@buf/tanamoe_urano.bufbuild_es@2.10.2-20260106064644-0e21cc540b40.1":
+  "@buf/tanamoe_urano.bufbuild_es@2.11.0-20260322084806-7cd501360d6e.1":
     resolution:
       {
-        tarball: https://buf.build/gen/npm/v1/@buf/tanamoe_urano.bufbuild_es/-/tanamoe_urano.bufbuild_es-2.10.2-20260106064644-0e21cc540b40.1.tgz,
+        tarball: https://buf.build/gen/npm/v1/@buf/tanamoe_urano.bufbuild_es/-/tanamoe_urano.bufbuild_es-2.11.0-20260322084806-7cd501360d6e.1.tgz,
       }
     peerDependencies:
-      "@bufbuild/protobuf": ^2.10.2
+      "@bufbuild/protobuf": ^2.11.0
 
   "@bufbuild/protobuf@2.10.2":
     resolution:
@@ -9888,7 +9888,7 @@ snapshots:
       cac: 6.7.14
       citty: 0.1.6
 
-  "@buf/tanamoe_urano.bufbuild_es@2.10.2-20260106064644-0e21cc540b40.1(@bufbuild/protobuf@2.10.2)":
+  "@buf/tanamoe_urano.bufbuild_es@2.11.0-20260322084806-7cd501360d6e.1(@bufbuild/protobuf@2.10.2)":
     dependencies:
       "@bufbuild/protobuf": 2.10.2
 

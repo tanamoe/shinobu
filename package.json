@@ -36,7 +36,7 @@
     "vue-tsc": "^3.2.2"
   },
   "dependencies": {
-    "@buf/tanamoe_urano.bufbuild_es": "2.10.2-20260106064644-0e21cc540b40.1",
+    "@buf/tanamoe_urano.bufbuild_es": "2.11.0-20260322084806-7cd501360d6e.1",
     "@connectrpc/connect": "^2.1.1",
     "@connectrpc/connect-web": "^2.1.1",
     "@iconify-json/fluent": "^1.2.36",
